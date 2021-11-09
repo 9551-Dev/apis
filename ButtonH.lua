@@ -9,7 +9,7 @@
 ---you dont have to but giving credits is nice :)------
 -------------------------------------------------------
 -------------------------------------------------------
---*!   pastebin get LTDZZZEJ button
+--   pastebin get LTDZZZEJ button
  
 --*functions usages
 --*API(ins, cord1, cord2, length, height)
