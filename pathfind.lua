@@ -4,18 +4,25 @@ if not pureLua then
     expect = require("cc.expect").expect
 end
 local vector = {}
-vector.create = function(x,y,z)
+vector.new = function(x,y,z)
     return setmetatable({
-        x=x,
-        y=y,
-        z=z
+        x=x or 0,
+        y=y or 0,
+        z=z or 0
     },{__add=function(i,x)
         return {
-            i.x+x.x,
-            i.y+x.y,
-            i.z+x.z
+            x=i.x+x.x,
+            y=i.y+x.y,
+            z=i.z+x.z
         }
-    end})
+    end,
+    __tostring = function(self)
+        local x = tostring(self.x)
+        local y = tostring(self.y)
+        local z = tostring(self.z)
+        return x..","..y..","..z
+    end
+    })
 end
 local createNode = function(passable,x,y)
     if passable == nil then passable = true end
@@ -167,10 +174,3 @@ local pathfind = function(gridData,startNode,endNode)
     end
     return {},false,"unable to find path"
 end
-
-return {
-    createNode=createNode,
-    pathfind=pathfind,
-    findInGrid=findInGrid,
-    createField=createField,
-}
