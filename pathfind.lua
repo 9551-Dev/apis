@@ -3,6 +3,20 @@ local expect
 if not pureLua then
     expect = require("cc.expect").expect
 end
+local vector = {}
+vector.create = function(x,y,z)
+    return setmetatable({
+        x=x,
+        y=y,
+        z=z
+    },{__add=function(i,x)
+        return {
+            i.x+x.x,
+            i.y+x.y,
+            i.z+x.z
+        }
+    end})
+end
 local createNode = function(passable,x,y)
     if passable == nil then passable = true end
     if not pureLua then
