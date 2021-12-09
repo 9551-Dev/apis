@@ -1,0 +1,149 @@
+local createNode = function(passable,x,y)
+    local gCost = 0
+    local hCost = 0
+    return setmetatable({
+        isPassable = passable,
+        gCost = gCost,
+        hCost = hCost,
+        pos = vector.new(x,y),
+    },{__index=function(self,index)
+            if index == "fCost" then
+                return self.gCost+self.hCost
+            end
+        end
+    })
+end
+local createSelfIndexArray = function()
+    return setmetatable({},
+        {
+            __index=function(t,k)
+                local new = {}
+                t[k]=new
+                return new
+            end
+        }
+    )
+end
+local findInGrid = function(grid,vec)
+    for k,v in pairs(grid) do
+        if (v.pos.x == vec.x) and (v.pos.y == vec.y) then
+            return v
+        end
+    end
+end
+local getNeighbors = function(grid,node,sizedat)
+    local foundNeighbors = {}
+    for x=-1,1 do
+        for y=-1,1 do
+            local abs = {math.abs(x),math.abs(y)}
+            if not (x == 0 and y == 0) and not (abs[1] == 1 and abs[2] == 1) then
+                local relative = node.pos+vector.new(x,y)
+                local relativeX,relativeY = relative.x,relative.y
+                if (relativeX >= 0 and relativeX < sizedat.w+1) and (relativeY >= 0 and relativeY < sizedat.h+1) then
+                    local neighbor = findInGrid(grid,vector.new(relativeX,relativeY))
+                    table.insert(foundNeighbors,neighbor)
+                end
+            end
+        end
+    end
+    return foundNeighbors
+end
+local getDistance = function(grid,nodeA,nodeB)
+    return math.sqrt((nodeA.pos.x - nodeB.pos.x)^2 + (nodeA.pos.y - nodeB.pos.y)^2 + (nodeA.pos.z - nodeB.pos.z)^2)
+end
+local tblRev = function(tbl)
+    local temp = {}
+    for k,v in pairs(tbl) do
+        temp[(#tbl-k)] = v
+    end
+    return temp
+end
+local retracePath = function(grid,sNode,nNode,sizedat)
+    local path = {nNode}
+    local curNode = nNode
+    local eStr = tostring(sNode.pos)
+    local curNode = (getNeighbors(grid,curNode,sizedat))[1]
+    if curNode then
+        while tostring(curNode.pos) ~= eStr do
+            table.insert(path,curNode)
+            curNode = curNode.parent
+        end
+    end
+    table.insert(path,sNode)
+    local output = {}
+    local tempValue = tblRev(path)
+    for k,v in pairs(tempValue or {}) do
+        table.insert(output,{x=v.pos.x,y=v.pos.y})
+        tempValue = v.parent
+    end
+    return output
+end
+local createField = function(w,h,xin,yin,width,height)
+    local temp = {}
+    for x=xin,xin+width do
+        for y=yin,yin+height do
+            table.insert(temp,createNode(true,x,y))
+        end
+    end
+    return {temp,{w=w,h=h}}
+end
+local loadNimgField = function(file,w,h)
+    local image = nimg.loadImage(file)
+    local temp = {}
+    for x=1,w do
+        for y=1,h do
+            if image[x] and image[x][y] then
+                table.insert(temp,createNode(false,x,y))
+            else
+                table.insert(temp,createNode(true,x,y))
+            end
+        end
+    end
+    return {temp,{w=w,h=h}}
+end
+local pathfind = function(gridData,startNode,endNode)
+    local grid = gridData[1]
+    local sizedat = gridData[2]
+    local targetNode = endNode
+    local openSet = {startNode}
+    local closedSet = {}
+    while next(openSet) do
+        local lastIndice = 1
+        local curNode = openSet[1]
+        for i=2,#openSet do
+            if (openSet[i].fCost < curNode.fCost) or (openSet[i].fCost == curNode.fCost and openSet[i].hCost < curNode.hCost) then
+                curNode = openSet[i]
+                lastIndice = i
+            end
+        end
+        table.insert(closedSet,curNode)
+        table.remove(openSet, lastIndice)
+        local cx,cy,cz = curNode.pos.x,curNode.pos.y,curNode.pos.z
+        local ex,ey,ez = targetNode.pos.x,targetNode.pos.y,targetNode.pos.z
+        if cx == ex and cy == ey and cz == ez then
+            return retracePath(closedSet,startNode,targetNode,sizedat)
+        end
+        for i,neighbor in pairs(getNeighbors(grid,curNode,sizedat)) do
+            if not ((not neighbor.isPassable) or findInGrid(closedSet,neighbor.pos)) then
+                local newMovCostToNeighbor = curNode.gCost + getDistance(grid,curNode,neighbor)
+                if (newMovCostToNeighbor < neighbor.gCost) or not findInGrid(openSet,neighbor.pos) then
+                    neighbor.gCost = newMovCostToNeighbor
+                    neighbor.hCost = getDistance(grid,neighbor,targetNode)
+                    neighbor.parent = curNode
+                    if not findInGrid(openSet,neighbor.pos) then
+                        table.insert(openSet,neighbor)
+                    end
+                end
+            end
+        end
+    end
+    return {},false,"unable to find path"
+end
+
+return {
+    createNode=createNode,
+    pathfind=pathfind,
+    findInGrid=findInGrid,
+    createField=createField,
+    loadNimgField=loadNimgField
+}
