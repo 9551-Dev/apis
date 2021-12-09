@@ -1,4 +1,15 @@
+local pureLua = false
+local expect
+if not pureLua then
+    expect = require("cc.expect").expect
+end
 local createNode = function(passable,x,y)
+    if passable == nil then passable = true end
+    if not pureLua then
+        expect(1,passable,"boolean","nil")
+        expect(2,x,"number")
+        expect(3,y,"number")
+    end
     local gCost = 0
     local hCost = 0
     return setmetatable({
@@ -25,6 +36,10 @@ local createSelfIndexArray = function()
     )
 end
 local findInGrid = function(grid,vec)
+    if not pureLua then
+        expect(1,grid,"table")
+        expect(2,vec,"table")
+    end
     for k,v in pairs(grid) do
         if (v.pos.x == vec.x) and (v.pos.y == vec.y) then
             return v
@@ -79,6 +94,14 @@ local retracePath = function(grid,sNode,nNode,sizedat)
     return output
 end
 local createField = function(w,h,xin,yin,width,height)
+    if not pureLua then
+        expect(1,w,"number")
+        expect(2,h,"number")
+        expect(3,xin,"number")
+        expect(4,yin,"number")
+    end
+    width = width or w
+    height = height or h
     local temp = {}
     for x=xin,xin+width do
         for y=yin,yin+height do
@@ -87,21 +110,12 @@ local createField = function(w,h,xin,yin,width,height)
     end
     return {temp,{w=w,h=h}}
 end
-local loadNimgField = function(file,w,h)
-    local image = nimg.loadImage(file)
-    local temp = {}
-    for x=1,w do
-        for y=1,h do
-            if image[x] and image[x][y] then
-                table.insert(temp,createNode(false,x,y))
-            else
-                table.insert(temp,createNode(true,x,y))
-            end
-        end
-    end
-    return {temp,{w=w,h=h}}
-end
 local pathfind = function(gridData,startNode,endNode)
+    if not pureLua then
+        expect(1,gridData,"table")
+        expect(2,startNode,"table")
+        expect(3,endNode,"table")
+    end
     local grid = gridData[1]
     local sizedat = gridData[2]
     local targetNode = endNode
@@ -145,5 +159,4 @@ return {
     pathfind=pathfind,
     findInGrid=findInGrid,
     createField=createField,
-    loadNimgField=loadNimgField
 }
