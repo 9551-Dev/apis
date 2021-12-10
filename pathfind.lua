@@ -129,7 +129,7 @@ local createField = function(w,h,xin,yin,width,height)
             table.insert(temp,createNode(true,x,y))
         end
     end
-    return {temp,{w=w,h=h}}
+    return {grid=temp,sizeData={w=w,h=h}}
 end
 local pathfind = function(gridData,startNode,endNode)
     if not pureLua then
@@ -137,8 +137,8 @@ local pathfind = function(gridData,startNode,endNode)
         expect(2,startNode,"table")
         expect(3,endNode,"table")
     end
-    local grid = gridData[1]
-    local sizedat = gridData[2]
+    local grid = gridData.grid
+    local sizedat = gridData.sizeData
     local targetNode = endNode
     local openSet = {startNode}
     local closedSet = {}
