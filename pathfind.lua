@@ -174,3 +174,9 @@ local pathfind = function(gridData,startNode,endNode)
     end
     return {},false,"unable to find path"
 end
+return {
+    createNode=createNode
+    pathfind=pathfind,
+    findInGrid=findInGrid,
+    createField=createField
+}
