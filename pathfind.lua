@@ -63,7 +63,7 @@ local findInGrid = function(grid,vec)
     end
     for k,v in pairs(grid) do
         if (v.pos.x == vec.x) and (v.pos.y == vec.y) then
-            return v
+            return v,grid[k],k
         end
     end
 end
