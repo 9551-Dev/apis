@@ -109,7 +109,7 @@ local retracePath = function(grid,sNode,nNode,sizedat)
     local output = {}
     local tempValue = tblRev(path)
     for k,v in pairs(tempValue or {}) do
-        table.insert(output,{x=v.pos.x,y=v.pos.y})
+        table.insert(output,{x=v.pos.x,y=v.pos.y,z=v.pos.z,g=v.gCost,h=v.hCost,f=v.fCost})
         tempValue = v.parent
     end
     return output
