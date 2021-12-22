@@ -72,8 +72,8 @@ local getNeighbors = function(grid,node,sizedat)
     for x=-1,1 do
         for y=-1,1 do
             for z=-1,1 do
-                local abs = {math.abs(x),math.abs(y),math.abs(z)}
-                if not (x == 0 and y == 0 and z == 0) and (abs[1] == 1 and abs[2] == 1 andabs[3] == 1) then
+                local abs = vector.new(math.abs(x),math.abs(y),math.abs(z))
+                if not (x == 0 and y == 0 and z == 0) and (abs.x == 1 and abs.y == 1 and abs.z == 1) then
                     local relative = node.pos+vector.new(x,y,z)
                     local relativeX,relativeY,relativeZ = relative.x,relative.y,relative.z
                     if (relativeX >= 0 and relativeX < sizedat.w+1) and (relativeY >= 0 and relativeY < sizedat.h+1) and (relativeZ >= 0 and relativeZ < sizedat.d+1) then
