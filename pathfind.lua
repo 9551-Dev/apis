@@ -126,17 +126,13 @@ local createField = function(w,h,d,xin,yin,zin,width,height,depth)
     width = width or w
     height = height or h
     local temp = {}
-    term.setBackgroundColor(colors.gray)
     for x=xin,xin+width do
         for y=yin,yin+height do
             for z=zin,zin+depth do
                 table.insert(temp,createNode(true,x,y,z))
-                term.setCursorPos(x,y)
-                term.write(" ")
             end
         end
     end
-    term.setBackgroundColor(colors.black)
     return {grid=temp,sizeData={w=w,h=h,d=d}}
 end
 local pathfind = function(gridData,startNode,endNode)
