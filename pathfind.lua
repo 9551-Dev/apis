@@ -73,7 +73,7 @@ local getNeighbors = function(grid,node,sizedat)
         for y=-1,1 do
             for z=-1,1 do
                 local abs = vector.new(math.abs(x),math.abs(y),math.abs(z))
-                if not (x == 0 and y == 0 and z == 0) and (abs.x == 1 and abs.y == 1 and abs.z == 1) then
+                if not (x == 0 and y == 0 and z == 0) and not (abs.x+abs.y+abs.z == 0 or abs.x+abs.y+abs.z > 1) then
                     local relative = node.pos+vector.new(x,y,z)
                     local relativeX,relativeY,relativeZ = relative.x,relative.y,relative.z
                     if (relativeX >= 0 and relativeX < sizedat.w+1) and (relativeY >= 0 and relativeY < sizedat.h+1) and (relativeZ >= 0 and relativeZ < sizedat.d+1) then
@@ -126,13 +126,17 @@ local createField = function(w,h,d,xin,yin,zin,width,height,depth)
     width = width or w
     height = height or h
     local temp = {}
+    term.setBackgroundColor(colors.gray)
     for x=xin,xin+width do
         for y=yin,yin+height do
             for z=zin,zin+depth do
                 table.insert(temp,createNode(true,x,y,z))
+                term.setCursorPos(x,y)
+                term.write(" ")
             end
         end
     end
+    term.setBackgroundColor(colors.black)
     return {grid=temp,sizeData={w=w,h=h,d=d}}
 end
 local pathfind = function(gridData,startNode,endNode)
