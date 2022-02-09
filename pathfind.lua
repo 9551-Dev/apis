@@ -73,10 +73,10 @@ local getNeighbors = function(grid,node,sizedat)
         for y=-1,1 do
             for z=-1,1 do
                 local abs = vector.new(math.abs(x),math.abs(y),math.abs(z))
-                if not (x == 0 and y == 0 and z == 0) and not (abs.x+abs.y+abs.z == 0 or abs.x+abs.y+abs.z > 1) then
+                if not (x == 0 and y == 0 and z == 0) and (abs.x+abs.y+abs.z == 1) then
                     local relative = node.pos+vector.new(x,y,z)
                     local relativeX,relativeY,relativeZ = relative.x,relative.y,relative.z
-                    if (relativeX >= 0 and relativeX < sizedat.w+1) and (relativeY >= 0 and relativeY < sizedat.h+1) and (relativeZ >= 0 and relativeZ < sizedat.d+1) then
+                    if relativeX < sizedat.w+1 and relativeY < sizedat.h+1 and relativeZ < sizedat.d+1 then
                         local neighbor = findInGrid(grid,vector.new(relativeX,relativeY,relativeZ))
                         table.insert(foundNeighbors,neighbor)
                     end
@@ -147,6 +147,10 @@ local pathfind = function(gridData,startNode,endNode)
     local openSet = {startNode}
     local closedSet = {}
     while next(openSet) do
+        if not pureLua then
+            os.queueEvent("fake")
+            os.pullEvent("fake")
+        end
         local lastIndice = 1
         local curNode = openSet[1]
         for i=2,#openSet do
