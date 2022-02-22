@@ -1,10 +1,10 @@
 local alpha_cons = {}
 local n_cons = {}
 for i=97,122 do
-    alpha_cons[i-97] = string.char(i)
+    alpha_cons[string.char(i)] = i-97
 end
 for i=0,9 do
-    n_cons[i] = tostring(i)
+    n_cons[tostring(i)] = i
 end
 
 return {
