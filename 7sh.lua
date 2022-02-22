@@ -77,7 +77,7 @@ function index:set_term(termt)
 end
 
 local function create_display(canv,x,y,value,font,bg,symbol,tg)
-    if not (type(canv) == "table") then error("create_display needs an term object as its first input to work!",2) end
+    if not (canv or {}).write then error("create_display needs an term object as its argument input to work!",2) end
     return setmetatable({
         pos=vector.new(x,y),
         value=value or 0,
