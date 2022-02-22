@@ -26,7 +26,7 @@ function index:update()
         for k,v in ipairs(bits[self.font]) do
             local value = self.value
             if i == 1 then value = -1 end
-            local state = bit32.band(bit32.rshift(v,value%10),1)
+            local state = bit32.band(bit32.rshift(v,value),1)
             term.setCursorPos(((k-1)%bits[self.font].size)+1+self.pos.x,math.ceil(k/bits[self.font].size)+self.pos.y)
             if state == 1 then
                 term.setBackgroundColor(self.bg)
