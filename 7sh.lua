@@ -12,7 +12,7 @@ if fs.exists("./fonts.7sh") and fs.isDir("./fonts.7sh") then
         local data = textutils.unserialise(file.readAll())
         if next(data) then
             for k,vdat in pairs(data) do
-                bits[v.."."..k] = v dat
+                bits[v.."."..k] = vdat
             end
         end
     end
