@@ -1,7 +1,8 @@
 local bits = {
     normal={
         1021,1007,1021,881,2,925,893,894,1021,325,2,1017,877,879,1021,
-        size=3
+        size=3,
+        conversion={}
     }
 }
 
@@ -26,7 +27,7 @@ function index:update()
         for k,v in ipairs(bits[self.font]) do
             local value = self.value
             if i == 1 then value = -1 end
-            local state = bit32.band(bit32.rshift(v,value),1)
+            local state = bit32.band(bit32.rshift(v,(v.conversion or {})[value] or value),1)
             term.setCursorPos(((k-1)%bits[self.font].size)+1+self.pos.x,math.ceil(k/bits[self.font].size)+self.pos.y)
             if state == 1 then
                 term.setBackgroundColor(self.bg)
