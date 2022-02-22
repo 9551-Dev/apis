@@ -11,8 +11,8 @@ if fs.exists("./fonts.7sh") and fs.isDir("./fonts.7sh") then
         local file = fs.open(v,"r")
         local data = textutils.unserialise(file.readAll())
         if next(data) then
-            for k,v in pairs(data) do
-                bits[k] = v 
+            for k,vdat in pairs(data) do
+                bits[v.."."..k] = v dat
             end
         end
     end
