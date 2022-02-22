@@ -22,26 +22,26 @@ end
 local index = {}
 
 function index:update()
-    local ob,ot = term.getBackgroundColor(),term.getTextColor()
+    local ob,ot = self.term.getBackgroundColor(),self.term.getTextColor()
     for i=1,2 do
         for k,v in ipairs(bits[self.font]) do
             local value = self.value
             if i == 1 then value = -1 end
             local state = bit32.band(bit32.rshift(v,(bits[self.font].conversion or {})[value] or value),1)
-            term.setCursorPos(((k-1)%bits[self.font].size)+1+self.pos.x,math.ceil(k/bits[self.font].size)+self.pos.y)
+            self.term.setCursorPos(((k-1)%bits[self.font].size)+1+self.pos.x,math.ceil(k/bits[self.font].size)+self.pos.y)
             if state == 1 then
-                term.setBackgroundColor(self.bg)
-                term.setTextColor(self.tg)
-                term.write(self.symbol)
+                self.term.setBackgroundColor(self.bg)
+                self.term.setTextColor(self.tg)
+                self.term.write(self.symbol)
             else
-                term.setBackgroundColor(ob)
-                term.setTextColor(ot)
-                term.write(" ")
+                self.term.setBackgroundColor(ob)
+                self.term.setTextColor(ot)
+                self.term.write(" ")
             end
         end
     end
-    term.setTextColor(ot)
-    term.setBackgroundColor(ob)
+    self.term.setTextColor(ot)
+    self.term.setBackgroundColor(ob)
 end
 
 function index:reposition(x,y)
@@ -70,14 +70,22 @@ function index:set_font(font)
     end
 end
 
-local function create_display(x,y,value,font,bg,symbol,tg)
+function index:set_term(termt)
+    if type(termt) == "table" then
+        self.term = termt
+    end
+end
+
+local function create_display(canv,x,y,value,font,bg,symbol,tg)
+    if not type(canv) == "table" then error("create_display needs an term object as its first input to work!",2) end
     return setmetatable({
         pos=vector.new(x,y),
         value=value or 0,
         symbol=symbol or " ",
         bg=bg or colors.white,
         tg=tg or colors.black,
-        font=font or "normal"
+        font=font or "normal",
+        term=canv
     },{
         __index=index
     })
