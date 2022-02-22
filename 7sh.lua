@@ -9,8 +9,8 @@ if not fs.exists("./fonts.7sh") then fs.makeDir("./fonts.7sh") end
 if fs.exists("./fonts.7sh") and fs.isDir("./fonts.7sh") then
     for k,v in pairs(fs.list("./fonts.7sh")) do
         local file = fs.open(v,"r")
-        local data = textutils.unserialise(file.readAll())
-        if next(data) then
+        local data = require("./fonts.7sh/"..v)
+        if next(data or {}) then
             for k,vdat in pairs(data) do
                 bits[v.."."..k] = vdat
             end
