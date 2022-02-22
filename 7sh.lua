@@ -85,7 +85,7 @@ local function create_display(canv,x,y,value,font,bg,symbol,tg)
         bg=bg or colors.white,
         tg=tg or colors.black,
         font=font or "normal",
-        term=canv
+        term=canv or term.current()
     },{
         __index=index
     })
