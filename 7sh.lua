@@ -23,21 +23,18 @@ local index = {}
 
 function index:update()
     local ob,ot = self.term.getBackgroundColor(),self.term.getTextColor()
-    for i=1,2 do
-        for k,v in ipairs(bits[self.font]) do
-            local value = self.value
-            if i == 1 then value = -1 end
-            local state = bit32.band(bit32.rshift(v,(bits[self.font].conversion or {})[value] or value),1)
-            self.term.setCursorPos(((k-1)%bits[self.font].size)+1+self.pos.x,math.ceil(k/bits[self.font].size)+self.pos.y)
-            if state == 1 then
-                self.term.setBackgroundColor(self.bg)
-                self.term.setTextColor(self.tg)
-                self.term.write(self.symbol)
-            else
-                self.term.setBackgroundColor(ob)
-                self.term.setTextColor(ot)
-                self.term.write(" ")
-            end
+    for k,v in ipairs(bits[self.font]) do
+        local value = self.value
+        local state = bit32.band(bit32.rshift(v,(bits[self.font].conversion or {})[value] or value),1)
+        self.term.setCursorPos(((k-1)%bits[self.font].size)+1+self.pos.x,math.ceil(k/bits[self.font].size)+self.pos.y)
+        if state == 1 then
+            self.term.setBackgroundColor(self.bg)
+            self.term.setTextColor(self.tg)
+            self.term.write(self.symbol)
+        else
+            self.term.setBackgroundColor(ob)
+            self.term.setTextColor(ot)
+            self.term.write(" ")
         end
     end
     self.term.setTextColor(ot)
