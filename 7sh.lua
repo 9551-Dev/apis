@@ -6,15 +6,12 @@ local bits = {
     }
 }
 
-if not fs.exists("./fonts.7sh") then fs.makeDir("./fonts.7sh") end 
-if fs.exists("./fonts.7sh") and fs.isDir("./fonts.7sh") then
-    for k,v in pairs(fs.list("./fonts.7sh")) do
-        local file = fs.open(v,"r")
-        local data = dofile("./fonts.7sh/"..v)
-        if next(data or {}) then
-            for k,vdat in pairs(data) do
-                bits[v.."."..k] = vdat
-            end
+if not fs.exists("./fonts.7sh") then fs.makeDir("./fonts.7sh") end
+for k,v in pairs(fs.list("./fonts.7sh")) do
+    local data = dofile("./fonts.7sh/"..v)
+    if next(data or {}) then
+        for k,vdat in pairs(data) do
+            bits[v.."."..k] = vdat
         end
     end
 end
