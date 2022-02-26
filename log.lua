@@ -19,7 +19,7 @@ function index:log(str,type)
     elseif type == "message" then self.term.setTextColor(colors.white)
     elseif type == "update" then self.term.setTextColor(colors.green)
     elseif type == "info" then self.term.setTextColor(colors.gray)
-    end
+    else self.term.setTextColor(colors.magenta) end
     local len = #str+#timeStr+#("("..tostring(self.nstr)..")")
     if len < 2 then len = 2 end
     print(timeStr..str..(" "):rep(width-len).."("..tostring(self.nstr)..")")
