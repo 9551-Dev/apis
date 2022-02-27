@@ -10,6 +10,7 @@ local function writeWrapped(termObj,str)
         termObj.setCursorPos(1,y+1)
         last=i*width
     end
+    return maxLen
 end
 
 function index:log(str,type)
@@ -17,7 +18,7 @@ function index:log(str,type)
     if self.lastLog == str..type then
         self.nstr = self.nstr + 1
         local x,y = self.term.getCursorPos()
-        self.term.setCursorPos(x,y-1)
+        self.term.setCursorPos(x,y-self.maxln)
         self.term.clearLine()
     else
         self.nstr = 1
@@ -36,7 +37,7 @@ function index:log(str,type)
     else self.term.setTextColor(colors.magenta) end
     local len = #str+#timeStr+#("("..tostring(self.nstr)..")")
     if len < 2 then len = 2 end
-    writeWrapped(self.term,timeStr..str..(" "):rep(width-len).."("..tostring(self.nstr)..")")
+    self.maxln = writeWrapped(self.term,timeStr..str..(" "):rep(width-len).."("..tostring(self.nstr)..")")
     self.term.setBackgroundColor(tb);self.term.setTextColor(tt)
 end
 
@@ -44,6 +45,7 @@ local function createLog(termObj)
     return setmetatable({
         lastLog="",
         nstr=1,
+        maxln=1,
         term=termObj
     },{__index=index})
 end
