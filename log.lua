@@ -22,7 +22,9 @@ function index:log(str,type)
     else self.term.setTextColor(colors.magenta) end
     local len = #str+#timeStr+#("("..tostring(self.nstr)..")")
     if len < 2 then len = 2 end
-    print(timeStr..str..(" "):rep(width-len).."("..tostring(self.nstr)..")")
+    self.term.write(timeStr..str..(" "):rep(width-len).."("..tostring(self.nstr)..")")
+    local _,y = self.term.getCursorPos()
+    self.term.setCursorPos(1,y+1)
     self.term.setBackgroundColor(tb);self.term.setTextColor(tt)
 end
 
