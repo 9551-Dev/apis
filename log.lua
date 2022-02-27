@@ -1,5 +1,17 @@
 local index = {}
 
+local function writeWrapped(termObj,str)
+    local width = termObj.getSize()
+    local strings,maxLen = {},math.ceil(#str/width)
+    local last = 1
+    for i=1,maxLen do
+        local _,y = term.getCursorPos()
+        termObj.write(str:sub(last,i*width))
+        term.setCursorPos(0,y+1)
+        last=i*width
+    end
+end
+
 function index:log(str,type)
     type = type or "info"
     if self.lastLog == str..type then
@@ -24,7 +36,7 @@ function index:log(str,type)
     else self.term.setTextColor(colors.magenta) end
     local len = #str+#timeStr+#("("..tostring(self.nstr)..")")
     if len < 2 then len = 2 end
-    self.term.write(timeStr..str..(" "):rep(width-len).."("..tostring(self.nstr)..")")
+    writeWrapped(self.term,timeStr..str..(" "):rep(width-len).."("..tostring(self.nstr)..")")
     local _,y = self.term.getCursorPos()
     self.term.setCursorPos(1,y+1)
     self.term.setBackgroundColor(tb);self.term.setTextColor(tt)
