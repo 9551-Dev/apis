@@ -37,7 +37,9 @@ function index:log(str,type)
     else self.term.setTextColor(colors.magenta) end
     local len = #str+#timeStr+#("("..tostring(self.nstr)..")")
     if len < 2 then len = 2 end
-    self.maxln = writeWrapped(self.term,timeStr..str..(" "):rep(width-len).."("..tostring(self.nstr)..")")
+    local wlen = width-len
+    if wlen < 1 then wlen = 1 end
+    self.maxln = writeWrapped(self.term,timeStr..str..(" "):rep(wlen).."("..tostring(self.nstr)..")")
     self.term.setBackgroundColor(tb);self.term.setTextColor(tt)
 end
 
