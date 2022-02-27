@@ -7,7 +7,7 @@ local function writeWrapped(termObj,str)
     for i=1,maxLen do
         local _,y = term.getCursorPos()
         termObj.write(str:sub(last,i*width))
-        term.setCursorPos(0,y+1)
+        termObj.setCursorPos(0,y+1)
         last=i*width
     end
 end
