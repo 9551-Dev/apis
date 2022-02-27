@@ -7,6 +7,8 @@ function index:log(str,type)
         local x,y = self.term.getCursorPos()
         self.term.setCursorPos(x,y-1)
         self.term.clearLine()
+    else
+        self.nstr = 1
     end
     self.lastLog = str..type
     local width = self.term.getSize()
