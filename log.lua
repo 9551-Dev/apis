@@ -28,16 +28,18 @@ end
 
 function index:log(str,type)
     type = type or "info"
+    local width,height = self.term.getSize()
     if self.lastLog == str..type then
         self.nstr = self.nstr + 1
         local x,y = self.term.getCursorPos()
-        self.term.setCursorPos(x,y-self.maxln)
+        local yid = y-self.maxln
+        self.term.setCursorPos(x,yid)
         self.term.clearLine()
+        if yid > width then self.term.scoll(1) end
     else
         self.nstr = 1
     end
     self.lastLog = str..type
-    local width = self.term.getSize()
     local timeStr = "["..textutils.formatTime(os.time()).."] "
     local tb,tt = self.term.getBackgroundColor(),self.term.getTextColor()
     if type == "error" then self.term.setTextColor(colors.red)
