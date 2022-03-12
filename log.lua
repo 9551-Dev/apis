@@ -7,6 +7,10 @@ local function writeWrapped(termObj,str)
     for i=1,maxLen do
         local _,y = termObj.getCursorPos()
         termObj.write(str:sub(last+1,i*width))
+        if y+1 > height then
+            self.term.scoll(1)
+            term.setCursorPos(1,height)
+        end
         termObj.setCursorPos(1,y+1)
         last=i*width
     end
@@ -35,7 +39,6 @@ function index:log(str,type)
         local yid = y-self.maxln
         self.term.setCursorPos(x,yid)
         self.term.clearLine()
-        if yid > width then self.term.scoll(1) end
     else
         self.nstr = 1
     end
