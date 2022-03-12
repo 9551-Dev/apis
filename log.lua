@@ -8,8 +8,8 @@ local function writeWrapped(termObj,str)
         local _,y = termObj.getCursorPos()
         termObj.write(str:sub(last+1,i*width))
         if y+1 > height then
-            self.term.scoll(1)
-            term.setCursorPos(1,height)
+            termObj.scoll(1)
+            termObj.setCursorPos(1,height)
         end
         termObj.setCursorPos(1,y+1)
         last=i*width
