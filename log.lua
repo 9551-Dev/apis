@@ -1,7 +1,7 @@
 local index = {}
 
 local function writeWrapped(termObj,str)
-    local width = termObj.getSize()
+    local width,height = termObj.getSize()
     local strings,maxLen = {},math.ceil(#str/width)
     local last = 0
     for i=1,maxLen do
