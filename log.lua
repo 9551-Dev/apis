@@ -140,6 +140,7 @@ local function createLogInternal(termObj,title,titlesym)
         __call=write_to_log_internal
     })
     log("")
+    log.lastLog = nil
     return log
 end
 
