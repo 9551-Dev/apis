@@ -146,7 +146,7 @@ local function createLogInternal(termObj,title,titlesym,auto_dump,file)
         log.term.write((log.tsym):rep(width))
         log.term.setCursorPos(math.ceil((width / 2) - (#log.title / 2)), 1)
         log.term.write(log.title)
-        term.setCursorPos(1,2)
+        log.term.setCursorPos(1,2)
     end
     log.lastLog = nil
     return log
