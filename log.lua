@@ -125,7 +125,7 @@ end
 
 local function createLogInternal(termObj,title,titlesym)
     titlesym = titlesym or "-"
-    return setmetatable({
+    local log = setmetatable({
         lastLog="",
         nstr=1,
         maxln=1,
@@ -139,6 +139,8 @@ local function createLogInternal(termObj,title,titlesym)
         __index=index,
         __call=write_to_log_internal
     })
+    log("")
+    return log
 end
 
 return {create_log=createLogInternal}
