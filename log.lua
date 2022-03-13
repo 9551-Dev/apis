@@ -56,7 +56,7 @@ local function getLineLen(termObj,str)
     return strLen
 end
 
-function index:log(str,type)
+local function write_to_log_internal(self,str,type)
     local width,height = self.term.getSize()
     local x,y = self.term.getCursorPos()
     local str = tostring(str)
@@ -136,8 +136,11 @@ local function createLogInternal(termObj,title,titlesym)
         tsym=(#titlesym < 4) and titlesym or "-",
         sbg=termObj.getBackgroundColor(),
         sfg=termObj.getTextColor()
-    },{__index=index})
-    if log.title then log:log("") end
+    },{
+        __index=index,
+        __call=write_to_log_internal
+    })
+    if log.title then log("") end
     return log
 end
 
