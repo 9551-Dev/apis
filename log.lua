@@ -65,7 +65,6 @@ local function write_to_log_internal(self,str,type)
         self.nstr = self.nstr + 1
         local yid = y-self.maxln
         self.term.setCursorPos(x,yid)
-        self.term.clearLine()
     else
         self.nstr = 1
     end
