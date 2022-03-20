@@ -26,7 +26,8 @@ for k,v in pairs(index) do
 end
 
 local function remove_time(str)
-    return str:gsub("^%[%d-%:%d-%]","")
+    local str = str:gsub("^%[%d-%:%d-% %a-]","")
+    return str
 end
 
 local function writeWrapped(termObj,str,bg,title)
