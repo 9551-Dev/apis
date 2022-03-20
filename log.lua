@@ -25,6 +25,10 @@ for k,v in pairs(index) do
     revIndex[v] = k
 end
 
+local function remove_time(str)
+    return str:gsub("^%[%d-%:%d-%]","")
+end
+
 local function writeWrapped(termObj,str,bg,title)
     local width,height = termObj.getSize()
     local strings,maxLen = {},math.ceil(#str/width)
@@ -62,14 +66,14 @@ function index:dump(path)
     local outputInternal = {}
     local str = ""
     for k,v in ipairs(self.history) do
-        if lastLog == v.str..v.type then
+        if lastLog == remove_time(v.str)..v.type then
             nstr = nstr + 1
             table.remove(outputInternal,#outputInternal)
         else
             nstr = 1
         end
         outputInternal[#outputInternal+1] = v.str.."("..tostring(nstr)..") type: "..(revIndex[v.type] or "info")
-        lastLog = v.str..v.type
+        lastLog = remove_time(v.str)..v.type
     end
     for k,v in ipairs(outputInternal) do
         str = str .. v .. "\n"
