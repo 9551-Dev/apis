@@ -29,22 +29,32 @@ local function coro_main(...)
     }
     local routine_id = 0
     local function create_wrapped_coro(func)
-        return coroutine.create(function()
+        return setmetatable({},{__index={coro=coroutine.create(function()
             local ok,err = pcall(func)
             if not ok then erro = err end
-        end)
+        end)}})
     end
     for k,v in ipairs({...}) do
         if type(v) == "function" then
             routine_id = routine_id + 1
-            object.coros[1][routine_id] = create_wrapped_coro(v)
+            local coro = create_wrapped_coro(v)
             object.id_names[routine_id] = 1
+            if not object.coros[1] then object.coros[1] = {} end
+            object.coros[1][routine_id] = setmetatable({},{
+                __index={
+                    coro=coro.coro,
+                    kill=function()
+                        object.coros[1][routine_id] = nil
+                        object.id_names[routine_id] = nil
+                    end
+                }
+            })
         end
     end
     local function checkLiving()
         local living = 0
         for name,order in pairs(object.id_names) do
-            if coroutine.status(object.coros[order][name]) ~= "dead" then
+            if coroutine.status(object.coros[order][name].coro) ~= "dead" then
                 living = living + 1
             end
         end
@@ -60,7 +70,15 @@ local function coro_main(...)
             object.id_names[name or routine_id] = order
             if not object.coros[order] then object.coros[order] = {} end
             object.coros[order][name or routine_id] = create_wrapped_coro(fnc)
-            return object.coros[order][order]
+            return setmetatable(object.coros[order][name or routine_id],{
+                __index={
+                    kill=function()
+                        object.coros[order][name or routine_id] = nil
+                        object.id_names[name or routine_id] = nil
+                    end,
+                    coro = object.coros[order][name or routine_id].coro
+                },
+            })
         end,
         kill=function(name)
             expect(2,name,"string")
@@ -84,11 +102,11 @@ local function coro_main(...)
                 if event[1] == "terminate" then error("Terminated",0) end
                 for key,_v in iterate_order(object.coros) do
                     for k,coro in pairs(_v) do
-                        if coroutine.status(coro) == "dead" then
+                        if coroutine.status(coro.coro) == "dead" then
                             object.coros[key][k] = nil
                             object.id_names[k] = nil
                         else
-                            coroutine.resume(coro,table.unpack(event,1,event.n))
+                            coroutine.resume(coro.coro,table.unpack(event,1,event.n))
                         end
                     end
                 end
