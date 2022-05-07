@@ -28,6 +28,7 @@ local function get_image_data(file,on,meta)
     local sekt = on
     local out = {}
     local pixels = 0
+    file.seek("set",on)
     while file.read() do pixels = pixels + 1 end
     file.seek("set",sekt)
     for i=1,math.floor(pixels/3) do
@@ -54,7 +55,7 @@ local function process_to_2d_array(list,width,tp)
     local out = {}
     for k,v in pairs(list) do
         local x = math.floor((k-1)%width+1)
-        local y = math.floor(k/width+0.5)
+        local y = math.ceil(k/width)
         if not out[tp and x or y] then out[tp and x or y] = {} end
         out[tp and x or y][tp and y or x] = v
     end
