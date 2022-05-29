@@ -390,7 +390,7 @@ function ALGO.get_line_points(startX, startY, endX, endY)
     return points
 end
 
-local function get_triangle_outline_points(v1,v2,v3)
+function ALGO.get_triangle_outline_points(v1,v2,v3)
     local final_points = {}
     local s1 = ALGO.get_line_points(v1.x,v1.y,v2.x,v2.y)
     local s2 = ALGO.get_line_points(v2.x,v2.y,v3.x,v3.y)
