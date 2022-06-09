@@ -48,38 +48,6 @@ m=e.get_elipse_points(o.positioning.width,o.positioning.height,o.positioning.x,o
 f,w in pairs(m)do\
 i.setCursorPos(w.x,w.y)i.blit(o.symbol,t.to_blit[o.fg],t.to_blit[o.bg])end end\
 end",
-[ "apis/coro" ] = "local e=require(\"cc.expect\").expect local function t(a)local o={}for i,n in\
-pairs(a)do table.insert(o,i)end return o end local function s(h)local r=0 local\
-d=t(h)table.sort(d,function(l,u)return l<u end)return function()r=r+1 if\
-h[d[r]]then return d[r],h[d[r]]else return end end end local function\
-c(...)local m local f={coros={},id_names={},running=true,filters={}}local w=0\
-local function y(p)return\
-setmetatable({},{__index={coro=coroutine.create(function()local v,b=pcall(p)if\
-not v then m=b end end)}})end for g,k in ipairs({...})do if\
-type(k)==\"function\"then w=w+1 local q=y(k)f.id_names[w]=1 if not f.coros[1]then\
-f.coros[1]={}end\
-f.coros[1][w]=setmetatable({},{__index={coro=q.coro,kill=function()f.coros[1][w]=nil\
-f.id_names[w]=nil end}})end end local function j()local x=0 for z,E in\
-pairs(f.id_names)do if coroutine.status(f.coros[E][z].coro)~=\"dead\"then x=x+1\
-end end return x end local T={create=function(A,O,I)local I=I or 1\
-e(1,A,\"function\")e(2,O,\"string\",\"nil\")e(3,I,\"number\")w=w+1 f.id_names[O or w]=I\
-if not f.coros[I]then f.coros[I]={}end f.coros[I][O or w]=y(A)return\
-setmetatable(f.coros[I][O or w],{__index={kill=function()f.coros[I][O or w]=nil\
-f.id_names[O or w]=nil end,coro=f.coros[I][O or\
-w].coro},})end,kill=function(N)e(2,N,\"string\")f.coros[f.id_names[N]][N]=nil\
-f.id_names[N]=nil end,get=function(S)e(2,S,\"string\")if not f.id_names[S]then\
-return\"coroutine no longer exists.\"end return\
-f.coros[f.id_names[S]][S]end,living=j,stop=function()f.running=false\
-end,kill_all=function()f.running=false\
-f.coros={}f.id_names={}end,run=function()f.running=true while f.running do\
-local H=table.pack(os.pullEventRaw())if m then error(m,0)end if\
-H[1]==\"terminate\"then error(\"Terminated\",0)end for R,D in s(f.coros)do for L,U\
-in pairs(D)do if coroutine.status(U.coro)==\"dead\"then f.coros[R][L]=nil\
-f.id_names[L]=nil else if f.filters[U.coro]==nil or f.filters[U.coro]==H[1]then\
-local C,M=coroutine.resume(U.coro,table.unpack(H,1,H.n))f.filters[U.coro]=M end\
-end end end if j()<1 then return true end end end}return\
-setmetatable(f,{__index=T})end\
-return{create=c}",
 [ "objects/button/logic" ] = "local e=require(\"api\")return function(t,a)if\
 e.is_within_field(a.x,a.y,t.positioning.x,t.positioning.y,t.positioning.width,t.positioning.height)then\
 t.on_click(t,a)end\
@@ -597,57 +565,7 @@ e.tables.merge(Nt,St,Ht)end\
 return{get_elipse_points=t,get_triangle_points=G,get_triangle_outline_points=Et,get_line_points=ht}",
 [ "objects/script/logic" ] = "return\
 function(e,t)e.code(e,t)end\
-",
-[ "apis/pathfind" ] = "local e=false local t if not e then t=require(\"cc.expect\").expect end local\
-function a(o,i,n,s)if not e then\
-t(1,o,\"number\")t(2,i,\"number\")t(3,n,\"number\")t(4,s,\"boolean\",\"nil\")end if\
-s==nil then s=true end local h=0 local r=0 return\
-setmetatable({passable=s,gCost=h,hCost=r,pos=vector.new(o,i,n),},{__index=function(d,l)if\
-l==\"fCost\"then return d.gCost+d.hCost end end})end local function u(c,m)m=m\
-or{}if c==0 then return m end setmetatable(m,{__index=function(f,w)local\
-y=u(c-1)f[w]=y return y end})return m end local function p(v,b)local g={}local\
-k={}for q,j in pairs(v)do local x=math.abs(q-b)g[#g+1],k[x]=x,q end local\
-z=math.min(table.unpack(g))return v[k[z]]end local function E(T,A)return\
-math.sqrt((T.pos.x-A.pos.x)^2+(T.pos.y-A.pos.y)^2+(T.pos.z-A.pos.z)^2)end local\
-function O(I)local N={}for S,H in pairs(I)do N[(#I-S+1)]=H end return N end\
-local function R(D,L,U,C,M,F)if not e then\
-t(1,D,\"number\")t(2,L,\"number\")t(3,U,\"number\")t(4,C,\"number\",\"nil\")t(5,M,\"number\",\"nil\")t(6,F,\"number\",\"nil\")end\
-C,M,F=C or 1,M or 1,F or 1 local W=u(3,{})for Y=C,C+D do for P=M,M+L do for\
-V=F,F+U do W[Y][P][V]=a(Y,P,V,true)end end end\
-return{grid=W,size={w=D,h=L,d=U}}end local function\
-B(G,K,Q)table.insert(G,Q)K[Q.pos.x][Q.pos.y][Q.pos.z]=#G end local function\
-J(X,Z,a)return X[Z[a.pos.x][a.pos.y][a.pos.z]]or{}end local function\
-et(tt,at)local ot,it=tt.pos,at.pos return ot.x==it.x and ot.y==it.y and\
-ot.z==it.z end local function nt(st)for ht,rt in pairs(st)do for dt,lt in\
-pairs(rt)do for ut,a in pairs(lt)do st[ht][dt][ut]=st[ht][dt][ut]-1 end end end\
-end local function ct(a,mt)local ft={}for wt=-1,1 do for yt=-1,1 do for pt=-1,1\
-do local vt=vector.new(math.abs(wt),math.abs(yt),math.abs(pt))if not(wt==0 and\
-yt==0 and pt==0)and(vt.x+vt.y+vt.z==1)then local bt=a.pos.x+wt local\
-gt=a.pos.y+yt local kt=a.pos.z+pt if bt<mt.size.w+1 and gt<mt.size.h+1 and\
-kt<mt.size.d+1 then local qt=mt.grid[bt][gt][kt]if next(qt)then\
-table.insert(ft,qt)end end end end end end return ft end local function\
-jt(xt)local zt={}local Et=xt[#xt]while Et do\
-table.insert(zt,vector.new(Et.pos.x,Et.pos.y,Et.pos.z))Et=Et.parent end return\
-O(zt)end local function Tt(At,Ot,It)if not e then\
-t(1,At,\"table\")t(2,Ot,\"table\")t(3,It,\"table\")end local Nt=Ot local St=It local\
-Ht={}local Rt={}local Dt=u(2)local Lt=u(2)B(Ht,Dt,Nt)while next(Ht)do local\
-Ut=Ht[1]for Ct,Mt in ipairs(Ht)do\
-if(Mt.fCost<Ut.fCost)or((Mt.fCost==Ut.fCost)and Mt.hCost<Ut.hCost)then Ut=Mt\
-end end B(Rt,Lt,Ut)table.remove(Ht,1)nt(Dt)Dt[Ut.pos.x][Ut.pos.y][Ut.pos.z]=nil\
-if et(Ut,St)then return jt(Rt)end for Ft,Wt in pairs(ct(Ut,At))do if not(not\
-Wt.passable or next(J(Rt,Lt,Wt)))then local\
-Yt=Ut.gCost+E(Ut,Wt)if(Yt<Wt.gCost)or not next(J(Ht,Dt,Wt))then Wt.gCost=Yt\
-Wt.hCost=E(Wt,St)Wt.parent=Ut if not next(J(Ht,Dt,Wt))then B(Ht,Dt,Wt)end end\
-end end os.queueEvent(\"pathfinding\")os.pullEvent(\"pathfinding\")end return false\
-end local function Pt(Vt)if not e then t(1,Vt,\"table\")end local\
-Bt,Gt=math.huge,-math.huge local Kt,Qt=math.huge,-math.huge local\
-Jt,Xt=math.huge,-math.huge for Zt,ea in pairs(Vt)do\
-Bt,Gt=math.min(Bt,Zt),math.max(Gt,Zt)for ta,aa in pairs(ea)do\
-Kt,Qt=math.min(Kt,ta),math.max(Qt,ta)for oa,ia in pairs(aa)do\
-Jt,Xt=math.min(Jt,oa),math.max(Xt,oa)end end end\
-return{w=math.abs(Bt)+Gt,h=math.abs(Kt)+Qt,d=math.abs(Jt)+Xt}end\
-return{pathfind=Tt,node=a,createField=R,get_array_whd=Pt,index_proximal=p,createNDarray=u}",
-[ "apis/fuzzy_find" ] = "_ENV=_ENV.ORIGINAL local e=require(\"cc.pretty\")local function t(a,o)local\
+",[ "apis/fuzzy_find" ] = "_ENV=_ENV.ORIGINAL local e=require(\"cc.pretty\")local function t(a,o)local\
 i=100/math.max(#a,#o)local n=string.len(a)local s=string.len(o)local h={}for\
 r=0,n do h[r]={}h[r][0]=r end for d=0,s do h[0][d]=d end for l=1,n do for u=1,s\
 do local c=0 if string.sub(a,l,l)~=string.sub(o,u,u)then c=1 end\
