@@ -952,7 +952,7 @@ return o end local function d(...)local l={...}local u={}for c,m in\
 pairs(l[1])do u[c]=function(...)local f={}for w,y in pairs(l)do\
 f=table.pack(y[c](...))end return table.unpack(f,1,f.n or 1)end end return u\
 end\
-return{mirror_monitors=e,make_shared_terminal=d}",
+return{mirror=e,make_shared=d}",
 object_loader = "local e=require(\"api\")local function t(a)local o=type(a)local i if\
 o==\"table\"then i={}for n,s in next,a,nil do if n==\"canvas\"then i.canvas=s else\
 i[t(n)]=t(s)end end setmetatable(i,t(getmetatable(a)))else i=a end return i end\
