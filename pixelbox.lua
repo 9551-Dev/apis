@@ -40,25 +40,39 @@ function OBJECT:push_updates()
         for x,block_color in pairs(x_list) do
             local RELATIVE_X = math.ceil(x/2)
             local RELATIVE_Y = math.ceil(y/3)
-            local SYMBOL_POS_X = (x-1)%2+1
-            local SYMBOL_POS_Y = (y-1)%3+1
-            self.symbols[RELATIVE_Y][RELATIVE_X] = PIXELBOX.INDEX_SYMBOL_CORDINATION(
-                self.symbols[RELATIVE_Y][RELATIVE_X],
-                SYMBOL_POS_X,SYMBOL_POS_Y,
-                block_color
-            )
+            if self.UPDATES[RELATIVE_Y][RELATIVE_X] then
+                local SYMBOL_POS_X = (x-1)%2+1
+                local SYMBOL_POS_Y = (y-1)%3+1
+                self.symbols[RELATIVE_Y][RELATIVE_X] = PIXELBOX.INDEX_SYMBOL_CORDINATION(
+                    self.symbols[RELATIVE_Y][RELATIVE_X],
+                    SYMBOL_POS_X,SYMBOL_POS_Y,
+                    block_color
+                )
+            end
         end
     end
-    for y,x_list in pairs(self.symbols) do
-        for x,color_block in ipairs(x_list) do
-            local char,fg,bg = graphic.build_drawing_char(color_block)
-            self.lines[y] = {
-                self.lines[y][1]..char,
-                self.lines[y][2]..graphic.to_blit[fg],
-                self.lines[y][3]..graphic.to_blit[bg]
-            }
+    for y=1,self.height do
+        for x=1,self.width do
+            local color_block = self.symbols[y][x]
+            if self.UPDATES[y][x] then
+                local char,fg,bg = graphic.build_drawing_char(color_block)
+                self.CHARS[y][x] = {symbol=char, background=graphic.to_blit[bg], fg=graphic.to_blit[fg]}
+                self.lines[y] = {
+                    self.lines[y][1]..char,
+                    self.lines[y][2]..graphic.to_blit[fg],
+                    self.lines[y][3]..graphic.to_blit[bg]
+                }
+            else
+                local prev_data = self.CHARS[y][x]
+                self.lines[y] = {
+                    self.lines[y][1]..prev_data.symbol,
+                    self.lines[y][2]..prev_data.fg,
+                    self.lines[y][3]..prev_data.background
+                }
+            end
         end
     end
+    self.UPDATES = api.createNDarray(1)
 end
 
 function OBJECT:get_pixel(x,y)
@@ -72,12 +86,8 @@ end
 function OBJECT:clear(color)
     PIXELBOX.ASSERT(type(self)=="table","Please use \":\" when running this function")
     EXPECT(1,color,"number")
-    self.CANVAS = api.createNDarray(2)
-    for y=1,self.height*3 do
-        for x=1,self.width*2 do
-            self.CANVAS[y][x] = color
-        end
-    end
+    self.CANVAS = api.createNDarray(1)
+    self:set_box(1,1,self.width*2,self.height*3,color,false)
     getmetatable(self.CANVAS).__tostring = function() return "PixelBOX_SCREEN_BUFFER" end
 end
 
@@ -92,20 +102,26 @@ function OBJECT:draw()
     end
 end
 
-function OBJECT:set_pixel(x,y,color,thiccness)
-    PIXELBOX.ASSERT(type(self)=="table","Please use \":\" when running this function")
-    EXPECT(1,x,"number")
-    EXPECT(2,y,"number")
-    EXPECT(3,color,"number")
-    PIXELBOX.ASSERT(x>0 and x<=self.width*2,"Out of range")
-    PIXELBOX.ASSERT(y>0 and y<=self.height*3,"Out of range")
-    thiccness = thiccness or 1
-    local t_ratio = (thiccness-1)/2
-    self:set_box(
-        math.ceil(x-t_ratio),
-        math.ceil(y-t_ratio),
-        x+thiccness-1,y+thiccness-1,color,true
-    )
+function OBJECT:set_pixel(x,y,color,thiccness,base)
+    if not base then
+        PIXELBOX.ASSERT(type(self)=="table","Please use \":\" when running this function")
+        EXPECT(1,x,"number")
+        EXPECT(2,y,"number")
+        EXPECT(3,color,"number")
+        PIXELBOX.ASSERT(x>0 and x<=self.width*2,"Out of range")
+        PIXELBOX.ASSERT(y>0 and y<=self.height*3,"Out of range")
+        thiccness = thiccness or 1
+        local t_ratio = (thiccness-1)/2
+        self:set_box(
+            math.ceil(x-t_ratio),
+            math.ceil(y-t_ratio),
+            x+thiccness-1,y+thiccness-1,color,true
+        )
+    else
+        local RELATIVE_X = math.ceil(x/2)
+        local RELATIVE_Y = math.ceil(y/3)
+        self.UPDATES[RELATIVE_Y][RELATIVE_X] = true
+    end
 end
 
 function OBJECT:set_box(sx,sy,ex,ey,color,check)
@@ -120,6 +136,9 @@ function OBJECT:set_box(sx,sy,ex,ey,color,check)
     for y=sy,ey do
         for x=sx,ex do
             if self:within(x,y) then
+                local RELATIVE_X = math.ceil(x/2)
+                local RELATIVE_Y = math.ceil(y/3)
+                self.UPDATES[RELATIVE_Y][RELATIVE_X] = true
                 self.CANVAS[y][x] = color
             end
         end
@@ -230,13 +249,20 @@ function PIXELBOX.new(terminal,bg,existing)
     local BOX = {}
     local w,h = terminal.getSize()
     BOX.term = setmetatable(terminal,{__tostring=function() return "term_object" end})
-    BOX.CANVAS = api.createNDarray(2,existing)
+    BOX.CANVAS = api.createNDarray(1,existing)
+    BOX.UPDATES = api.createNDarray(1)
+    BOX.CHARS = api.createNDarray(1)
     getmetatable(BOX.CANVAS).__tostring = function() return "PixelBOX_SCREEN_BUFFER" end
     BOX.width = w
     BOX.height = h
     for y=1,h*3 do
         for x=1,w*2 do
             BOX.CANVAS[y][x] = bg
+        end
+    end
+    for y=1,h do
+        for x=1,w do
+            BOX.CHARS[y][x] = {symbol=" ",background=graphic.to_blit[bg],fg="f"}
         end
     end
     return setmetatable(BOX,{__index = OBJECT})
