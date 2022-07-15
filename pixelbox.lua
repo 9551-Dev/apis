@@ -30,6 +30,23 @@ function OBJECT:within(x,y)
         and y <= self.height*3
 end
 
+function PIXELBOX.RESTORE(BOX,color,existing)
+    BOX.CANVAS = api.createNDarray(1)
+    BOX.UPDATES = api.createNDarray(1)
+    BOX.CHARS = api.createNDarray(1)
+    for y=1,BOX.height*3 do
+        for x=1,BOX.width*2 do
+            BOX.CANVAS[y][x] = color
+        end
+    end
+    for y=1,BOX.height do
+        for x=1,BOX.width do
+            BOX.CHARS[y][x] = {symbol=" ",background=graphic.to_blit[color],fg="f"}
+        end
+    end
+    getmetatable(BOX.CANVAS).__tostring = function() return "PixelBOX_SCREEN_BUFFER" end
+end
+
 function OBJECT:push_updates()
     PIXELBOX.ASSERT(type(self)=="table","Please use \":\" when running this function")
     self.symbols = api.createNDarray(2)
@@ -86,9 +103,7 @@ end
 function OBJECT:clear(color)
     PIXELBOX.ASSERT(type(self)=="table","Please use \":\" when running this function")
     EXPECT(1,color,"number")
-    self.CANVAS = api.createNDarray(1)
-    self:set_box(1,1,self.width*2,self.height*3,color,false)
-    getmetatable(self.CANVAS).__tostring = function() return "PixelBOX_SCREEN_BUFFER" end
+    PIXELBOX.RESTORE(self,color)
 end
 
 function OBJECT:draw()
@@ -249,22 +264,9 @@ function PIXELBOX.new(terminal,bg,existing)
     local BOX = {}
     local w,h = terminal.getSize()
     BOX.term = setmetatable(terminal,{__tostring=function() return "term_object" end})
-    BOX.CANVAS = api.createNDarray(1,existing)
-    BOX.UPDATES = api.createNDarray(1)
-    BOX.CHARS = api.createNDarray(1)
-    getmetatable(BOX.CANVAS).__tostring = function() return "PixelBOX_SCREEN_BUFFER" end
     BOX.width = w
     BOX.height = h
-    for y=1,h*3 do
-        for x=1,w*2 do
-            BOX.CANVAS[y][x] = bg
-        end
-    end
-    for y=1,h do
-        for x=1,w do
-            BOX.CHARS[y][x] = {symbol=" ",background=graphic.to_blit[bg],fg="f"}
-        end
-    end
+    PIXELBOX.RESTORE(BOX,bg,existing)
     return setmetatable(BOX,{__index = OBJECT})
 end
 
