@@ -51,6 +51,8 @@ function OBJECT:push_updates()
     PIXELBOX.ASSERT(type(self)=="table","Please use \":\" when running this function")
     self.symbols = api.createNDarray(2)
     self.lines = api.create_blit_array(self.height)
+    local SYMBOL_COLORS = api.createNDarray(1)
+    local SYMBOL_LUT =    api.createNDarray(2)
     getmetatable(self.symbols).__tostring=function() return "PixelBOX.SYMBOL_BUFFER" end
     setmetatable(self.lines,{__tostring=function() return "PixelBOX.LINE_BUFFER" end})
     for y,x_list in pairs(self.CANVAS) do
@@ -60,6 +62,11 @@ function OBJECT:push_updates()
             if self.UPDATES[RELATIVE_Y][RELATIVE_X] then
                 local SYMBOL_POS_X = (x-1)%2+1
                 local SYMBOL_POS_Y = (y-1)%3+1
+                if not SYMBOL_LUT[RELATIVE_Y][RELATIVE_X][block_color] then
+                    if not SYMBOL_COLORS[RELATIVE_Y][RELATIVE_X] then SYMBOL_COLORS[RELATIVE_Y][RELATIVE_X] = 0 end
+                    SYMBOL_COLORS[RELATIVE_Y][RELATIVE_X] = SYMBOL_COLORS[RELATIVE_Y][RELATIVE_X] + 1
+                    SYMBOL_LUT[RELATIVE_Y][RELATIVE_X][block_color] = true
+                end
                 self.symbols[RELATIVE_Y][RELATIVE_X] = PIXELBOX.INDEX_SYMBOL_CORDINATION(
                     self.symbols[RELATIVE_Y][RELATIVE_X],
                     SYMBOL_POS_X,SYMBOL_POS_Y,
@@ -72,7 +79,10 @@ function OBJECT:push_updates()
         for x=1,self.width do
             local color_block = self.symbols[y][x]
             if self.UPDATES[y][x] then
-                local char,fg,bg = graphic.build_drawing_char(color_block)
+                local char,fg,bg = " ",colors.black,color_block[1]
+                if SYMBOL_COLORS[y][x] > 1 then
+                    char,fg,bg = graphic.build_drawing_char(color_block)
+                end
                 self.CHARS[y][x] = {symbol=char, background=graphic.to_blit[bg], fg=graphic.to_blit[fg]}
                 self.lines[y] = {
                     self.lines[y][1]..char,
