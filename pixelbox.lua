@@ -479,10 +479,14 @@ function graphic.build_drawing_char(arr,mode)
         end
     end
     table.sort(fin,function(a,b) return a.count > b.count end)
+    local swap = true
     for k=1,6 do
         if arr[k] == fin[1].c then char[k] = 1
         elseif arr[k] == fin[2].c then char[k] = 0
-        else char[k] = mode and 0 or 1 end
+        else char[k] =(function()
+            swap = not swap
+            return swap and 1 or 0
+        end)() end
     end
     if char[6] == 1 then for i = 1, 5 do char[i] = 1-char[i] end end
     local n = 128
