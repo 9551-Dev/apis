@@ -1312,14 +1312,14 @@ Nt=math.floor(e.math.lerp(Tt,zt,qt(e.math.lerp,Ot/jt))+0.5)l.positioning.x=It\
 l.positioning.y=Nt sleep(At)end end)end end if l.positioning and\
 l.positioning.width and l.positioning.height then\
 yt[kt]=function(St,Ht,Rt,Dt,Lt,Ut)Dt=Dt or l.positioning.width or 1 Lt=Lt or\
-l.positioning.width or 1 Ht=Ht or Dt Lt=Lt or Lt Ut=Ut or 0.05 return\
+l.positioning.height or 1 Ht=Ht or Dt Rt=Rt or Lt Ut=Ut or 0.05 return\
 h.async(function()for Ct=0.05*(Ut/0.05),St+Ut,Ut do local\
 Mt=math.floor(e.math.lerp(Dt,Ht,qt(e.math.lerp,Ct/St))+0.5)local\
 Ft=math.floor(e.math.lerp(Lt,Rt,qt(e.math.lerp,Ct/St))+0.5)l.positioning.width=Mt\
 l.positioning.height=Ft sleep(Ut)end end)end end gt[kt]=function(Wt,Yt,Pt,Vt)if\
 l.text then Vt=Vt or 0.05 return h.async(function()for\
 Bt=0.05*(Vt/0.05),Wt+Vt,Vt do local\
-Gt=math.floor(e.math.lerp(1,#Yt,qt(e.math.lerp,Bt/Wt))+0.5)l.text.text=Yt:sub(1,Gt)if\
+Gt=math.floor(e.math.lerp(0,#Yt,qt(e.math.lerp,Bt/Wt))+0.5)l.text.text=Yt:sub(0,Gt)if\
 type(Pt)==\"function\"then Pt(l)end sleep(Vt)end end)end end\
 setmetatable(wt,{__call=function(Kt,...)wt.linear(...)end,__index={text=gt,reposition=wt,move=wt,resize=yt}})end\
 mt.animate=wt mt.resize=yt mt.logic=q mt.graphic=x mt.set=G mt.get=K\
