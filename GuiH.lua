@@ -561,7 +561,7 @@ table.insert(x[I.logic_order or I.order],function()if\
 e.events_with_cords[m.name]and I.blocking then local N=I.positioning if N and\
 N.x and N.y then local S=N.width or 1 local H=N.height or 1 local\
 R=e.is_within_field(m.x,m.y,N.x,N.y,S,H)if R then if E[m.x][m.y]and not\
-I.always_update then return end for D=1,S*H do\
+I.always_update then return end if _G.type(I.on_focus) == \"function\" then I.on_focus(I) end for D=1,S*H do\
 E[(D-1)%S+N.x][math.ceil(D/S)+N.y-1]=true end end end end\
 table.insert(z,function()if a[m.name]then if I.logic then\
 setfenv(I.logic,_ENV)(I,m,n)end else if((I.btn or o)[m.button])or\
