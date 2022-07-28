@@ -1156,7 +1156,7 @@ local files={
   end,__call=function(P,V)local l=g(l,V)if not(type(l.name)==\"string\")then\
   l.name=e.uuid4()end if not(type(l.order)==\"number\")then l.order=1 end if\
   not(type(l.logic_order)==\"number\")then l.logic_order=1 end\
-  if _G.type(data.on_focus) == \"function\" then object.on_focus = data.on_focus end\
+  if _G.type(V.on_focus) == \"function\" then l.on_focus =  V.on_focus end\
   if not(type(l.graphic_order)==\"number\")then l.graphic_order=1 end if\
   not(type(l.react_to_events)==\"table\")then l.react_to_events={}end if\
   not(type(l.btn)==\"table\")then l.btn={}end if\
