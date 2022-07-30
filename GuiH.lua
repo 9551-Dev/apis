@@ -699,7 +699,7 @@ Q=z.h*(Q/100)end if Y>0 then J=z.w*(J/100)end if V>0 then X=z.h*(X/100)end if\
 N==\"center\"then if C>0 then K=K-J/2+1 end if F>0 then Q=Q-X/2+1 end elseif\
 N==\"top_right\"then if C>0 then K=K-J+1 end elseif N==\"bottom_left\"then if F>0\
 then Q=Q-X+1 end elseif N==\"bottom_right\"then if C>0 then K=K-J+1 end if F>0\
-then Q=Q-X+1 end end B.x=math.floor(K+0.5)+S B.y=math.floor(Q+0.5)+S\
+then Q=Q-X+1 end end B.x=math.floor(K+0.5)+S B.y=math.floor(Q+0.5)+H\
 B.width=J+R B.height=X+D end G()if z.debug then\
 h(\"Made new dynamic position \"..L)end z.dynamic_positions[L]=G return B end\
 z.position=z.create_position z.relative_to=function(Z,et,tt,j,x,at,ot)local\
