@@ -20,85 +20,446 @@ SOFTWARE.
 
 
 local files={
-[ "core/object-base" ] = "local e=require(\"util\")return function(t,a)a=a or{}if\
+  [ "objects/circle/logic" ] = "return\
+function()end\
+",
+  [ "objects/script/object" ] = "local e=require(\"util\")return function(t,a)a=a or{}if\
 type(a.visible)~=\"boolean\"then a.visible=true end if\
-type(a.reactive)~=\"boolean\"then a.reactive=true end local o={name=a.name or\
-e.uuid4(),visible=a.visible,reactive=a.reactive,react_to_events={},btn={},order=a.order\
-or 1,logic_order=a.logic_order,graphic_order=a.graphic_order,}return o\
+type(a.reactive)~=\"boolean\"then a.reactive=true end if\
+type(a.blocking)~=\"boolean\"then a.blocking=false end if\
+type(a.always_update)~=\"boolean\"then a.always_update=true end local\
+o={name=a.name or e.uuid4(),visible=a.visible,reactive=a.reactive,code=a.code\
+or function()return false end,graphic=a.graphic or function()return false\
+end,order=a.order or\
+1,logic_order=a.logic_order,graphic_order=a.graphic_order,react_to_events={mouse_click=true,mouse_drag=true,monitor_touch=true,mouse_scroll=true,mouse_up=true,key=true,key_up=true,char=true,paste=true},blocking=a.blocking,always_update=a.always_update}return\
+o\
 end",
-[ "animations/ease_out_elastic" ] = "return function(e,t)local a=(2*math.pi)/3;return t==0 and 0 or(t==1 and 1\
+  [ "core/algo" ] = "local e=require(\"util\")_ENV=_ENV.ORIGINAL local function t(a,o,i,n,s)local\
+h,r=math.ceil(math.floor(a-0.5)/2),math.ceil(math.floor(o-0.5)/2)local d,l=0,r\
+local u=((r*r)-(h*h*r)+(0.25*h*h))local c=2*r^2*d local m=2*h^2*l local\
+f={}while c<m do\
+table.insert(f,{x=d+i,y=l+n})table.insert(f,{x=-d+i,y=l+n})table.insert(f,{x=d+i,y=-l+n})table.insert(f,{x=-d+i,y=-l+n})if\
+s then for l=-l+n+1,l+n-1 do\
+table.insert(f,{x=d+i,y=l})table.insert(f,{x=-d+i,y=l})end end if u<0 then\
+d=d+1 c=c+2*r^2 u=u+c+r^2 else d,l=d+1,l-1 c=c+2*r^2 m=m-2*h^2 u=u+c-m+r^2 end\
+end local w=(((r*r)*((d+0.5)*(d+0.5)))+((h*h)*((l-1)*(l-1)))-(h*h*r*r))while\
+l>=0 do\
+table.insert(f,{x=d+i,y=l+n})table.insert(f,{x=-d+i,y=l+n})table.insert(f,{x=d+i,y=-l+n})table.insert(f,{x=-d+i,y=-l+n})if\
+s then for l=-l+n,l+n do\
+table.insert(f,{x=d+i,y=l})table.insert(f,{x=-d+i,y=l})end end if w>0 then\
+l=l-1 m=m-2*h^2 w=w+h^2-m else l=l-1 d=d+1 m=m-2*h^2 c=c+2*r^2 w=w+c-m+h^2 end\
+end return f end local function y(p,v,b,g)local k=(g.x-v.x)/(g.y-v.y)local\
+q=(g.x-b.x)/(g.y-b.y)local j=math.ceil(v.y-0.5)local x=math.ceil(g.y-0.5)-1 for\
+z=j,x do local E=k*(z+0.5-v.y)+v.x local T=q*(z+0.5-b.y)+b.x local\
+A=math.ceil(E-0.5)local O=math.ceil(T-0.5)for I=A,O do\
+table.insert(p,{x=I,y=z})end end end local function N(S,H,R,D)local\
+L=(R.x-H.x)/(R.y-H.y)local U=(D.x-H.x)/(D.y-H.y)local C=math.ceil(H.y-0.5)local\
+M=math.ceil(D.y-0.5)-1 for F=C,M do local W=L*(F+0.5-H.y)+H.x local\
+Y=U*(F+0.5-H.y)+H.x local P=math.ceil(W-0.5)local V=math.ceil(Y-0.5)for B=P,V\
+do table.insert(S,{x=B,y=F})end end end local function G(K,Q,J)local X={}if\
+Q.y<K.y then K,Q=Q,K end if J.y<Q.y then Q,J=J,Q end if Q.y<K.y then K,Q=Q,K\
+end if K.y==Q.y then if Q.x<K.x then K,Q=Q,K end y(X,K,Q,J)elseif Q.y==J.y then\
+if J.x<Q.x then J,Q=Q,J end N(X,K,Q,J)else local Z=(Q.y-K.y)/(J.y-K.y)local\
+et={x=K.x+((J.x-K.x)*Z),y=K.y+((J.y-K.y)*Z),}if Q.x<et.x then\
+N(X,K,Q,et)y(X,Q,et,J)else N(X,K,et,Q)y(X,et,Q,J)end end return X end local\
+function tt(at,ot,it,nt)local st={}for at=at,at+it do for ot=ot,ot+nt do\
+table.insert(st,{x=at,y=ot})end end end local function ht(rt,dt,lt,ut)local\
+ct={}rt,dt,lt,ut=math.floor(rt),math.floor(dt),math.floor(lt),math.floor(ut)if\
+rt==lt and dt==ut then return{x=rt,y=dt}end local mt=math.min(rt,lt)local\
+ft,wt,yt if mt==rt then wt,ft,yt=dt,lt,ut else wt,ft,yt=ut,rt,dt end local\
+pt,vt=ft-mt,yt-wt if pt>math.abs(vt)then local bt=wt local gt=vt/pt for\
+kt=mt,ft do table.insert(ct,{x=kt,y=math.floor(bt+0.5)})bt=bt+gt end else local\
+qt,jt=mt,pt/vt if yt>=wt then for xt=wt,yt do\
+table.insert(ct,{x=math.floor(qt+0.5),y=xt})qt=qt+jt end else for zt=wt,yt,-1\
+do table.insert(ct,{x=math.floor(qt+0.5),y=zt})qt=qt-jt end end end return ct\
+end local function Et(Tt,At,Ot)local It={}local Nt=ht(Tt.x,Tt.y,At.x,At.y)local\
+St=ht(At.x,At.y,Ot.x,Ot.y)local Ht=ht(Ot.x,Ot.y,Tt.x,Tt.y)return\
+e.tables.merge(Nt,St,Ht)end\
+return{get_elipse_points=t,get_triangle_points=G,get_triangle_outline_points=Et,get_line_points=ht}",
+  [ "animations/ease_out_elastic" ] = "return function(e,t)local a=(2*math.pi)/3;return t==0 and 0 or(t==1 and 1\
 or(2^(-10*t)*math.sin((t*10-0.75)*a)+1))end\
 ",
-[ "presets/tex/checker" ] = "local e=require(\"util\")local t=require(\"graphic_handle\")return\
-function(...)local a=e.tables.createNDarray(2,{offset={5,13,11,4}})local\
-o={...}local i=1 for n,s in pairs(o)do local h={}for r=1,table.getn(o)do local\
-d=((r+i)-2)%table.getn(o)+1 h[r]=o[d]end for n,s in pairs(h)do\
-a[n+4][i+8]={s=\" \",t=\"f\",b=t.code.to_blit[s]}end i=i+1 end return\
-t.load_texture(a)end",
-[ "objects/group/object" ] = "local e=require(\"util\")local t=require(\"core.gui_object\")return\
-function(a,o)o=o or{}if type(o.visible)~=\"boolean\"then o.visible=true end if\
-type(o.reactive)~=\"boolean\"then o.reactive=true end if\
-type(o.blocking)~=\"boolean\"then o.blocking=true end if\
-type(o.always_update)~=\"boolean\"then o.always_update=false end local\
-i={name=o.name or e.uuid4(),positioning={x=o.x or 1,y=o.y or 1,width=o.width or\
-0,height=o.height or 0},visible=o.visible,last_known_position={x=o.x or 1,y=o.y\
-or 1,width=o.width or 0,height=o.height or 0},order=o.order or\
-1,logic_order=o.logic_order,graphic_order=o.graphic_order,bef_draw=o.bef_draw\
-or function()end,blocking=o.blocking,always_update=o.always_update}local\
-n=window.create(a.term_object,i.positioning.x,i.positioning.y,i.positioning.width,i.positioning.height)i.gui=t(n,a.term_object,a.log)i.window=n\
-i.gui.inherit(a,i)return i\
-end",
-[ "objects/text/graphic" ] = "return function(e)if e.text then e:update(e.text)e.text()end\
-end\
+  [ "animations/ease_out_quad" ] = "return function(e,t)return\
+1-(1-t)*(1-t)end\
 ",
-[ "animations/ease_out_expo" ] = "return function(e,t)return t==1 and 1 or\
+  [ "core/blbfor" ] = "_ENV=_ENV.ORIGINAL local e=require(\"cc.expect\").expect local t=0x0A local\
+a=0x30 local o={INTERNAL={STRING={}}}local i={}local n={}function\
+o.INTERNAL.STRING.FORMAT_BLIT(s)return(\"%x\"):format(s)end function\
+o.INTERNAL.STRING.TO_BLIT(h,r)local d=(not\
+r)and(o.INTERNAL.STRING.FORMAT_BLIT(select(2,math.frexp(h))-1))or(select(2,math.frexp(h))-1)return\
+d end function o.INTERNAL.STRING.FROM_HEX(l)return tonumber(l,16)end function\
+o.INTERNAL.READ_BYTES_STREAM(u,c,m)local f={}u.seek(\"set\",c)for w=c,c+m-1 do\
+local y=u.read()table.insert(f,y)end return table.unpack(f)end function\
+o.INTERNAL.STRING_TO_BYTES(p)local v={}for b=1,#p do v[b]=p:byte(b)end return\
+table.unpack(v)end function o.INTERNAL.WRITE_BYTES_STREAM(g,k,...)local\
+q={...}for j=1,#q do g.seek(\"set\",k+j-1)g.write(q[j])end end function\
+o.INTERNAL.READ_STRING_UNTIL_SEP(x,z)local E=\"\"x.seek(\"set\",z)local\
+T=x.read()if not T then return false end while T~=t do\
+E=E..string.char(T)T=x.read()end return E end function\
+o.INTERNAL.READ_INT(A,O)local I=0 A.seek(\"set\",O)local N=A.read()while N~=t do\
+I=I*10+(N-a)N=A.read()end return I end function\
+o.INTERNAL.COLORS_TO_BYTE(S,H)local R=select(2,math.frexp(S))-1 local\
+D=select(2,math.frexp(H))-1 return R*16+D end function\
+o.INTERNAL.BYTE_TO_COLORS(L)return\
+bit32.rshift(bit32.band(0xF0,L),4),bit32.band(0x0F,L)end function\
+o.INTERNAL.WRITE_HEADER(U)U.stream.seek(\"set\",0)local\
+C=textutils.serialiseJSON(U.meta):gsub(\"\\n\",\"NEWLINE\")o.INTERNAL.WRITE_BYTES_STREAM(U.stream,0,o.INTERNAL.STRING_TO_BYTES((\"BLBFOR1\\n%d\\n%d\\n%d\\n%d\\n%s\\n\"):format(U.width,U.height,U.layers,os.epoch(\"utc\"),C)))end\
+function o.INTERNAL.ASSERT(M,F)if not M then error(F,3)else return M end end\
+function o.INTERNAL.createNDarray(W,Y)Y=Y or{}if W==0 then return Y end\
+setmetatable(Y,{__index=function(P,V)local\
+B=o.INTERNAL.createNDarray(W-1)P[V]=B return B end})return Y end function\
+o.INTERNAL.ENCODE(G)o.INTERNAL.WRITE_HEADER(G)for K,Q in ipairs(G.data)do for\
+J,X in ipairs(Q)do local Z={}for et,tt in ipairs(X)do\
+table.insert(Z,tt[1])table.insert(Z,o.INTERNAL.COLORS_TO_BYTE(2^tt[2],2^tt[3]))end\
+o.INTERNAL.WRITE_BYTES_STREAM(G.stream,G.stream.seek(\"cur\"),table.unpack(Z))end\
+end end function o.INTERNAL.DECODE(at)at.stream.seek(\"set\",0)local\
+ot=o.INTERNAL.READ_STRING_UNTIL_SEP(at.stream,0)local\
+it=o.INTERNAL.createNDarray(2)o.INTERNAL.ASSERT(ot==\"BLBFOR1\",\"Invalid header\",2)local\
+nt=o.INTERNAL.READ_INT(at.stream,at.stream.seek(\"cur\"))local\
+st=o.INTERNAL.READ_INT(at.stream,at.stream.seek(\"cur\"))local\
+ht=o.INTERNAL.READ_INT(at.stream,at.stream.seek(\"cur\"))local\
+rt=o.INTERNAL.READ_INT(at.stream,at.stream.seek(\"cur\"))local\
+dt=textutils.unserializeJSON(o.INTERNAL.READ_STRING_UNTIL_SEP(at.stream,at.stream.seek(\"cur\")))at.width=nt\
+at.height=st at.layers=ht at.meta=dt at.last_flushed=rt\
+at.data=o.INTERNAL.createNDarray(3,at.data)for lt=1,at.layers do for ut=1,st do\
+if not next(it[lt][ut])then it[lt][ut]={\"\",\"\",\"\"}end local ct={}for mt=1,nt do\
+local ft={}local\
+wt,yt=o.INTERNAL.READ_BYTES_STREAM(at.stream,at.stream.seek(\"cur\"),2)ft[1]=wt\
+ft[2],ft[3]=o.INTERNAL.BYTE_TO_COLORS(yt)ct[mt]=ft\
+it[lt][ut]={it[lt][ut][1]..string.char(ft[1]),it[lt][ut][2]..o.INTERNAL.STRING.FORMAT_BLIT(ft[2]),it[lt][ut][3]..o.INTERNAL.STRING.FORMAT_BLIT(ft[3])}end\
+at.data[lt][ut]=ct end end at.lines=it end function\
+i:set_pixel(pt,vt,bt,gt,kt,qt)o.INTERNAL.ASSERT(type(self)==\"table\",\"Please use \\\":\\\" when running this function\")o.INTERNAL.ASSERT(not\
+self.closed,\"Image handle closed\")e(1,pt,\"number\")e(2,vt,\"number\")e(3,bt,\"number\")e(4,gt,\"string\")e(5,kt,\"number\")e(6,qt,\"number\")o.INTERNAL.ASSERT(not(vt<1\
+or bt<1 or vt>self.width or\
+bt>self.height),\"pixel out of range\")self.data[pt][bt][vt]={gt:byte(),o.INTERNAL.STRING.TO_BLIT(kt,true),o.INTERNAL.STRING.TO_BLIT(qt,true)}end\
+function\
+n:get_pixel(jt,xt,zt,Et)o.INTERNAL.ASSERT(type(self)==\"table\",\"Please use \\\":\\\" when running this function\")e(1,jt,\"number\")e(2,xt,\"number\")e(3,zt,\"number\")e(4,Et,\"boolean\",\"nil\")o.INTERNAL.ASSERT(not(xt<1\
+or zt<1 or xt>self.width or zt>self.height),\"pixel out of range\")local\
+Tt=self.data[jt][zt][xt]local At={string.char(Tt[1]),2^Tt[2],2^Tt[3]}local\
+Ot={string.char(Tt[1]),o.INTERNAL.STRING.FORMAT_BLIT(Tt[2]),o.INTERNAL.STRING.FORMAT_BLIT(Tt[3])}return\
+table.unpack(Et and Ot or At)end function\
+n:get_line(It,Nt)o.INTERNAL.ASSERT(type(self)==\"table\",\"Please use \\\":\\\" when running this function\")e(1,It,\"number\")e(2,Nt,\"number\")o.INTERNAL.ASSERT(not(Nt<1\
+or Nt>self.height),\"line out of range\")return\
+self.lines[It][Nt][1],self.lines[It][Nt][2],self.lines[It][Nt][3]end function\
+i:set_line(St,Ht,Rt,Dt,Lt)o.INTERNAL.ASSERT(type(self)==\"table\",\"Please use \\\":\\\" when running this function\")o.INTERNAL.ASSERT(not\
+self.closed,\"Image handle closed\")e(1,St,\"number\")e(2,Ht,\"number\")e(3,Rt,\"string\")e(4,Dt,\"string\")e(5,Lt,\"string\")o.INTERNAL.ASSERT(#Dt==#Rt\
+and#Lt==#Rt,\"line length mismatch\")o.INTERNAL.ASSERT(#Rt<=self.width,\"line too long\")o.INTERNAL.ASSERT(Ht<=self.height\
+and Ht>0,\"line out of range\")for Ut=1,#Rt do\
+self:set_pixel(St,Ut,Ht,Rt:sub(Ut,Ut),2^o.INTERNAL.STRING.FROM_HEX(Dt:sub(Ut,Ut)),2^o.INTERNAL.STRING.FROM_HEX(Lt:sub(Ut,Ut)))end\
+end function\
+i:close()o.INTERNAL.ASSERT(type(self)==\"table\",\"Please use \\\":\\\" when running this function\")o.INTERNAL.ASSERT(not\
+self.closed,\"Image handle closed\")o.INTERNAL.ENCODE(self)self.stream.close()self.closed=true\
+end function\
+i:flush()o.INTERNAL.ASSERT(type(self)==\"table\",\"Please use \\\":\\\" when running this function\")o.INTERNAL.ASSERT(not\
+self.closed,\"Image handle closed\")o.INTERNAL.ENCODE(self)self.stream.flush()end\
+i.write_pixel=i.set_pixel i.write_line=i.set_line n.read_pixel=n.get_pixel\
+n.read_line=n.get_line function\
+o.open(Ct,Mt,Ft,Wt,Yt,Pt,Vt,Bt,Gt)e(1,Ct,\"string\")e(2,Mt,\"string\")local\
+Kt=Ct:match(\"%.%a+$\")o.INTERNAL.ASSERT(Kt==\".bbf\",\"file must be a .bbf file\")local\
+Qt={}if Mt:sub(1,1):lower()==\"w\"then\
+e(3,Ft,\"number\")e(4,Wt,\"number\")e(5,Yt,\"number\",\"nil\")e(6,Pt,\"string\",\"nil\")e(7,Vt,\"string\",\"nil\")e(8,Bt,\"string\",\"nil\")e(9,Gt,\"table\",\"nil\")Yt=Yt\
+or 1 local Jt=fs.open(Ct,\"wb\")if not Jt then error(\"Could not open file\",2)end\
+Qt.meta=Gt or{}Qt.width=Ft Qt.height=Wt Qt.layers=Yt\
+Qt.data=o.INTERNAL.createNDarray(3)Qt.stream=Jt for Xt=1,Yt do for Zt=1,Ft do\
+for ea=1,Wt do Qt.data[Xt][ea][Zt]={(Bt or\
+string.char(0)):byte(),o.INTERNAL.STRING.TO_BLIT(Pt or\
+colors.black,true),o.INTERNAL.STRING.TO_BLIT(Vt or colors.black,true)}end end\
+end return setmetatable(Qt,{__index=i})elseif Mt:sub(1,1):lower()==\"r\"then\
+local ta=fs.open(Ct,\"rb\")if not ta then error(\"Could not open file\",2)end local\
+aa=ta.seek(\"cur\")Qt.raw=ta.readAll()ta.seek(\"set\",aa)Qt.stream=ta\
+o.INTERNAL.DECODE(Qt)Qt.closed=true ta.close()return\
+setmetatable(Qt,{__index=n})else\
+stream.close()error(\"invalid mode. please use \\\"w\\\" or \\\"r\\\" (Write/Read)\",2)end\
+end return\
+o",
+  [ "animations/ease_out_expo" ] = "return function(e,t)return t==1 and 1 or\
 1-2^(-10*t)end\
 ",
-util = "_ENV=_ENV.ORIGINAL local function e(t,a,o,i,n,s)return t>=o and t<o+n and a>=i\
-and a<i+s end local h=function(r,d,l)if d==0 then return l,l,l end local\
-u=math.floor(r/60)local c=(r/60)-u local m=l*(1-d)local f=l*(1-d*c)local\
-w=l*(1-d*(1-c))if u==0 then return l,w,m elseif u==1 then return f,l,m elseif\
-u==2 then return m,l,w elseif u==3 then return m,f,l elseif u==4 then return\
-w,m,l elseif u==5 then return l,m,f end end local function y(p,v)v=v or{}if\
-p==0 then return v end setmetatable(v,{__index=function(b,g)local\
-k=y(p-1)b[g]=k return k end})return v end local q=function(j)return\
-setmetatable(j or{},{__index=function(x,z)local E={}x[z]=E return E end})end\
-local T=function(A)return setmetatable(A or{},{__index=function(O,I)local\
-N=q()O[I]=N return N end})end local function S(...)local H={}for R,D in\
-pairs({...})do for L,U in pairs(D)do table.insert(H,U)end end return H end\
-local function C(M,F,W)local Y=W-M.y local P=F.y-M.y local\
-V=M.x+(Y*(F.x-M.x))/P local B=M.z+(Y*(F.z-M.z))/P return V,B end local function\
-G(K,Q,J)local X=K.z+(J-K.x)*(((Q.z-K.z)/(Q.x-K.x)))return X end local function\
-Z(et,tt,at,ot,it,nt,st,ht)local rt=(ot-st)/(ot-et)*at+(st-et)/(ot-et)*nt\
-return(it-ht)/(it-tt)*rt+(ht-tt)/(it-tt)*rt end local function\
-dt(lt,ut,ct)return(1-ct)*lt+ct*ut end local function mt(ft)local\
-wt=createSelfIndexArray()for yt,pt in pairs(ft)do if type(pt)==\"table\"then for\
-vt,bt in pairs(pt)do wt[vt][yt]=bt end end end return wt end local\
-gt=function(kt)local qt=0 for jt,xt in pairs(kt)do qt=qt+1 end return qt,#kt\
-end local zt=function(Et,Tt)local At=true local Ot=gt(Et)local It=gt(Tt)for\
-Nt,St in pairs(Et)do if St~=Tt[Nt]then At=false end end if At and Ot==It then\
-return true end end local function Ht(Rt)local Ht={}for Dt,Lt in pairs(Rt)do\
-table.insert(Ht,Dt)end return Ht end local function Ut(Ct,Mt)local Ft=0 local\
-Ht=Ht(Ct)table.sort(Ht,function(Wt,Yt)if Mt then return Yt<Wt else return Wt<Yt\
-end end)return function()Ft=Ft+1 if Ct[Ht[Ft]]then return Ht[Ft],Ct[Ht[Ft]]else\
-return end end end local function Pt()local Vt=math.random local\
-Bt='xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'return\
-string.gsub(Bt,'[xy]',function(Gt)return string.format('%x',Gt=='x'and\
-Vt(0,0xf)or Vt(8,0xb))end)end local function Kt(Qt)local\
-Jt=os.epoch(\"utc\")+Qt*1000 while os.epoch(\"utc\")<Jt do\
-os.queueEvent(\"waiting\")os.pullEvent(\"waiting\")end end local function\
-Xt(Zt)local ea={}Zt:gsub(\".\",function(ta)table.insert(ea,ta)end)return ea end\
-local function aa(oa)local ia={}for na=1,oa do ia[na]={\"\",\"\",\"\"}end return ia\
-end local\
-sa={monitor_touch=true,mouse_click=true,mouse_drag=true,mouse_scroll=true,mouse_up=true}return{is_within_field=e,tables={createNDarray=y,get_true_table_len=gt,compare_table=zt,switchXYArray=mt,create2Darray=q,create3Darray=T,iterate_order=Ut,merge=S},math={interpolateY=C,interpolateZ=G,interpolate_on_line=Z,lerp=dt},HSVToRGB=h,uuid4=Pt,precise_sleep=Kt,piece_string=Xt,create_blit_array=aa,events_with_cords=sa}",
-[ "objects/script/graphic" ] = "return\
-function(e,t)e.graphic(e,t)end\
+  [ "animations/ease_out_quart" ] = "return function(e,t)return 1-(1-t)^4\
+end\
 ",
-graphic_handle = "local e=require\"core.luappm\"local t=require\"core.blbfor\".open local\
-a=require\"util\"local o=require\"cc.expect\"local i=\"0123456789abcdef\"local\
-n,s={},{}for h=0,15 do n[2^h]=i:sub(h+1,h+1)s[i:sub(h+1,h+1)]=2^h end local\
-r=function(d)local l=a.tables.createNDarray(2)l[\"offset\"]=d[\"offset\"]for u,c in\
-pairs(d)do for m,f in pairs(c)do if type(f)==\"table\"then l[u][m]={}if f then\
+  [ "apis/fuzzy_find" ] = "local e=require(\"cc.pretty\")local function t(a,o)local\
+i=100/math.max(#a,#o)local n=string.len(a)local s=string.len(o)local h={}for\
+r=0,n do h[r]={}h[r][0]=r end for d=0,s do h[0][d]=d end for l=1,n do for u=1,s\
+do local c=0 if string.sub(a,l,l)~=string.sub(o,u,u)then c=1 end\
+h[l][u]=math.min(h[l-1][u]+1,h[l][u-1]+1,h[l-1][u-1]+c)end end return\
+100-h[n][s]*i end local function m(f,w)local y,p={},{}for v,b in pairs(f)do\
+table.insert(y,{t(v,w),v,b})end table.sort(y,function(g,k)return\
+g[1]>k[1]end)for q,j in ipairs(y)do p[q]={match=j[1],str=j[2],data=j[3]}end\
+return p end\
+return{fuzzy_match=t,sort_strings=m,}",
+  [ "core/gui_object" ] = "local e=require(\"object_loader\")local t=require(\"graphic_handle\")local\
+a=require(\"core.update\")local o=require(\"util\")_ENV=_ENV.ORIGINAL local\
+function i(n,s,h,r,d)local l={}local u=\"term_object\"local c=s local function\
+m(f)r,d=0,0 pcall(function()local function w(y)local\
+p,v=y.getPosition()r=r+(p-1)d=d+(v-1)local\
+b,g=debug.getupvalue(y.reposition,5)if g.reposition and g~=term.current()then\
+c=g w(g)elseif g~=nil then c=g end end w(n)end)if f then f.event_offset_x=r\
+f.event_offset_y=d end end if not r or not d then m()end\
+pcall(function()u=peripheral.getType(c)end)for k,q in pairs(e.types)do\
+l[q]={}end local j,x=n.getSize()local\
+z={term_object=n,term=n,gui=l,update=a,visible=true,id=o.uuid4(),task_schedule={},update_delay=0.05,held_keys={},log=h,task_routine={},paused_task_routine={},w=j,h=x,width=j,height=x,event_listeners={},paused_listeners={},background=n.getBackgroundColor(),cls=false,key={},texture_cache={},debug=false,event_offset_x=r,event_offset_y=d,dynamic_positions={},paused_dynamic_positions={}}z.inherit=function(E,T)z.api=E.api\
+z.preset=E.preset z.async=E.async z.schedule=E.schedule\
+z.add_listener=E.add_listener z.debug=E.debug z.parent=T end z.elements=z.gui\
+z.calibrate=function()m(z)end z.getSize=function()return z.w,z.h end local\
+A={[\"center\"]=true,[\"top_left\"]=true,[\"top_right\"]=true,[\"bottom_left\"]=true,[\"bottom_right\"]=true}z.create_position=function(O,I,j,x,N,S,H)local\
+R=o.uuid4()O,I=tostring(O),tostring(I)j,x=tostring(j),tostring(x)N=A[N]and N\
+or\"center\"local D,L=O:gsub(\"%%\",\"\")local U,C=I:gsub(\"%%\",\"\")local\
+M,F=j:gsub(\"%%\",\"\")local W,Y=x:gsub(\"%%\",\"\")local P={}local function V()local\
+B=tonumber(D)local G=tonumber(U)local K=tonumber(M)local Q=tonumber(W)h(z.h)if\
+L>0 then B=z.w*(B/100)end if C>0 then G=z.h*(G/100)end if F>0 then\
+K=z.w*(K/100)end if Y>0 then Q=z.h*(Q/100)end if N==\"center\"then if L>0 then\
+B=B-K/2+1 end if C>0 then G=G-Q/2+1 end elseif N==\"top_right\"then if L>0 then\
+B=B-K+1 end elseif N==\"bottom_left\"then if C>0 then G=G-Q+1 end elseif\
+N==\"bottom_right\"then if L>0 then B=B-K+1 end if C>0 then G=G-Q+1 end end\
+P.x=math.floor(B+0.5)P.y=math.floor(G+0.5)P.width=K P.height=Q end V()if\
+z.debug then h(\"Made new dynamic position \"..R)end z.dynamic_positions[R]=V\
+return P end z.position=z.create_position\
+z.relative_to=function(J,X,Z,j,x,et,tt)local\
+at=o.uuid4()j,x=tostring(j),tostring(x)X=X or 0 Z=Z or 0 et=A[et]and et\
+or\"centered\"tt=A[tt]and tt or\"centered\"local ot,it=j:gsub(\"%%\",\"\")local\
+nt,st=x:gsub(\"%%\",\"\")local ht={}local function rt()local dt=J.positioning.x or\
+1 local lt=J.positioning.y or 1 local ut=J.positioning.width or 1 local\
+ct=J.positioning.height or 1 local mt=tonumber(ot)local ft=tonumber(nt)if not\
+next(ht)then ht={width=mt,height=ft}end if it>0 then mt=z.w*(mt/100)end if st>0\
+then ft=z.h*(ft/100)end if et==\"centered\"then dt=dt+(ut/2)+0.5 lt=lt+(ct/2)+0.5\
+elseif et==\"top_right\"then dt=dt+ut lt=lt+1 elseif et==\"bottom_left\"then\
+dt=dt+1 lt=lt+ct elseif et==\"bottom_right\"then dt=dt+ut lt=lt+ct elseif\
+et==\"top_left\"then dt=dt+1 lt=lt+1 end if tt==\"centered\"then dt=dt-ht.width/2\
+lt=lt-ht.height/2 elseif tt==\"top_right\"then dt=dt-ht.width+0.5 lt=lt-0.5\
+elseif tt==\"bottom_left\"then dt=dt-0.5 lt=lt-ht.height+0.5 elseif\
+tt==\"bottom_right\"then dt=dt-ht.width+0.5 lt=lt-ht.height+0.5 elseif\
+tt==\"top_left\"then dt=dt-0.5 lt=lt-0.5 end ht.x=math.floor(dt-0.5)+X\
+ht.y=math.floor(lt-0.5)+Z ht.width=mt ht.height=ft end rt()if z.debug then\
+h(\"Made new relative position \"..at)end z.dynamic_positions[at]=rt return ht\
+end h(\"set up updater\",h.update)local function\
+wt(yt,pt,vt,bt,gt,kt,qt,jt,xt,zt,Et)return\
+a(z,yt,pt,vt,bt,gt,kt,qt,jt,xt,zt,Et)end local Tt local At=false\
+z.schedule=function(Ot,It,Nt,St)local Ht=o.uuid4()if St or z.debug then\
+h(\"created new thread: \"..tostring(Ht),h.info)end local Rt={}local\
+Dt={c=coroutine.create(function()local Lt,Ut=pcall(function()if It then\
+o.precise_sleep(It)end Ot(z,z.term_object)end)if not Lt then if Nt==true then\
+Tt=Ut end Rt.err=Ut if St or z.debug then\
+h(\"error in thread: \"..tostring(Ht)..\"\\n\"..tostring(Ut),h.error)h:dump()end end\
+end),dbug=St}z.task_routine[Ht]=Dt local function Ct(...)local\
+Mt=z.task_routine[Ht]or z.paused_task_routine[Ht]if Mt then local\
+Ft,Tt=coroutine.resume(Mt.c,...)if not Ft then Rt.err=Tt if St or z.debug then\
+h(\"task \"..tostring(Ht)..\" error: \"..tostring(Tt),h.error)h:dump()end end\
+return true,Ft,Tt else if St or z.debug then\
+h(\"task \"..tostring(Ht)..\" not found\",h.error)h:dump()end return false end end\
+return setmetatable(Dt,{__index={kill=function()z.task_routine[Ht]=nil\
+z.paused_task_routine[Ht]=nil if St or z.debug then\
+h(\"killed task: \"..tostring(Ht),h.info)h:dump()end return true\
+end,alive=function()local Wt=z.task_routine[Ht]or z.paused_task_routine[Ht]if\
+not Wt then return false end return\
+coroutine.status(Wt.c)~=\"dead\"end,step=Ct,update=Ct,pause=function()local\
+Yt=z.task_routine[Ht]or z.paused_task_routine[Ht]if Yt then\
+z.paused_task_routine[Ht]=Yt z.task_routine[Ht]=nil if St or z.debug then\
+h(\"paused task: \"..tostring(Ht),h.info)h:dump()end return true else if St or\
+z.debug then h(\"task \"..tostring(Ht)..\" not found\",h.error)h:dump()end return\
+false end end,resume=function()local Pt=z.paused_task_routine[Ht]or\
+z.task_routine[Ht]if Pt then z.task_routine[Ht]=Pt\
+z.paused_task_routine[Ht]=nil if St or z.debug then\
+h(\"resumed task: \"..tostring(Ht),h.info)h:dump()end return true else if St or\
+z.debug then h(\"task \"..tostring(Ht)..\" not found\",h.error)h:dump()end return\
+false end end,get_error=function()return Rt.err\
+end,set_running=function(Vt,St)local Bt=z.task_routine[Ht]or\
+z.paused_task_routine[Ht]local At=z.task_routine[Ht]~=nil if Bt then if At and\
+Vt then return true end if not At and not Vt then return true end if At and not\
+Vt then z.paused_task_routine[Ht]=Bt z.task_routine[Ht]=nil if St or z.debug\
+then h(\"paused task: \"..tostring(Ht),h.info)h:dump()end return true end if not\
+At and Vt then z.task_routine[Ht]=Bt z.paused_task_routine[Ht]=nil if St or\
+z.debug then h(\"resumed task: \"..tostring(Ht),h.info)h:dump()end return true\
+end end end},__tostring=function()return\"GuiH.SCHEDULED_THREAD.\"..Ht end})end\
+z.async=z.schedule z.add_listener=function(Gt,Kt,Qt,Jt)if not\
+_G.type(Kt)==\"function\"then return end if not(_G.type(Gt)==\"table\"or\
+_G.type(Gt)==\"string\")then Gt={}end local Xt=Qt or o.uuid4()local\
+Zt={filter=Gt,code=Kt}z.event_listeners[Xt]=Zt if Jt or z.debug then\
+h(\"created event listener: \"..Xt,h.success)h:dump()end return\
+setmetatable(Zt,{__index={kill=function()z.event_listeners[Xt]=nil\
+z.paused_listeners[Xt]=nil if Jt or z.debug then\
+h(\"killed event listener: \"..Xt,h.success)h:dump()end\
+end,pause=function()z.paused_listeners[Xt]=Zt z.event_listeners[Xt]=nil if Jt\
+or z.debug then h(\"paused event listener: \"..Xt,h.success)h:dump()end\
+end,resume=function()local Zt=z.paused_listeners[Xt]or z.event_listeners[Xt]if\
+Zt then z.event_listeners[Xt]=Zt z.paused_listeners[Xt]=nil if Jt or z.debug\
+then h(\"resumed event listener: \"..Xt,h.success)h:dump()end elseif Jt or\
+z.debug then h(\"event listener not found: \"..Xt,h.error)h:dump()end\
+end},__tostring=function()return\"GuiH.EVENT_LISTENER.\"..Xt end})end\
+z.cause_exeption=function(ea)Tt=tostring(ea)end z.stop=function()At=false end\
+z.kill=z.stop z.error=z.cause_exeption z.clear=function(ta)if ta or z.debug\
+then h(\"clearing the gui..\",h.update)end local aa={}for oa,ia in\
+pairs(e.types)do aa[ia]={}end z.gui=aa z.elements=aa local\
+na=e.main(z,aa,h)z.create=na z.new=na end z.isHeld=function(...)local\
+sa={...}local ha,ra=true,true for da,la in pairs(sa)do local\
+ua=z.held_keys[la]or{}if ua[1]then ha=ha and true ra=ra and ua[2]else return\
+false,false,z.held_keys end end return ha,ra,z.held_keys end\
+z.key.held=z.isHeld\
+z.execute=setmetatable({},{__call=function(ca,ma,fa,wa,ya)if At then\
+h(\"Coulnt execute. Gui is already running\",h.error)h:dump()return false end\
+Tt=nil At=true h(\"\")h(\"loading execute..\",h.update)local pa=z.term_object local\
+va local ba=pa.getBackgroundColor()local ga=coroutine.create(function()local\
+ka,qa=pcall(function()pa.setVisible(true)wt(0)pa.redraw()while true do\
+pa.setBackgroundColor(z.background or ba)pa.clear();(wa or\
+function()end)(pa)local va=a(z,nil,true,false,nil);(fa or\
+function()end)(pa,va);(ya or function()end)(pa)end end)if not ka then Tt=qa\
+h:dump()end end)h(\"created graphic routine 1\",h.update)local ja=ma or\
+function()end local function xa()local za,Ea=pcall(ja,pa)if not za then Tt=Ea\
+h:dump()end end h(\"created custom updater\",h.update)local\
+Ta=coroutine.create(function()while true do\
+pa.setVisible(false)pa.setBackgroundColor(z.background or\
+ba)pa.clear();z.update(0,true,nil,{type=\"mouse_click\",x=-math.huge,y=-math.huge,button=-math.huge});(ya\
+or\
+function()end)(pa)pa.setVisible(true)pa.setVisible(false)sleep(math.max(z.update_delay,0.05))end\
+end)h(\"created event listener handle\",h.update)local\
+Aa=coroutine.create(function()local Oa,Ia=pcall(function()while true do local\
+Na=table.pack(os.pullEventRaw())for Sa,Ha in pairs(z.event_listeners)do local\
+Ra=Ha.filter if _G.type(Ra)==\"string\"then Ra={[Ha.filter]=true}end if\
+Ra[Na[1]]or Ra==Na[1]or(not next(Ra))then\
+Ha.code(table.unpack(Na,_G.type(Ha.filter)~=\"table\"and 2 or 1,Na.n))end end end\
+end)if not Oa then Tt=Ia h:dump()end\
+end)h(\"created graphic routine 2\",h.update)local\
+Da=coroutine.create(function()while true do for La,Ua in\
+pairs(z.dynamic_positions)do Ua()end sleep(math.max(z.update_delay,0.05))end\
+end)h(\"Created position updater\",h.update)local\
+Ca=coroutine.create(function()while true do local Ma,Fa,Wa=os.pullEvent()if\
+Ma==\"key\"then z.held_keys[Fa]={true,Wa}end if Ma==\"key_up\"then\
+z.held_keys[Fa]=nil end end end)h(\"created key handler\")local\
+Ya=coroutine.create(xa)coroutine.resume(Ya)coroutine.resume(ga,\"mouse_click\",math.huge,-math.huge,-math.huge)coroutine.resume(ga,\"mouse_click\",math.huge,-math.huge,-math.huge)coroutine.resume(ga,\"mouse_click\",math.huge,-math.huge,-math.huge)coroutine.resume(Ta)coroutine.resume(Da)h(\"\")h(\"Started execution..\",h.success)h(\"\")h:dump()while((coroutine.status(Ya)~=\"dead\"or\
+not(_G.type(ma)==\"function\"))and coroutine.status(ga)~=\"dead\"and Tt==nil)and At\
+do local va=table.pack(os.pullEventRaw())if o.events_with_cords[va[1]]then\
+va[3]=va[3]-(z.event_offset_x)va[4]=va[4]-(z.event_offset_y)end if\
+va[1]==\"terminate\"then Tt=\"Terminated\"break end if va[1]~=\"guih_data_event\"then\
+coroutine.resume(Aa,table.unpack(va,1,va.n))end\
+coroutine.resume(Ya,table.unpack(va,1,va.n))if va[1]==\"key\"or\
+va[1]==\"key_up\"then coroutine.resume(Ca,table.unpack(va,1,va.n))end for Pa,Va\
+in pairs(z.task_routine)do if coroutine.status(Va.c)~=\"dead\"then if\
+Va.filter==va[1]or Va.filter==nil then local\
+Ba,Ga=coroutine.resume(Va.c,table.unpack(va,1,va.n))if Ba then Va.filter=Ga end\
+end else z.task_routine[Pa]=nil z.task_schedule[Pa]=nil if Va.dbug then\
+h(\"Finished sheduled task: \"..tostring(Pa),h.success)end end end\
+coroutine.resume(Da,table.unpack(va,1,va.n))coroutine.resume(ga,table.unpack(va,1,va.n))coroutine.resume(Ta,table.unpack(va,1,va.n))local\
+j,x=s.getSize()if j~=z.w or x~=z.h then if(va[1]==\"monitor_resize\"and\
+z.monitor==va[2])or z.monitor==\"term_object\"then\
+z.term_object.reposition(1,1,j,x)z.w,z.h=j,x z.width,z.height=j,x\
+coroutine.resume(ga,\"mouse_click\",math.huge,-math.huge,-math.huge)end end end\
+if Tt then z.last_err=Tt end pa.setVisible(true)if Tt then\
+h(\"a Fatal error occured: \"..Tt..\" \"..debug.traceback(),h.fatal)else\
+h(\"finished execution\",h.success)end h:dump()Tt=nil return z.last_err,true\
+end,__tostring=function()return\"GuiH.main_gui_executor\"end})z.run=z.execute if\
+u==\"monitor\"then\
+h(\"Display object: monitor\",h.info)z.monitor=peripheral.getName(c)else\
+h(\"Display object: term\",h.info)z.monitor=\"term_object\"end\
+z.load_texture=function(Ka)h(\"Loading nimg texture.. \",h.update)local\
+Qa=t.load_texture(Ka)return Qa end z.load_ppm_texture=function(Ja,Xa)local\
+Za,eo,to=pcall(t.load_ppm_texture,z.term_object,Ja,Xa,h)if Za then return eo,to\
+else h(\"Failed to load texture: \"..eo,h.error)end end\
+z.load_cimg_texture=function(ao)h(\"Loading cimg texture.. \",h.update)local\
+oo=t.load_cimg_texture(ao)return oo end\
+z.load_blbfor_texture=function(io)h(\"Loading blbfor texture.. \",h.update)local\
+no,so=t.load_blbfor_texture(io)return no,so end\
+z.load_limg_texture=function(ho,ro,lo)h(\"Loading limg texture.. \",h.update)local\
+uo,co=t.load_limg_texture(ho,ro,lo)return uo,co end\
+z.load_limg_animation=function(mo,fo)h(\"Loading limg animation.. \",h.update)local\
+wo=t.load_limg_animation(mo,fo)return wo end\
+z.load_blbfor_animation=function(yo)h(\"Loading blbfor animation.. \",h.update)local\
+po=t.load_blbfor_animation(yo)return po end\
+z.set_event_offset=function(vo,bo)z.event_offset_x,z.event_offset_y=vo or\
+z.event_offset_x,bo or z.event_offset_y end\
+h(\"\")h(\"Starting creator..\",h.info)local go=e.main(z,z.gui,h)z.create=go\
+z.new=go h(\"\")z.update=wt\
+h(\"loading text object...\",h.update)h(\"\")z.get_blit=function(ko,qo,jo)local xo\
+pcall(function()xo={z.term_object.getLine(ko)}end)if not xo then return false\
+end return xo[1]:sub(qo,jo),xo[2]:sub(qo,jo),xo[3]:sub(qo,jo)end\
+z.text=function(zo)zo=zo or{}if _G.type(zo.centered)~=\"boolean\"then\
+zo.centered=false end local\
+Eo=(_G.type(zo.text)==\"string\")and(\"0\"):rep(#zo.text)or(\"0\"):rep(13)local\
+To=(_G.type(zo.text)==\"string\")and(\"f\"):rep(#zo.text)or(\"f\"):rep(13)if\
+_G.type(zo.blit)~=\"table\"then zo.blit={Eo,To}end zo.blit[1]=(zo.blit[1]or\
+Eo):lower()zo.blit[2]=(zo.blit[2]or\
+To):lower()h(\"created new text object\",h.info)return setmetatable({text=zo.text\
+or\"<TEXT OBJECT>\",centered=zo.centered,x=zo.x or 1,y=zo.y or\
+1,offset_x=zo.offset_x or 0,offset_y=zo.offset_y or 0,blit=zo.blit\
+or{Eo,To},transparent=zo.transparent,bg=zo.bg,fg=zo.fg,width=zo.width,height=zo.height},{__call=function(Ao,Oo,Io,No,j,x)Io,No=Io\
+or Ao.x,No or Ao.y if Ao.width then j=Ao.width end if Ao.height then\
+x=Ao.height end local So=Oo or z.term_object local Ho if\
+_G.type(Io)==\"number\"and _G.type(No)==\"number\"then Ho=1 end if\
+_G.type(Io)~=\"number\"then Io=1 end if _G.type(No)~=\"number\"then No=1 end local\
+Ro,Do=Io,No local Lo={}for Uo in Ao.text:gmatch(\"[^\\n]+\")do\
+table.insert(Lo,Uo)end if Ao.centered then Do=Do-#Lo/2 else Do=Do-1 end for\
+Co=1,#Lo do local Mo=Lo[Co]Do=Do+1 if Ao.centered then local Fo=(x or\
+z.h)/2-0.5 local Wo=math.ceil(((j or\
+z.w)/2)-(#Mo/2)-0.5)So.setCursorPos(Wo+Ao.offset_x+Ro,Fo+Ao.offset_y+Do)Io,No=Wo+Ao.offset_x+Ro,Fo+Ao.offset_y+Do\
+else So.setCursorPos((Ho or Ao.x)+Ao.offset_x+Ro-1,(Ho or\
+Ao.y)+Ao.offset_y+Do-1)Io,No=(Ho or Ao.x)+Ao.offset_x+Ro-1,(Ho or\
+Ao.y)+Ao.offset_y+Do-1 end if Ao.transparent==true then local Yo=-1 if Io<1\
+then Yo=math.abs(math.min(Io+1,3)-2)So.setCursorPos(1,No)Io=1\
+Mo=Mo:sub(Yo+1)end local Eo,To=table.unpack(Ao.blit)if Ao.bg then\
+To=t.code.to_blit[Ao.bg]:rep(#Mo)end if Ao.fg then\
+Eo=t.code.to_blit[Ao.fg]:rep(#Mo)end local Po\
+pcall(function()_,_,Po=So.getLine(math.floor(No))end)if not Po then return end\
+local Vo=Po:sub(Io,math.min(Io+#Mo-1,z.w))local Bo=#Mo-#Vo-1 if#Eo~=#Mo then\
+Eo=(\"0\"):rep(#Mo)end\
+pcall(So.blit,Mo,Eo:sub(math.min(Io,1)),Vo..To:sub(#To-Bo,#To))else local\
+Eo,To=table.unpack(Ao.blit)if Ao.bg then To=t.code.to_blit[Ao.bg]:rep(#Mo)end\
+if Ao.fg then Eo=t.code.to_blit[Ao.fg]:rep(#Mo)end if#Eo~=#Mo then\
+Eo=(\"0\"):rep(#Mo)end if#To~=#Mo then To=(\"f\"):rep(#Mo)end\
+pcall(So.blit,Mo,Eo,To)end end\
+end,__tostring=function()return\"GuiH.primitive.text\"end})end return z end\
+return\
+i",
+  [ "animations/ease_out_quint" ] = "return function(e,t)return 1-(1-t)^5\
+end\
+",
+  [ "apis/log" ] = "local\
+e={{colors.red},{colors.yellow},{colors.white,colors.red},{colors.white,colors.lime},{colors.white,colors.lime},{colors.white},{colors.green},{colors.gray},}local\
+t={error=1,warn=2,fatal=3,success=4,message=6,update=7,info=8}local a={}for o,i\
+in pairs(t)do a[i]=o end local function n(s)local\
+s=s:gsub(\"^%[%d-%:%d-% %a-]\",\"\")return s end local function h(r,d,l,u)local\
+c,m=r.getSize()local f,w={},math.ceil(#d/c)local y=0 for p=1,w do local\
+v,b=r.getCursorPos()if b>m then r.scroll(1)r.setCursorPos(1,b-1)b=b-1 end\
+r.write(d:sub(y+1,p*c))r.setCursorPos(1,b+1)y=p*c end return w end local\
+function g(k,q)local j=k.getSize()local x,z={},math.ceil(#q/j)local E=0 local T\
+for A=1,z do local O=q:sub(E+1,A*j)E=A*j T=#O end return T end function\
+t:dump(I)local N=\"\"local S=1 local H={}local R=\"\"for D,L in\
+ipairs(self.history)do if N==n(L.str)..L.type then S=S+1 table.remove(H,#H)else\
+S=1 end\
+H[#H+1]=L.str..\"(\"..tostring(S)..\") type: \"..(a[L.type]or\"info\")N=n(L.str)..L.type\
+end for U,C in ipairs(H)do R=R..C..\"\\n\"end if type(I)==\"string\"then local\
+M=fs.open(I..\".log\",\"w\")M.write(R)M.close()end return R end local function\
+F(W,Y,P)local V,B=W.term.getSize()local G,K=W.term.getCursorPos()local\
+Y=tostring(Y)P=P or\"info\"if W.lastLog==Y..P then W.nstr=W.nstr+1 local\
+Q=K-W.maxln W.term.setCursorPos(G,Q)else W.nstr=1 end W.lastLog=Y..P local\
+J=\"[\"..textutils.formatTime(os.time())..\"] \"local\
+X,Z=W.term.getBackgroundColor(),W.term.getTextColor()local\
+et,tt=unpack(e[P]or{})W.term.setBackgroundColor(tt or X);W.term.setTextColor(et\
+or colors.gray)local at=J..Y..\"(\"..tostring(W.nstr)..\")\"local ot=#at if ot<1\
+then ot=1 end local it=V-ot if it<1 then it=1 end it=V-(g(W.term,at))local\
+nt=J..Y..(\" \"):rep(it)table.insert(W.history,{str=nt,type=P})W.maxln=h(W.term,nt..\"(\"..tostring(W.nstr)..\")\",X,W.title)local\
+G,K=W.term.getCursorPos()W.term.setBackgroundColor(W.sbg);W.term.setTextColor(W.sfg)if\
+W.title then\
+W.term.setCursorPos(1,1)W.term.write((W.tsym):rep(V))W.term.setCursorPos(math.ceil((V/2)-(#W.title/2)),1)W.term.write(W.title)W.term.setCursorPos(G,K)end\
+W.term.setBackgroundColor(X);W.term.setTextColor(Z)end local function\
+st(ht,rt,dt,lt,ut)dt=dt or\"-\"local ct,mt=ht.getSize()local\
+ft=setmetatable({lastLog=\"\",nstr=1,maxln=1,term=ht,history={},title=rt,tsym=(#dt<4)and\
+dt\
+or\"-\",sbg=ht.getBackgroundColor(),sfg=ht.getTextColor(),auto_dump=lt},{__index=t,__call=F})if\
+ft.title then\
+ft.term.setCursorPos(1,1)ft.term.write((ft.tsym):rep(ct))ft.term.setCursorPos(math.ceil((ct/2)-(#ft.title/2)),1)ft.term.write(ft.title)ft.term.setCursorPos(1,2)end\
+ft.lastLog=nil return ft end\
+return{create_log=st}",
+  [ "objects/ellipse/logic" ] = "return\
+function()end\
+",
+  [ "animations/ease_out_sine" ] = "return function(e,t)return\
+math.sin((t*math.pi)/2)end\
+",
+  graphic_handle = "local e=require\"core.luappm\"local t=require\"core.blbfor\".open local\
+a=require\"util\"_ENV=_ENV.ORIGINAL local o=require\"cc.expect\"local\
+i=\"0123456789abcdef\"local n,s={},{}for h=0,15 do\
+n[2^h]=i:sub(h+1,h+1)s[i:sub(h+1,h+1)]=2^h end local r=function(d)local\
+l=a.tables.createNDarray(2)l[\"offset\"]=d[\"offset\"]for u,c in pairs(d)do for m,f\
+in pairs(c)do if type(f)==\"table\"then l[u][m]={}if f then\
 l[u][m].t=s[f.t]l[u][m].b=s[f.b]l[u][m].s=f.s end end end end return\
 setmetatable(l,getmetatable(d))end local function w(y)local\
 p,v=math.huge,-math.huge local b,g=math.huge,-math.huge for k,q in pairs(y)do\
@@ -173,94 +534,77 @@ local function Qa(Ja,Xa,Za,eo)local to=Za.tex local\
 ao,oo=math.floor(to.scale[1]-0.5),math.floor(to.scale[2]-0.5)Ja=((Ja-1)%ao)+1\
 Xa=((Xa-1)%oo)+1 local io=to[Ja][Xa]local no=to.scale to.scale=nil if not io\
 and eo then local so=z(to,Ja)io=R(so or{},Xa)end to.scale=no return io end\
-local function ho(ro,lo,uo,co,mo,fo,wo,yo,po,vo,bo)local\
-go,ko,qo={},{},{}po,vo=po or 0,vo or 0 local jo=false if type(bo)==\"table\"and\
-bo[lo.id]then local xo=bo[lo.id].args jo=xo.x==uo and xo.y==co and xo.width==mo\
-and xo.height==fo and xo.bg==wo and xo.tg==yo and xo.offsetx==po and\
-xo.offsety==vo end if type(bo)==\"table\"and bo[lo.id]and jo then\
-go=bo[lo.id].bg_layers ko=bo[lo.id].fg_layers qo=bo[lo.id].text_layers else for\
-zo=1,fo do for Eo=1,mo do local To=Qa(Eo+po,zo+vo,lo)if To and next(To)then\
-go[zo]=(go[zo]or\"\")..n[To.background_color]ko[zo]=(ko[zo]or\"\")..n[To.text_color]qo[zo]=(qo[zo]or\"\")..To.symbol:match(\".$\")else\
-go[zo]=(go[zo]or\"\")..n[wo]ko[zo]=(ko[zo]or\"\")..n[yo]qo[zo]=(qo[zo]or\"\")..\" \"end\
+local function ho(ro,lo,uo,co,mo,fo,wo,yo,po,vo,bo,go)local\
+ko,qo,jo={},{},{}po,vo=po or 0,vo or 0 local xo=false if type(bo)==\"table\"and\
+bo[lo.id]then local zo=bo[lo.id].args xo=zo.x==uo and zo.y==co and zo.width==mo\
+and zo.height==fo and zo.bg==wo and zo.tg==yo and zo.offsetx==po and\
+zo.offsety==vo end if type(bo)==\"table\"and bo[lo.id]and xo then\
+ko=bo[lo.id].bg_layers qo=bo[lo.id].fg_layers jo=bo[lo.id].text_layers else for\
+Eo=1,fo do for To=1,mo do local Ao=Qa(To+po,Eo+vo,lo)if Ao and next(Ao)then\
+ko[Eo]=(ko[Eo]or\"\")..n[Ao.background_color]qo[Eo]=(qo[Eo]or\"\")..n[Ao.text_color]jo[Eo]=(jo[Eo]or\"\")..Ao.symbol:match(\".$\")else\
+ko[Eo]=(ko[Eo]or\"\")..n[wo]qo[Eo]=(qo[Eo]or\"\")..n[yo]jo[Eo]=(jo[Eo]or\"\")..\" \"end\
 end end if type(bo)==\"table\"then\
-bo[lo.id]={bg_layers=go,fg_layers=ko,text_layers=qo,args={term=ro,x=uo,y=co,width=mo,height=fo,bg=wo,tg=yo,offsetx=po,offsety=vo}}end\
-end for Ao,Oo in pairs(go)do\
-ro.setCursorPos(uo,co+Ao-1)ro.blit(qo[Ao],ko[Ao],go[Ao])end end\
-return{load_nimg_texture=M,load_ppm_texture=za,load_cimg_texture=Q,load_blbfor_texture=Wt,load_blbfor_animation=nt,load_limg_texture=Lt,load_limg_animation=pt,code={get_pixel=Qa,draw_box_tex=ho,to_blit=n,to_color=s,build_drawing_char=aa},load_texture=M}",
-[ "animations/ease_in_out_back" ] = "return function(e,t)local a=1.70158;local o=a*1.525;return t<0.5\
-and((2*t)^2*((o+1)*2*t-o))/2 or((2*t-2)^2*((o+1)*(t*2-2)+o)+2)/2\
+bo[lo.id]={bg_layers=ko,fg_layers=qo,text_layers=jo,args={term=ro,x=uo,y=co,width=mo,height=fo,bg=wo,tg=yo,offsetx=po,offsety=vo}}end\
+end if not go then for Oo,Io in pairs(ko)do\
+ro.setCursorPos(uo,co+Oo-1)ro.blit(jo[Oo],qo[Oo],ko[Oo])end end end local\
+function\
+No(So,Ho,Ro,Do,Lo,Uo,Co,Mo,Fo,Wo,Yo)ho(So,Ho,Ro,Do,Lo,Uo,Co,Mo,Fo,Wo,Yo)end\
+local function\
+Po(Vo,Bo,Go,Ko,Qo,Jo,Xo,Zo,ei,ti,ai)ho(Vo,Bo,Go,Ko,Qo,Jo,Xo,Zo,ei,ti,ai,true)end\
+return{load_nimg_texture=M,load_ppm_texture=za,load_cimg_texture=Q,load_blbfor_texture=Wt,load_blbfor_animation=nt,load_limg_texture=Lt,load_limg_animation=pt,code={get_pixel=Qa,draw_box_tex=No,cache_image=Po,to_blit=n,to_color=s,build_drawing_char=aa},load_texture=M}",
+  [ "objects/ellipse/object" ] = "local e=require(\"util\")local\
+t={[\"left-right\"]=true,[\"right-left\"]=true,[\"top-down\"]=true,[\"down-top\"]=true,}return\
+function(a,o)o=o or{}if type(o.visible)~=\"boolean\"then o.visible=true end if\
+type(a.symbols)~=\"table\"then o.symbols={}end if type(o.filled)~=\"boolean\"then\
+o.filled=true end if type(o.blocking)~=\"boolean\"then o.blocking=false end if\
+type(o.always_update)~=\"boolean\"then o.always_update=true end local\
+i={name=o.name or e.uuid4(),positioning={x=o.x or 1,y=o.y or 1,width=o.width or\
+1,height=o.height or 1},symbol=o.symbol or\" \",bg=o.background_color or\
+colors.white,fg=o.text_color or\
+colors.black,visible=o.visible,filled=o.filled,order=o.order or\
+1,logic_order=o.logic_order,graphic_order=o.graphic_order,blocking=o.blocking,always_update=o.always_update}return\
+i\
 end",
-[ "animations/ease_out_quad" ] = "return function(e,t)return\
-1-(1-t)*(1-t)end\
-",
-init = "local e=require\"main\"return\
+  [ "core/luappm" ] = "_ENV=_ENV.ORIGINAL local function e(t,a,o)local i={}for n=a,o do\
+t.seek(\"set\",n)table.insert(i,t.read())end return\
+string.char(table.unpack(i))end local function s(h,r)local d=r local l={}for\
+u=1,3 do local c={}local m=\"\"while not(m==0x20 or m==0x0A)do\
+h.seek(\"set\",d)m=h.read()table.insert(c,m)d=d+1 end\
+table.insert(l,tonumber(string.char(table.unpack(c))))end return l,d end local\
+function f(w,y,p)local v=y local b={}local g=0 w.seek(\"set\",y)while w.read()do\
+g=g+1 end w.seek(\"set\",v)for k=1,math.floor(g/3)do local q=\"\"for k=1,3 do local\
+j=0 local x={}while q and j<3 do w.seek(\"set\",v)q=w.read()if q~=nil then\
+q=q/p[3]end table.insert(x,q)v=v+1 j=j+1 end if not next(x)then break end\
+table.insert(b,{r=x[1],g=x[2],b=x[3]})end end return b,g/3 end local function\
+z(E,T,A)local O={}for I,N in pairs(E)do local S=math.floor((I-1)%T+1)local\
+H=math.ceil(I/T)if not O[A and S or H]then O[A and S or H]={}end O[A and S or\
+H][A and H or S]=N end return O end local function R(D)local\
+L=fs.open(D,\"rb\")if not L then error(\"File: \"..(D or\"\")..\" doesnt exist\",3)end\
+if e(L,0,2)==\"P6\\x0A\"then local U=-math.huge while true do local C=L.read()if\
+string.char(C)==\"#\"then while true do local M=L.read()if M==0x0A then break end\
+U=L.seek(\"cur\")+1 end else local F,U=s(L,U)local W,Y=f(L,U,F)local\
+C=z(W,F[1],true)local\
+P=L.readAll()L.close()return{data=P,meta=F,pixels=C,pixel_count=Y,width=F[1],height=F[2],color_type=F[3],get_pixel=function(V,B)local\
+G=C[math.floor(V+0.5)]if G then return G[math.floor(B+0.5)]end\
+end,get_palette=function()local K={}local Q=0 local J={}local X={}for Z,et in\
+pairs(W)do local tt=colors.packRGB(et.r,et.g,et.b)if not K[tt]then Q=Q+1\
+K[tt]={c=tt,count=0}end K[tt].count=K[tt].count+1 end for at,ot in pairs(K)do\
+table.insert(J,ot)end table.sort(J,function(it,nt)return it.count>nt.count\
+end)for st,ht in ipairs(J)do local\
+rt,dt,lt=colors.unpackRGB(ht.c)table.insert(X,{r=rt,g=dt,b=lt,c=ht.count})end\
+return X,Q end}end end else\
+L.close()error(\"File is unsupported format: \"..e(L,0,1),2)end end return\
+R",
+  init = "local e=require\"main\"return\
 setmetatable(e,{__tostring=function()return\"GuiH.API\"end})\
 ",
-[ "objects/inputbox/graphic" ] = "local e=require(\"graphic_handle\").code local function t(a)return\
-a:gsub(\"[%[%]%(%)%.%+%-%%%$%^%*%?]\",\"%%%1\")end return function(o)local\
-i=o.canvas.term_object local n,s=o.input,0 if#o.input>=o.positioning.width-1\
-then\
-n=o.input:sub(#o.input-o.positioning.width+1-o.shift,#o.input-o.shift)s=#o.input-#n\
-end local h=(o.positioning.x+o.cursor_pos)-s\
-i.setCursorPos(o.positioning.x,o.positioning.y)local r=n\
-n=n:gsub(\" \",o.space_symbol)..o.background_symbol:rep(o.positioning.width-#n+1)local\
-d if o.replace_char then\
-d=o.replace_char:rep(#r)..o.background_symbol:rep(o.positioning.width-#r+1)end\
-i.blit(d or\
-n,e.to_blit[o.text_color]:rep(#n),e.to_blit[o.background_color]:rep(#n))if\
-o.selected and(o.char_limit>o.cursor_pos)then\
-i.setCursorPos(math.max(h+o.shift,o.positioning.x),o.positioning.y)if\
-h+o.shift<o.positioning.x then o.shift=o.shift+1 end if\
-h+o.shift>o.positioning.x+o.positioning.width then o.shift=o.shift-1 end local\
-l if o.cursor_pos<o.positioning.width then\
-l=o.input:sub(o.cursor_pos+1,o.cursor_pos+1)o.cursor_x=o.cursor_pos+1 else\
-l=o.input:sub(o.cursor_pos+1,o.cursor_pos+1)i.setCursorPos(h+o.shift,o.positioning.y)end\
-o.cursor_x=h+o.shift i.blit((l)~=\"\"and(o.replace_char or l)or\"_\",l~=\"\"and\
-e.to_blit[o.background_color]or e.to_blit[o.text_color],l~=\"\"and\
-e.to_blit[o.text_color]or e.to_blit[o.background_color])else\
-i.setCursorPos(o.positioning.x+o.positioning.width,o.positioning.y)i.blit(\"\\127\",e.to_blit[o.text_color],e.to_blit[o.background_color])end\
-if o.autoc.str_diff then\
-i.setCursorPos(o.cursor_x+o.shift,o.positioning.y)local\
-u=o.autoc.sorted[o.autoc.selected]if u then local\
-c=o.input:match(\"%S+$\")or\"\"local m=u:gsub(\"^\"..c:gsub(\" $\",\"\"),\"\")if\
-o.cursor_pos>=#o.input then local m=m:gsub(\"%%(.)\",\"%1\")local\
-f=o.positioning.x+o.positioning.width+1 local w=o.cursor_x+o.shift+#m if w>f\
-and not o.autoc.ignore_width then local y=w-f m=m:sub(1,#m-y)end\
-i.blit(m,e.to_blit[o.autoc.fg]:rep(#m),e.to_blit[o.autoc.bg]:rep(#m))end end\
-end\
+  [ "core/object-base" ] = "local e=require(\"util\")return function(t,a)a=a or{}if\
+type(a.visible)~=\"boolean\"then a.visible=true end if\
+type(a.reactive)~=\"boolean\"then a.reactive=true end local o={name=a.name or\
+e.uuid4(),visible=a.visible,reactive=a.reactive,react_to_events={},btn={},order=a.order\
+or 1,logic_order=a.logic_order,graphic_order=a.graphic_order,}return o\
 end",
-[ "animations/ease_out_quart" ] = "return function(e,t)return 1-(1-t)^4\
-end\
-",
-[ "animations/ease_in_out_cubic" ] = "return function(e,t)return t<0.5 and 4*t^3 or 1-(-2*t+2)^3/2\
-end\
-",
-[ "objects/ellipse/graphic" ] = "local e=require(\"core.algo\")local t=require(\"graphic_handle\").code local\
-a=require(\"util\")return function(o)local i=o.canvas.term_object local n={}local\
-s={}local h=a.tables.createNDarray(2)if o.filled then local\
-r=e.get_elipse_points(o.positioning.width,o.positioning.height,o.positioning.x,o.positioning.y,true)for\
-d,l in ipairs(r)do if h[l.x][l.y]~=true then\
-n[l.y]=(n[l.y]or\"\")..\"*\"s[l.y]=math.min(s[l.y]or math.huge,l.x)h[l.x][l.y]=true\
-end end for u,c in pairs(n)do\
-i.setCursorPos(s[u],u)i.blit(c:gsub(\"%*\",o.symbol),c:gsub(\"%*\",t.to_blit[o.fg]),c:gsub(\"%*\",t.to_blit[o.bg]))end\
-else local\
-m=e.get_elipse_points(o.positioning.width,o.positioning.height,o.positioning.x,o.positioning.y)for\
-f,w in pairs(m)do\
-i.setCursorPos(w.x,w.y)i.blit(o.symbol,t.to_blit[o.fg],t.to_blit[o.bg])end end\
-end",
-installer = "local\
-e=http.get(\"https://api.github.com/repos/9551-Dev/GuiH/git/trees/main?recursive=1\",_G._GIT_API_KEY\
-and{Authorization='token '.._G._GIT_API_KEY})local\
-t=textutils.unserialiseJSON(e.readAll())local a={}local o=0 e.close()for i,n in\
-pairs(t.tree)do if n.type==\"blob\"and n.path:lower():match(\".+%.lua\")then\
-a[\"https://raw.githubusercontent.com/9551-Dev/GuiH/main/\"..n.path]=n.path o=o+1\
-end end local s=100/o local h=0 local r=0 local d={}for l,u in pairs(a)do\
-table.insert(d,function()local c=http.get(l)local\
-m=fs.open(\"./GuiH/\"..u,\"w\")m.write(c.readAll())m.close()c.close()h=h+1 local\
-f=fs.getSize(\"./GuiH/\"..u)r=r+f\
-print(\"downloading \"..u..\"  \"..tostring(math.ceil(h*s))..\"% \"..tostring(math.ceil(f/1024*10)/10)..\"kB total: \"..math.ceil(r/1024)..\"kB\")end)end\
-parallel.waitForAll(table.unpack(d))print(\"Finished downloading GuiH\")",
-[ "objects/inputbox/logic" ] = "local e=require(\"util\")local function t(a)return\
+  [ "objects/inputbox/logic" ] = "local e=require(\"util\")local function t(a)return\
 a:gsub(\"[%[%]%(%)%.%+%-%%%$%^%*%?]\",\"%%%1\")end local function o(i,n,s)local o=0\
 local h=string.len(i)local r=string.len(n)local d=math.min(h,r)if i==n then\
 return 0 end if h==0 and s then return 0.4 end for l=1,d do if\
@@ -316,22 +660,107 @@ L.key==keys.home then D.cursor_pos=0 elseif L.key==keys[\"end\"]then\
 D.cursor_pos=#D.input elseif L.key==keys.delete then\
 D.input=C..M:gsub(\"^.\",\"\")D.autoc.selected=1\
 D.on_change_input(D,L,D.input)elseif L.key==keys.insert and not L.held then\
-D.insert=not D.insert elseif L.key==keys.down then if\
+D.insert=not D.insert elseif L.key==keys.down then if D.autoc.sorted then if\
 D.autoc.selected+1<=#D.autoc.sorted then D.autoc.selected=D.autoc.selected+1\
-end elseif L.key==keys.up then if D.autoc.selected>1 then\
-D.autoc.selected=D.autoc.selected-1 end elseif L.key==keys.enter and D.selected\
-then local\
+end end elseif L.key==keys.up then if D.autoc.sorted then if D.autoc.selected>1\
+then D.autoc.selected=D.autoc.selected-1 end end elseif L.key==keys.enter and\
+D.selected then local\
 K={}D.input:gsub(\"%S+\",function(Q)table.insert(K,Q)end)D.on_enter(D,L,K)end end\
 if L.name==\"paste\"then D.autoc.selected=1 D.input=C..L.text..M\
 D.cursor_pos=D.cursor_pos+#L.text D.on_change_input(D,L,D.input)end\
 end",
-[ "animations/ease_out_quint" ] = "return function(e,t)return 1-(1-t)^5\
-end\
-",
-[ "animations/ease_in_out_elastic" ] = "return function(e,t)local a=(2*math.pi)/4.5 return t==0 and 0 or(t==1 and 1\
-or(t<0.5 and-(2^(20*t-10)*math.sin((20*t-11.125)*a))/2\
-or(2^(-20*t+10)*math.sin((20*t-11.125)*a))/2+1))end",
-main = "local e=require(\"core.logger\")local t=e.create_log()local\
+  installer = "local\
+e=http.get(\"https://api.github.com/repos/9551-Dev/GuiH/git/trees/main?recursive=1\",_G._GIT_API_KEY\
+and{Authorization='token '.._G._GIT_API_KEY})local\
+t=textutils.unserialiseJSON(e.readAll())local a={}local o=0 e.close()for i,n in\
+pairs(t.tree)do if n.type==\"blob\"and n.path:lower():match(\".+%.lua\")then\
+a[\"https://raw.githubusercontent.com/9551-Dev/GuiH/main/\"..n.path]=n.path o=o+1\
+end end local s=100/o local h=0 local r=0 local d={}for l,u in pairs(a)do\
+table.insert(d,function()local c=http.get(l)local\
+m=fs.open(\"./GuiH/\"..u,\"w\")m.write(c.readAll())m.close()c.close()h=h+1 local\
+f=fs.getSize(\"./GuiH/\"..u)r=r+f\
+print(\"downloading \"..u..\"  \"..tostring(math.ceil(h*s))..\"% \"..tostring(math.ceil(f/1024*10)/10)..\"kB total: \"..math.ceil(r/1024)..\"kB\")end)end\
+parallel.waitForAll(table.unpack(d))print(\"Finished downloading GuiH\")",
+  [ "objects/frame/graphic" ] = "return function(e)local t=e.last_known_position local a=e.positioning if\
+t.x~=a.x or t.y~=a.y or t.width~=a.width or t.height~=a.height then\
+e.child.w,e.child.width=a.width,a.width\
+e.child.h,e.child.height=a.height,a.height\
+e.window.reposition(a.x,a.y,a.width,a.height)e.last_known_position={x=a.x,y=a.y,width=a.width,height=a.height}end\
+e.on_graphic(e)end",
+  [ "core/update" ] = "local e=require(\"util\")_ENV=_ENV.ORIGINAL local\
+t={[\"mouse_click\"]=true,[\"mouse_drag\"]=true,[\"monitor_touch\"]=true,[\"mouse_scroll\"]=true,[\"mouse_up\"]=true,[\"key\"]=true,[\"key_up\"]=true,[\"char\"]=true,[\"guih_data_event\"]=true,[\"paste\"]=true}local\
+a={[\"key\"]=true,[\"key_up\"]=true,[\"char\"]=true,[\"paste\"]=true}local\
+o={[1]=true,[2]=true}local\
+i={[\"mouse_click\"]=true,[\"mouse_drag\"]=true,[\"mouse_up\"]=true,[\"mouse_scroll\"]=true}return\
+function(n,s,h,r,d,l,u,c,m,f,w,y)if h==nil then h=true end local p=\"none\"local\
+v=d local b=d local g=n.gui local k,q,j,x local z,E={},{}local T=true if((s or\
+math.huge)>0)and not l then if not b or not r then while not t[p]do\
+p,k,q,j,x=os.pullEvent()end if p==\"monitor_touch\"then\
+v={name=p,monitor=k,x=q,y=j}end if p==\"mouse_click\"or p==\"mouse_up\"then\
+v={name=p,button=k,x=q,y=j}end if p==\"mouse_drag\"then\
+v={name=p,button=k,x=q,y=j}end if p==\"mouse_scroll\"then\
+v={name=p,direction=k,x=q,y=j}end if p==\"key\"then\
+v={name=p,key=k,held=q,x=math.huge,y=math.huge}end if p==\"key_up\"then\
+v={name=p,key=k,x=math.huge,y=math.huge}end if p==\"paste\"then\
+v={name=p,text=k,x=math.huge,y=math.huge}end if p==\"char\"then\
+v={name=p,character=k,x=math.huge,y=math.huge}end if p==\"guih_data_event\"then\
+v=k end if not v.monitor then v.monitor=\"term_object\"end if not(q~=n.id and\
+p~=\"guih_data_event\")then T=false end end local A={}local O={}local I=c or\
+e.tables.createNDarray(1)if T and((v.monitor==n.monitor)or a[v.name])and not u\
+then for N,S in pairs(g)do for H,R in pairs(S)do if R.react_to_events[v.name]or\
+not next(R.react_to_events)then if not A[R.logic_order or R.order]then\
+A[R.logic_order or R.order]={}end table.insert(A[R.logic_order or\
+R.order],function()if e.events_with_cords[v.name]and R.blocking then local\
+D=R.positioning if D and D.x and D.y then local L=D.width or 1 local U=D.height\
+or 1 local C=e.is_within_field(v.x,v.y,D.x,D.y,L,U)if C then if I[v.x][v.y]and\
+not R.always_update then return end if _G.type(R.on_focus)==\"function\"and\
+v.name~=\"mouse_drag\"then setfenv(R.on_focus,_ENV)(R)end for M=1,L*U do\
+I[(M-1)%L+D.x][math.ceil(M/L)+D.y-1]=true end end end end if R.reactive then\
+table.insert(w or O,function()if a[v.name]then if R.logic then\
+setfenv(R.logic,_ENV)(R,v,n)end else if((R.btn or o)[v.button])or\
+v.monitor==n.monitor then if R.logic then setfenv(R.logic,_ENV)(R,v,n)end end\
+end end)end end)end end end end for F,W in e.tables.iterate_order(A,true)do for\
+Y,P in pairs(W)do P()end end if not w then for V=#O,1,-1 do O[V]()end end end\
+local B,G=n.term_object.getCursorPos()if h and n.visible then for K,Q in\
+pairs(g)do for J,X in pairs(Q)do if not E[X.graphic_order or X.order]then\
+E[X.graphic_order or X.order]={}end table.insert(E[X.graphic_order or\
+X.order],function()if not(X.gui or X.child)then if X.visible and X.graphic then\
+setfenv(X.graphic,_ENV)(X,n)end else if X.visible and X.graphic then\
+setfenv(X.graphic,_ENV)(X,n);(X.gui or X.child).term_object.redraw()end end\
+end)end end end for Z,et in e.tables.iterate_order(E,y)do for tt,at in\
+pairs(et)do if y then table.insert(y,at)else at()end end end local ot={}for\
+it,nt in pairs(g)do for st,ht in pairs(nt)do if not ot[ht.graphic_order or\
+ht.order]then ot[ht.graphic_order or ht.order]={}end\
+table.insert(ot[ht.graphic_order or ht.order],function()if ht.gui or ht.child\
+then table.insert(z,ht)end end)end end for rt,dt in\
+e.tables.iterate_order(ot,true)do for lt,ut in pairs(dt)do ut()end end if not T\
+then return v,table.pack(p,k,q,j,x)end local ct=e.tables.createNDarray(1)local\
+mt,ft={},{}local wt={}for yt,pt in ipairs(z)do local\
+vt,bt=pt.window.getPosition()local gt,kt=pt.window.getSize()local b=b or d or v\
+if b then local\
+qt={x=(b.x-vt)+1,y=(b.y-bt)+1,name=b.name,monitor=b.monitor,button=b.button,direction=b.direction,held=b.held,key=b.key,character=b.character,text=b.text}if(pt.gui\
+or pt.child)and(pt.gui or pt.child).cls then(pt.gui or\
+pt.child).term_object.setBackgroundColor((pt.gui or\
+pt.child).background);(pt.gui or pt.child).term_object.clear();end if\
+e.is_within_field(b.x,b.y,vt,bt,vt+gt,bt+kt)then(pt.child or\
+pt.gui).update(math.huge,pt.visible,true,qt,not pt.reactive,not pt.visible,ct,m\
+or b.x,f or b.y,mt,ft)else qt.x=-math.huge qt.y=-math.huge;(pt.child or\
+pt.gui).update(math.huge,pt.visible,true,qt,not pt.reactive,not pt.visible,ct,m\
+or b.x,f or b.y,mt,mt)end if(pt.gui or pt.child)and(pt.gui or pt.child).cls\
+then(pt.gui or pt.child).term_object.redraw()end end end for jt=#mt,1,-1 do\
+mt[jt]()end for xt,zt in ipairs(ft)do zt()end return\
+v,table.pack(p,k,q,j,x)end",
+  [ "objects/text/object" ] = "local e=require(\"util\")return function(t,a)a=a or{}if\
+type(a.visible)~=\"boolean\"then a.visible=true end if\
+type(a.reactive)~=\"boolean\"then a.reactive=true end if\
+type(a.blocking)~=\"boolean\"then a.blocking=false end if\
+type(a.always_update)~=\"boolean\"then a.always_update=false end local\
+o={name=a.name or e.uuid4(),visible=a.visible,text=a.text or\
+t.text{text=\"none\",x=1,y=1,bg=colors.red,fg=colors.white},order=a.order or\
+1,logic_order=a.logic_order,graphic_order=a.graphic_order,update=a.update or\
+function()end,blocking=a.blocking,always_update=a.always_update}return o\
+end",
+  main = "local e=require(\"core.logger\")local t=e.create_log()local\
 a={algo=require(\"core.algo\"),luappm=require(\"core.luappm\"),blbfor=require(\"core.blbfor\"),graphic=require(\"graphic_handle\").code,general=require(\"util\")}local\
 o={}t(\"loading apis..\",t.update)for i,n in pairs(fs.list(\"apis\"))do local\
 s=n:match(\"[^.]+\")if not fs.isDir(\"apis/\"..n)then\
@@ -355,35 +784,36 @@ z={name=g,key=k,x=math.huge,y=math.huge}end if g==\"char\"then\
 z={name=g,character=k,x=math.huge,y=math.huge}end if g==\"guih_data_event\"then\
 z=k end if not z.monitor then z.monitor=\"term_object\"end return z\
 or{name=g}end,apis=a,presets=o,valid_events={[\"mouse_click\"]=true,[\"mouse_drag\"]=true,[\"monitor_touch\"]=true,[\"mouse_scroll\"]=true,[\"mouse_up\"]=true,[\"key\"]=true,[\"key_up\"]=true,[\"char\"]=true,[\"guih_data_event\"]=true},log=t}",
-[ "animations/ease_out_sine" ] = "return function(e,t)return\
-math.sin((t*math.pi)/2)end\
-",
-[ "objects/inputbox/object" ] = "local e=require(\"util\")return function(t,a)if type(a.visible)~=\"boolean\"then\
-a.visible=true end if type(a.reactive)~=\"boolean\"then a.reactive=true end if\
-not a.autoc then a.autoc={}end if type(a.autoc.put_space)~=\"boolean\"then\
-a.autoc.put_space=true end if type(a.blocking)~=\"boolean\"then a.blocking=true\
-end if type(a.always_update)~=\"boolean\"then a.always_update=false end local\
-o={name=a.name or\
-e.uuid4(),visible=a.visible,reactive=a.reactive,react_to_events={[\"mouse_click\"]=true,[\"monitor_touch\"]=true,[\"char\"]=true,[\"key\"]=true,[\"key_up\"]=true,[\"paste\"]=true},positioning={x=a.x\
-or 1,y=a.y or 1,width=a.width or 0,},pattern=a.pattern\
-or\".\",selected=a.selected or\
-false,insert=false,ctrl=false,btn=a.btn,cursor_pos=a.cursor_pos or\
-0,char_limit=a.char_limit or a.width or\
-math.huge,input=\"\",background_color=a.background_color or\
-t.term_object.getBackgroundColor(),text_color=a.text_color or\
-t.term_object.getTextColor(),order=a.order or\
-1,logic_order=a.logic_order,graphic_order=a.graphic_order,shift=0,space_symbol=a.space_symbol\
-or\"\\175\",background_symbol=a.background_symbol\
-or\" \",on_change_select=a.on_change_select or\
-function()end,on_change_input=a.on_change_input or\
-function()end,on_enter=a.on_enter or\
-function()end,replace_char=a.replace_char,ignore_tab=a.ignore_tab,autoc={strings=a.autoc.strings\
-or{},spec_strings=a.autoc.spec_strings or{},bg=a.autoc.bg or a.background_color\
-or t.term_object.getBackgroundColor(),fg=a.autoc.fg or a.text_color or\
-t.term_object.getTextColor(),current=\"\",selected=1,put_space=a.autoc.put_space},blocking=a.blocking,always_update=a.always_update}o.cursor_x=o.positioning.x\
-return o\
+  [ "objects/frame/logic" ] = "local e=require(\"util\")return function(t,a)t.on_any(t,a)local\
+o,i=t.window.getPosition()local n=t.dragger.x+o local s=t.dragger.y+i if\
+a.name==\"mouse_click\"or a.name==\"monitor_touch\"then if\
+e.is_within_field(a.x,a.y,n-1,s-1,t.dragger.width,t.dragger.height)then\
+t.dragged=true t.last_click=a t.on_select(t,a)end elseif a.name==\"mouse_up\"then\
+t.dragged=false t.on_select(t,a)elseif a.name==\"mouse_drag\"and t.dragged and\
+t.dragable then local h,r=t.window.getPosition()local\
+d,l=a.x-t.last_click.x,a.y-t.last_click.y t.last_click=a local u,c=h+d,r+l if\
+not t.on_move(t,{x=u,y=c})then t.window.reposition(u,c)end local\
+m,f=t.window.getPosition()local\
+w,y=t.window.getSize()t.last_known_position={x=m,y=f,width=w,height=y}t.positioning={x=m,y=f,width=w,height=y}end\
 end",
-object_loader = "local e=require(\"util\")_ENV=_ENV.ORIGINAL local function t(a)local\
+  [ "objects/switch/object" ] = "local e=require(\"util\")return function(t,a)a=a or{}if\
+type(a.visible)~=\"boolean\"then a.visible=true end if\
+type(a.reactive)~=\"boolean\"then a.reactive=true end if\
+type(a.blocking)~=\"boolean\"then a.blocking=true end if\
+type(a.always_update)~=\"boolean\"then a.always_update=false end local\
+o={name=a.name or e.uuid4(),positioning={x=a.x or 1,y=a.y or 1,width=a.width or\
+0,height=a.height or 0},on_change_state=a.on_change_state or\
+function()end,background_color=a.background_color or\
+t.term_object.getBackgroundColor(),background_color_on=a.background_color_on or\
+t.term_object.getBackgroundColor(),text_color=a.text_color or\
+t.term_object.getTextColor(),text_color_on=a.text_color_on or\
+t.term_object.getTextColor(),symbol=a.symbol\
+or\" \",texture=a.tex,texture_on=a.tex_on,text=a.text,text_on=a.text_on,visible=a.visible,reactive=a.reactive,react_to_events={mouse_click=true,monitor_touch=true},btn=a.btn,order=a.order\
+or\
+1,logic_order=a.logic_order,graphic_order=a.graphic_order,tags={},value=(a.value~=nil)and\
+a.value or false,blocking=a.blocking,always_update=a.always_update}return o\
+end",
+  object_loader = "local e=require(\"util\")_ENV=_ENV.ORIGINAL local function t(a)local\
 o=type(a)local i if o==\"table\"then i={}for n,s in next,a,nil do if\
 n==\"canvas\"then i.canvas=s else i[t(n)]=t(s)end end\
 setmetatable(i,t(getmetatable(a)))else i=a end return i end\
@@ -514,71 +944,42 @@ d(p..\" has an invalid logic and graphic file !\",d.error)end end else if v and\
 not(type(b)==\"function\")then d(p..\" has invalid object file!\",d.error)else\
 d(p..\" is missing an object file !\",d.error)end end end return u\
 end,types=fs.list(\"objects\")}",
-[ "animations/ease_in_out_expo" ] = "return function(e,t)return t==0 and 0 or(t==1 and 1 or(t<0.5 and 2^(20*t-10)/2\
-or(2-2^(-20*t+10))/2))end\
-",
-[ "animations/flip" ] = "return function(e,t)return 1-t\
+  [ "animations/ease_in_cubic" ] = "return function(e,t)return t^3\
 end\
 ",
-[ "animations/ease_in_out_quad" ] = "return function(e,t)return t<0.5 and 2*t^2 or 1-(-2*t+2)^2/2\
-end\
-",
-[ "animations/linear" ] = "return function(e,t)return t\
-end\
-",
-[ "animations/ease_in_out_quart" ] = "return function(e,t)return t<0.5 and 8*t^4 or 1-(-2*t+2)^4/2\
-end\
-",
-[ "objects/script/logic" ] = "return\
-function(e,t)e.code(e,t)end\
-",
-[ "animations/ease_in_out_quint" ] = "return function(e,t)return t<0.5 and 16*t^5 or 1-(-2*t+2)^5/2\
-end\
-",
-[ "objects/circle/graphic" ] = "local e=require(\"core.algo\")local t=require(\"graphic_handle\").code local\
-a=require(\"util\")return function(o)local i=o.canvas.term_object local n={}local\
-s={}local h=a.tables.createNDarray(2)if o.filled then local\
-r=e.get_elipse_points(o.positioning.radius,math.ceil(o.positioning.radius-o.positioning.radius/3)+0.5,o.positioning.x,o.positioning.y,true)for\
-d,l in ipairs(r)do if h[l.x][l.y]~=true then\
-n[l.y]=(n[l.y]or\"\")..\"*\"s[l.y]=math.min(s[l.y]or math.huge,l.x)h[l.x][l.y]=true\
-end end for u,c in pairs(n)do\
-i.setCursorPos(s[u],u)i.blit(c:gsub(\"%*\",o.symbol),c:gsub(\"%*\",t.to_blit[o.fg]),c:gsub(\"%*\",t.to_blit[o.bg]))end\
+  [ "objects/frame/object" ] = "local e=require(\"util\")local t=require(\"core.gui_object\")return\
+function(a,o)o=o or{}if type(o.clear)~=\"boolean\"then o.clear=true end if\
+type(o.draggable)~=\"boolean\"then o.draggable=true end if\
+type(o.visible)~=\"boolean\"then o.visible=true end if\
+type(o.reactive)~=\"boolean\"then o.reactive=true end if\
+type(o.blocking)~=\"boolean\"then o.blocking=true end if\
+type(o.always_update)~=\"boolean\"then o.always_update=false end local\
+i={name=o.name or e.uuid4(),positioning={x=o.x or 1,y=o.y or 1,width=o.width or\
+0,height=o.height or\
+0},visible=o.visible,reactive=o.reactive,react_to_events={mouse_drag=true,mouse_click=true,mouse_up=true},dragged=false,dragger=o.dragger,last_click={x=1,y=1},last_known_position={x=o.x\
+or 1,y=o.y or 1,width=o.width or 0,height=o.height or 0},order=o.order or\
+1,logic_order=o.logic_order,graphic_order=o.graphic_order,btn=o.btn,dragable=o.draggable,on_move=o.on_move\
+or function()end,on_select=o.on_select or function()end,on_any=o.on_any or\
+function()end,on_graphic=o.on_graphic or\
+function()end,on_deselect=o.on_deselect or\
+function()end,blocking=o.blocking,always_update=o.always_update}local\
+n=window.create(a.term_object,i.positioning.x,i.positioning.y,i.positioning.width,i.positioning.height)if\
+not i.dragger then i.dragger={x=1,y=1,width=i.positioning.width,height=1}end\
+i.child=t(n,a.term_object,a.log)i.window=n i.child.inherit(a,i)return i\
+end",
+  [ "objects/triangle/graphic" ] = "local e=require(\"core.algo\")local t=require(\"graphic_handle\").code return\
+function(a)local o=a.canvas.term_object local i={}local n={}if a.filled then\
+local\
+s=e.get_triangle_points(a.positioning.p1,a.positioning.p2,a.positioning.p3)for\
+h,r in ipairs(s)do i[r.y]=(i[r.y]or\"\")..\"*\"n[r.y]=math.min(n[r.y]or\
+math.huge,r.x)end for d,l in pairs(i)do\
+o.setCursorPos(n[d],d)o.blit(l:gsub(\"%*\",a.symbol),l:gsub(\"%*\",t.to_blit[a.fg]),l:gsub(\"%*\",t.to_blit[a.bg]))end\
 else local\
-m=e.get_elipse_points(o.positioning.radius,math.ceil(o.positioning.radius-o.positioning.radius/3)+0.5,o.positioning.x,o.positioning.y)for\
-f,w in pairs(m)do\
-i.setCursorPos(w.x,w.y)i.blit(o.symbol,t.to_blit[o.fg],t.to_blit[o.bg])end end\
+u=e.get_triangle_outline_points(a.positioning.p1,a.positioning.p2,a.positioning.p3)for\
+c,m in pairs(u)do\
+o.setCursorPos(m.x,m.y)o.blit(a.symbol,t.to_blit[a.fg],t.to_blit[a.bg])end end\
 end",
-[ "objects/script/object" ] = "local e=require(\"util\")return function(t,a)a=a or{}if\
-type(a.visible)~=\"boolean\"then a.visible=true end if\
-type(a.reactive)~=\"boolean\"then a.reactive=true end if\
-type(a.blocking)~=\"boolean\"then a.blocking=false end if\
-type(a.always_update)~=\"boolean\"then a.always_update=true end local\
-o={name=a.name or e.uuid4(),visible=a.visible,reactive=a.reactive,code=a.code\
-or function()return false end,graphic=a.graphic or function()return false\
-end,order=a.order or\
-1,logic_order=a.logic_order,graphic_order=a.graphic_order,react_to_events={mouse_click=true,mouse_drag=true,monitor_touch=true,mouse_scroll=true,mouse_up=true,key=true,key_up=true,char=true,paste=true},blocking=a.blocking,always_update=a.always_update}return\
-o\
-end",
-[ "presets/tex/brick" ] = "local e=require(\"graphic_handle\")return function(t,a)if not t then\
-t=colors.gray end if not a then a=colors.lightGray end local\
-o=[[{\
-        [3] = {[5] = {b = \"background\", s = \"\", t = \"brick\"}, [6] = {b = \"background\", s = \"\", t = \"brick\"}},\
-        [4] = {[5] = {b = \"background\", s = \"\", t = \"brick\"}, [6] = {b = \"background\", s = \"\", t = \"brick\"}},\
-        [5] = {[5] = {b = \"background\", s = \"\", t = \"brick\"}, [6] = {b = \"background\", s = \"\", t = \"brick\"}},\
-        offset = {3, 9, 11, 4}\
-    }]]local\
-i=o:gsub(\"background\",e.code.to_blit[t]):gsub(\"brick\",e.code.to_blit[a])return\
-e.load_texture(textutils.unserialize(i))end",
-[ "animations/ease_in_out_sine" ] = "return function(e,t)return-(math.cos(math.pi*t)-1)/2\
-end\
-",
-[ "presets/rect/window" ] = "return\
-function(e,t)return{top_left={sym=\" \",bg=e,fg=t},top_right={sym=\" \",bg=e,fg=t},bottom_left={sym=\" \",bg=t,fg=e},bottom_right={sym=\" \",bg=t,fg=e},side_left={sym=\" \",bg=t,fg=e},side_right={sym=\" \",bg=t,fg=e},side_top={sym=\" \",bg=e,fg=t},side_bottom={sym=\" \",bg=t,fg=e},inside={sym=\" \",bg=t,fg=e},}end\
-",
-[ "objects/circle/logic" ] = "return\
-function()end\
-",
-[ "objects/progressbar/graphic" ] = "local e=require(\"graphic_handle\")return function(t)local a=t.canvas.term_object\
+  [ "objects/progressbar/graphic" ] = "local e=require(\"graphic_handle\")return function(t)local a=t.canvas.term_object\
 local\
 o=math.floor(math.max(math.min(t.positioning.width*(t.value/100),t.positioning.width),0))local\
 i=math.ceil(math.min(math.max(t.positioning.width-o,0),t.positioning.width))if\
@@ -626,111 +1027,158 @@ for c=t.positioning.y,t.positioning.y+o-1 do\
 a.setCursorPos(t.positioning.x,c)a.blit((\" \"):rep(t.positioning.width),(\"f\"):rep(t.positioning.width),e.code.to_blit[t.bg]:rep(t.positioning.width))end\
 end end\
 end",
-[ "animations/ease_in" ] = "return function(e,t)return t*t*t\
+  [ "animations/ease_in_out_quint" ] = "return function(e,t)return t<0.5 and 16*t^5 or 1-(-2*t+2)^5/2\
 end\
 ",
-[ "apis/fuzzy_find" ] = "local e=require(\"cc.pretty\")local function t(a,o)local\
-i=100/math.max(#a,#o)local n=string.len(a)local s=string.len(o)local h={}for\
-r=0,n do h[r]={}h[r][0]=r end for d=0,s do h[0][d]=d end for l=1,n do for u=1,s\
-do local c=0 if string.sub(a,l,l)~=string.sub(o,u,u)then c=1 end\
-h[l][u]=math.min(h[l-1][u]+1,h[l][u-1]+1,h[l-1][u-1]+c)end end return\
-100-h[n][s]*i end local function m(f,w)local y,p={},{}for v,b in pairs(f)do\
-table.insert(y,{t(v,w),v,b})end table.sort(y,function(g,k)return\
-g[1]>k[1]end)for q,j in ipairs(y)do p[q]={match=j[1],str=j[2],data=j[3]}end\
-return p end\
-return{fuzzy_match=t,sort_strings=m,}",
-[ "presets/rect/framed_window" ] = "return\
+  util = "_ENV=_ENV.ORIGINAL local function e(t,a,o,i,n,s)return t>=o and t<o+n and a>=i\
+and a<i+s end local h=function(r,d,l)if d==0 then return l,l,l end local\
+u=math.floor(r/60)local c=(r/60)-u local m=l*(1-d)local f=l*(1-d*c)local\
+w=l*(1-d*(1-c))if u==0 then return l,w,m elseif u==1 then return f,l,m elseif\
+u==2 then return m,l,w elseif u==3 then return m,f,l elseif u==4 then return\
+w,m,l elseif u==5 then return l,m,f end end local function y(p,v)v=v or{}if\
+p==0 then return v end setmetatable(v,{__index=function(b,g)local\
+k=y(p-1)b[g]=k return k end})return v end local q=function(j)return\
+setmetatable(j or{},{__index=function(x,z)local E={}x[z]=E return E end})end\
+local T=function(A)return setmetatable(A or{},{__index=function(O,I)local\
+N=q()O[I]=N return N end})end local function S(...)local H={}for R,D in\
+pairs({...})do for L,U in pairs(D)do table.insert(H,U)end end return H end\
+local function C(M,F,W)local Y=W-M.y local P=F.y-M.y local\
+V=M.x+(Y*(F.x-M.x))/P local B=M.z+(Y*(F.z-M.z))/P return V,B end local function\
+G(K,Q,J)local X=K.z+(J-K.x)*(((Q.z-K.z)/(Q.x-K.x)))return X end local function\
+Z(et,tt,at,ot,it,nt,st,ht)local rt=(ot-st)/(ot-et)*at+(st-et)/(ot-et)*nt\
+return(it-ht)/(it-tt)*rt+(ht-tt)/(it-tt)*rt end local function\
+dt(lt,ut,ct)return(1-ct)*lt+ct*ut end local function mt(ft)local\
+wt=createSelfIndexArray()for yt,pt in pairs(ft)do if type(pt)==\"table\"then for\
+vt,bt in pairs(pt)do wt[vt][yt]=bt end end end return wt end local\
+gt=function(kt)local qt=0 for jt,xt in pairs(kt)do qt=qt+1 end return qt,#kt\
+end local zt=function(Et,Tt)local At=true local Ot=gt(Et)local It=gt(Tt)for\
+Nt,St in pairs(Et)do if St~=Tt[Nt]then At=false end end if At and Ot==It then\
+return true end end local function Ht(Rt)local Ht={}for Dt,Lt in pairs(Rt)do\
+table.insert(Ht,Dt)end return Ht end local function Ut(Ct,Mt)local Ft=0 local\
+Ht=Ht(Ct)table.sort(Ht,function(Wt,Yt)if Mt then return Yt<Wt else return Wt<Yt\
+end end)return function()Ft=Ft+1 if Ct[Ht[Ft]]then return Ht[Ft],Ct[Ht[Ft]]else\
+return end end end local function Pt()local Vt=math.random local\
+Bt='xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'return\
+string.gsub(Bt,'[xy]',function(Gt)return string.format('%x',Gt=='x'and\
+Vt(0,0xf)or Vt(8,0xb))end)end local function Kt(Qt)local\
+Jt=os.epoch(\"utc\")+Qt*1000 while os.epoch(\"utc\")<Jt do\
+os.queueEvent(\"waiting\")os.pullEvent(\"waiting\")end end local function\
+Xt(Zt)local ea={}Zt:gsub(\".\",function(ta)table.insert(ea,ta)end)return ea end\
+local function aa(oa)local ia={}for na=1,oa do ia[na]={\"\",\"\",\"\"}end return ia\
+end local\
+sa={monitor_touch=true,mouse_click=true,mouse_drag=true,mouse_scroll=true,mouse_up=true}return{is_within_field=e,tables={createNDarray=y,get_true_table_len=gt,compare_table=zt,switchXYArray=mt,create2Darray=q,create3Darray=T,iterate_order=Ut,merge=S},math={interpolateY=C,interpolateZ=G,interpolate_on_line=Z,lerp=dt},HSVToRGB=h,uuid4=Pt,precise_sleep=Kt,piece_string=Xt,create_blit_array=aa,events_with_cords=sa}",
+  [ "presets/tex/checker" ] = "local e=require(\"util\")local t=require(\"graphic_handle\")return\
+function(...)local a=e.tables.createNDarray(2,{offset={5,13,11,4}})local\
+o={...}local i=1 for n,s in pairs(o)do local h={}for r=1,table.getn(o)do local\
+d=((r+i)-2)%table.getn(o)+1 h[r]=o[d]end for n,s in pairs(h)do\
+a[n+4][i+8]={s=\" \",t=\"f\",b=t.code.to_blit[s]}end i=i+1 end return\
+t.load_texture(a)end",
+  [ "animations/ease_in_elastic" ] = "return function(e,t)local a=(2*math.pi)/3;return t==0 and 0 or(t==1 and 1\
+or(-2^(10*t-10)*math.sin((t*10-10.75)*a)))end\
+",
+  [ "objects/triangle/logic" ] = "return\
+function()end\
+",
+  [ "objects/progressbar/logic" ] = "return\
+function(e)end\
+",
+  [ "presets/tex/brick" ] = "local e=require(\"graphic_handle\")return function(t,a)if not t then\
+t=colors.gray end if not a then a=colors.lightGray end local\
+o=[[{\
+        [3] = {[5] = {b = \"background\", s = \"\", t = \"brick\"}, [6] = {b = \"background\", s = \"\", t = \"brick\"}},\
+        [4] = {[5] = {b = \"background\", s = \"\", t = \"brick\"}, [6] = {b = \"background\", s = \"\", t = \"brick\"}},\
+        [5] = {[5] = {b = \"background\", s = \"\", t = \"brick\"}, [6] = {b = \"background\", s = \"\", t = \"brick\"}},\
+        offset = {3, 9, 11, 4}\
+    }]]local\
+i=o:gsub(\"background\",e.code.to_blit[t]):gsub(\"brick\",e.code.to_blit[a])return\
+e.load_texture(textutils.unserialize(i))end",
+  [ "animations/ease_in_out_sine" ] = "return function(e,t)return-(math.cos(math.pi*t)-1)/2\
+end\
+",
+  [ "objects/group/graphic" ] = "return function(e)local t=e.last_known_position local a=e.positioning if\
+t.x~=a.x or t.y~=a.y or t.width~=a.width or t.height~=a.height then\
+e.window.reposition(a.x,a.y,a.width,a.height)e.gui.w,e.gui.width=a.width,a.width\
+e.gui.h,e.gui.height=a.height,a.height\
+e.last_known_position={x=a.x,y=a.y,width=a.width,height=a.height}end\
+e.window.redraw()end",
+  [ "animations/ease_in_out_expo" ] = "return function(e,t)return t==0 and 0 or(t==1 and 1 or(t<0.5 and 2^(20*t-10)/2\
+or(2-2^(-20*t+10))/2))end\
+",
+  [ "objects/text/logic" ] = "return\
+function()end\
+",
+  [ "presets/rect/window" ] = "return\
+function(e,t)return{top_left={sym=\" \",bg=e,fg=t},top_right={sym=\" \",bg=e,fg=t},bottom_left={sym=\" \",bg=t,fg=e},bottom_right={sym=\" \",bg=t,fg=e},side_left={sym=\" \",bg=t,fg=e},side_right={sym=\" \",bg=t,fg=e},side_top={sym=\" \",bg=e,fg=t},side_bottom={sym=\" \",bg=t,fg=e},inside={sym=\" \",bg=t,fg=e},}end\
+",
+  [ "animations/ease_in_expo" ] = "return function(e,t)return t==0 and 0 or\
+2^(10*t-10)end\
+",
+  [ "presets/rect/framed_window" ] = "return\
 function(e,t)return{top_left={sym=\" \",bg=e,fg=t},top_right={sym=\" \",bg=e,fg=t},bottom_left={sym=\"\\138\",bg=e,fg=t},bottom_right={sym=\"\\133\",bg=e,fg=t},side_left={sym=\"\\149\",bg=t,fg=e},side_right={sym=\"\\149\",bg=e,fg=t},side_top={sym=\" \",bg=e,fg=t},side_bottom={sym=\"\\143\",bg=e,fg=t},inside={sym=\" \",bg=t,fg=e}}end\
 ",
-[ "animations/ease_in_quad" ] = "return function(e,t)return t^2\
+  [ "animations/ease_in_quad" ] = "return function(e,t)return t^2\
 end\
 ",
-[ "presets/rect/frame_thick" ] = "return\
-function(e,t)return{top_left={sym=\" \",bg=e,fg=t},top_right={sym=\" \",bg=e,fg=t},bottom_left={sym=\" \",bg=e,fg=t},bottom_right={sym=\" \",bg=e,fg=t},side_left={sym=\" \",bg=e,fg=t},side_right={sym=\" \",bg=e,fg=t},side_top={sym=\" \",bg=e,fg=t},side_bottom={sym=\" \",bg=e,fg=t},inside={sym=\" \",bg=t,fg=t},}end\
+  [ "objects/group/logic" ] = "return\
+function(e,t)e.bef_draw(e,t)end\
 ",
-[ "objects/circle/object" ] = "local e=require(\"util\")local\
-t={[\"left-right\"]=true,[\"right-left\"]=true,[\"top-down\"]=true,[\"down-top\"]=true,}return\
-function(a,o)o=o or{}if type(o.visible)~=\"boolean\"then o.visible=true end if\
-type(a.symbols)~=\"table\"then o.symbols={}end if type(o.filled)~=\"boolean\"then\
-o.filled=true end if type(o.blocking)~=\"boolean\"then o.blocking=false end if\
-type(o.always_update)~=\"boolean\"then o.always_update=true end local\
-i={name=o.name or e.uuid4(),positioning={x=o.x or 1,y=o.y or 1,radius=o.radius\
-or 3},symbol=o.symbol or\" \",bg=o.background_color or\
-colors.white,fg=o.text_color or\
-colors.black,visible=o.visible,filled=o.filled,order=o.order or\
-1,logic_order=o.logic_order,graphic_order=o.graphic_order,blocking=o.blocking,always_update=o.always_update}return\
-i\
+  [ "animations/ease_in_out_quad" ] = "return function(e,t)return t<0.5 and 2*t^2 or 1-(-2*t+2)^2/2\
+end\
+",
+  [ "objects/inputbox/object" ] = "local e=require(\"util\")return function(t,a)if type(a.visible)~=\"boolean\"then\
+a.visible=true end if type(a.reactive)~=\"boolean\"then a.reactive=true end if\
+not a.autoc then a.autoc={}end if type(a.autoc.put_space)~=\"boolean\"then\
+a.autoc.put_space=true end if type(a.blocking)~=\"boolean\"then a.blocking=true\
+end if type(a.always_update)~=\"boolean\"then a.always_update=false end local\
+o={name=a.name or\
+e.uuid4(),visible=a.visible,reactive=a.reactive,react_to_events={[\"mouse_click\"]=true,[\"monitor_touch\"]=true,[\"char\"]=true,[\"key\"]=true,[\"key_up\"]=true,[\"paste\"]=true},positioning={x=a.x\
+or 1,y=a.y or 1,width=a.width or 0,},pattern=a.pattern\
+or\".\",selected=a.selected or\
+false,insert=false,ctrl=false,btn=a.btn,cursor_pos=a.cursor_pos or\
+0,char_limit=a.char_limit or a.width or\
+math.huge,input=\"\",background_color=a.background_color or\
+t.term_object.getBackgroundColor(),text_color=a.text_color or\
+t.term_object.getTextColor(),order=a.order or\
+1,logic_order=a.logic_order,graphic_order=a.graphic_order,shift=0,space_symbol=a.space_symbol\
+or\"\\175\",background_symbol=a.background_symbol\
+or\" \",on_change_select=a.on_change_select or\
+function()end,on_change_input=a.on_change_input or\
+function()end,on_enter=a.on_enter or\
+function()end,replace_char=a.replace_char,ignore_tab=a.ignore_tab,autoc={strings=a.autoc.strings\
+or{},spec_strings=a.autoc.spec_strings or{},bg=a.autoc.bg or a.background_color\
+or t.term_object.getBackgroundColor(),fg=a.autoc.fg or a.text_color or\
+t.term_object.getTextColor(),current=\"\",selected=1,put_space=a.autoc.put_space},blocking=a.blocking,always_update=a.always_update}o.cursor_x=o.positioning.x\
+return o\
 end",
-[ "objects/text/object" ] = "local e=require(\"util\")return function(t,a)a=a or{}if\
-type(a.visible)~=\"boolean\"then a.visible=true end if\
-type(a.reactive)~=\"boolean\"then a.reactive=true end if\
-type(a.blocking)~=\"boolean\"then a.blocking=false end if\
-type(a.always_update)~=\"boolean\"then a.always_update=false end local\
-o={name=a.name or e.uuid4(),visible=a.visible,text=a.text or\
-t.text{text=\"none\",x=1,y=1,bg=colors.red,fg=colors.white},order=a.order or\
-1,logic_order=a.logic_order,graphic_order=a.graphic_order,update=a.update or\
-function()end,blocking=a.blocking,always_update=a.always_update}return o\
-end",
-[ "presets/rect/border" ] = "return\
+  [ "presets/rect/frame" ] = "return\
+function(e,t)return{top_left={sym=\"\\151\",bg=t,fg=e},top_right={sym=\"\\148\",bg=e,fg=t},bottom_left={sym=\"\\138\",bg=e,fg=t},bottom_right={sym=\"\\133\",bg=e,fg=t},side_left={sym=\"\\149\",bg=t,fg=e},side_right={sym=\"\\149\",bg=e,fg=t},side_top={sym=\"\\131\",bg=t,fg=e},side_bottom={sym=\"\\143\",bg=e,fg=t},inside={sym=\" \",bg=t,fg=e}}end\
+",
+  [ "animations/ease_in_out" ] = "return function(e,t)return\
+e(t^3,1-((1-t)^3),t)end\
+",
+  [ "presets/rect/border" ] = "return\
 function(e,t)return{top_left={sym=\"\\159\",fg=t,bg=e},top_right={sym=\"\\144\",fg=e,bg=t},bottom_left={sym=\"\\130\",fg=e,bg=t},bottom_right={sym=\"\\129\",fg=e,bg=t},side_left={sym=\"\\149\",fg=t,bg=e},side_right={sym=\"\\149\",fg=e,bg=t},side_top={sym=\"\\143\",fg=t,bg=e},side_bottom={sym=\"\\131\",fg=e,bg=t},inside={sym=\" \",bg=t,fg=e},}end\
 ",
-[ "apis/log" ] = "local\
-e={{colors.red},{colors.yellow},{colors.white,colors.red},{colors.white,colors.lime},{colors.white,colors.lime},{colors.white},{colors.green},{colors.gray},}local\
-t={error=1,warn=2,fatal=3,success=4,message=6,update=7,info=8}local a={}for o,i\
-in pairs(t)do a[i]=o end local function n(s)local\
-s=s:gsub(\"^%[%d-%:%d-% %a-]\",\"\")return s end local function h(r,d,l,u)local\
-c,m=r.getSize()local f,w={},math.ceil(#d/c)local y=0 for p=1,w do local\
-v,b=r.getCursorPos()if b>m then r.scroll(1)r.setCursorPos(1,b-1)b=b-1 end\
-r.write(d:sub(y+1,p*c))r.setCursorPos(1,b+1)y=p*c end return w end local\
-function g(k,q)local j=k.getSize()local x,z={},math.ceil(#q/j)local E=0 local T\
-for A=1,z do local O=q:sub(E+1,A*j)E=A*j T=#O end return T end function\
-t:dump(I)local N=\"\"local S=1 local H={}local R=\"\"for D,L in\
-ipairs(self.history)do if N==n(L.str)..L.type then S=S+1 table.remove(H,#H)else\
-S=1 end\
-H[#H+1]=L.str..\"(\"..tostring(S)..\") type: \"..(a[L.type]or\"info\")N=n(L.str)..L.type\
-end for U,C in ipairs(H)do R=R..C..\"\\n\"end if type(I)==\"string\"then local\
-M=fs.open(I..\".log\",\"w\")M.write(R)M.close()end return R end local function\
-F(W,Y,P)local V,B=W.term.getSize()local G,K=W.term.getCursorPos()local\
-Y=tostring(Y)P=P or\"info\"if W.lastLog==Y..P then W.nstr=W.nstr+1 local\
-Q=K-W.maxln W.term.setCursorPos(G,Q)else W.nstr=1 end W.lastLog=Y..P local\
-J=\"[\"..textutils.formatTime(os.time())..\"] \"local\
-X,Z=W.term.getBackgroundColor(),W.term.getTextColor()local\
-et,tt=unpack(e[P]or{})W.term.setBackgroundColor(tt or X);W.term.setTextColor(et\
-or colors.gray)local at=J..Y..\"(\"..tostring(W.nstr)..\")\"local ot=#at if ot<1\
-then ot=1 end local it=V-ot if it<1 then it=1 end it=V-(g(W.term,at))local\
-nt=J..Y..(\" \"):rep(it)table.insert(W.history,{str=nt,type=P})W.maxln=h(W.term,nt..\"(\"..tostring(W.nstr)..\")\",X,W.title)local\
-G,K=W.term.getCursorPos()W.term.setBackgroundColor(W.sbg);W.term.setTextColor(W.sfg)if\
-W.title then\
-W.term.setCursorPos(1,1)W.term.write((W.tsym):rep(V))W.term.setCursorPos(math.ceil((V/2)-(#W.title/2)),1)W.term.write(W.title)W.term.setCursorPos(G,K)end\
-W.term.setBackgroundColor(X);W.term.setTextColor(Z)end local function\
-st(ht,rt,dt,lt,ut)dt=dt or\"-\"local ct,mt=ht.getSize()local\
-ft=setmetatable({lastLog=\"\",nstr=1,maxln=1,term=ht,history={},title=rt,tsym=(#dt<4)and\
-dt\
-or\"-\",sbg=ht.getBackgroundColor(),sfg=ht.getTextColor(),auto_dump=lt},{__index=t,__call=F})if\
-ft.title then\
-ft.term.setCursorPos(1,1)ft.term.write((ft.tsym):rep(ct))ft.term.setCursorPos(math.ceil((ct/2)-(#ft.title/2)),1)ft.term.write(ft.title)ft.term.setCursorPos(1,2)end\
-ft.lastLog=nil return ft end\
-return{create_log=st}",
-[ "objects/ellipse/object" ] = "local e=require(\"util\")local\
-t={[\"left-right\"]=true,[\"right-left\"]=true,[\"top-down\"]=true,[\"down-top\"]=true,}return\
+  [ "animations/ease_in_quart" ] = "return function(e,t)return t^4\
+end\
+",
+  [ "objects/group/object" ] = "local e=require(\"util\")local t=require(\"core.gui_object\")return\
 function(a,o)o=o or{}if type(o.visible)~=\"boolean\"then o.visible=true end if\
-type(a.symbols)~=\"table\"then o.symbols={}end if type(o.filled)~=\"boolean\"then\
-o.filled=true end if type(o.blocking)~=\"boolean\"then o.blocking=false end if\
-type(o.always_update)~=\"boolean\"then o.always_update=true end local\
+type(o.reactive)~=\"boolean\"then o.reactive=true end if\
+type(o.blocking)~=\"boolean\"then o.blocking=true end if\
+type(o.always_update)~=\"boolean\"then o.always_update=false end local\
 i={name=o.name or e.uuid4(),positioning={x=o.x or 1,y=o.y or 1,width=o.width or\
-1,height=o.height or 1},symbol=o.symbol or\" \",bg=o.background_color or\
-colors.white,fg=o.text_color or\
-colors.black,visible=o.visible,filled=o.filled,order=o.order or\
-1,logic_order=o.logic_order,graphic_order=o.graphic_order,blocking=o.blocking,always_update=o.always_update}return\
-i\
+0,height=o.height or 0},visible=o.visible,last_known_position={x=o.x or 1,y=o.y\
+or 1,width=o.width or 0,height=o.height or 0},order=o.order or\
+1,logic_order=o.logic_order,graphic_order=o.graphic_order,bef_draw=o.bef_draw\
+or function()end,blocking=o.blocking,always_update=o.always_update}local\
+n=window.create(a.term_object,i.positioning.x,i.positioning.y,i.positioning.width,i.positioning.height)i.gui=t(n,a.term_object,a.log)i.window=n\
+i.gui.inherit(a,i)return i\
 end",
-[ "animations/ease_in_quart" ] = "return function(e,t)return t^4\
+  [ "animations/ease_in_out_quart" ] = "return function(e,t)return t<0.5 and 8*t^4 or 1-(-2*t+2)^4/2\
 end\
 ",
-[ "animations/ease_in_back" ] = "return function(e,t)local a=1.70158;local o=a+1 return o*t^3-a*t^2\
-end\
-",
-[ "objects/triangle/object" ] = "local e=require(\"util\")local\
+  [ "objects/triangle/object" ] = "local e=require(\"util\")local\
 t={[\"left-right\"]=true,[\"right-left\"]=true,[\"top-down\"]=true,[\"down-top\"]=true,}return\
 function(a,o)o=o or{}if type(o.visible)~=\"boolean\"then o.visible=true end if\
 type(a.symbols)~=\"table\"then o.symbols={}end if type(o.filled)~=\"boolean\"then\
@@ -745,25 +1193,7 @@ or colors.black,visible=o.visible,filled=o.filled,order=o.order or\
 1,logic_order=o.logic_order,graphic_order=o.graphic_order,blocking=o.blocking,always_update=o.always_update}return\
 i\
 end",
-[ "objects/triangle/logic" ] = "return\
-function()end\
-",
-[ "objects/triangle/graphic" ] = "local e=require(\"core.algo\")local t=require(\"graphic_handle\").code return\
-function(a)local o=a.canvas.term_object local i={}local n={}if a.filled then\
-local\
-s=e.get_triangle_points(a.positioning.p1,a.positioning.p2,a.positioning.p3)for\
-h,r in ipairs(s)do i[r.y]=(i[r.y]or\"\")..\"*\"n[r.y]=math.min(n[r.y]or\
-math.huge,r.x)end for d,l in pairs(i)do\
-o.setCursorPos(n[d],d)o.blit(l:gsub(\"%*\",a.symbol),l:gsub(\"%*\",t.to_blit[a.fg]),l:gsub(\"%*\",t.to_blit[a.bg]))end\
-else local\
-u=e.get_triangle_outline_points(a.positioning.p1,a.positioning.p2,a.positioning.p3)for\
-c,m in pairs(u)do\
-o.setCursorPos(m.x,m.y)o.blit(a.symbol,t.to_blit[a.fg],t.to_blit[a.bg])end end\
-end",
-[ "presets/rect/frame" ] = "return\
-function(e,t)return{top_left={sym=\"\\151\",bg=t,fg=e},top_right={sym=\"\\148\",bg=e,fg=t},bottom_left={sym=\"\\138\",bg=e,fg=t},bottom_right={sym=\"\\133\",bg=e,fg=t},side_left={sym=\"\\149\",bg=t,fg=e},side_right={sym=\"\\149\",bg=e,fg=t},side_top={sym=\"\\131\",bg=t,fg=e},side_bottom={sym=\"\\143\",bg=e,fg=t},inside={sym=\" \",bg=t,fg=e}}end\
-",
-[ "apis/sevensh" ] = "local\
+  [ "apis/sevensh" ] = "local\
 e={normal={1021,1007,1021,881,2,925,893,894,1021,325,2,1017,877,879,1021,size=3,conversion={}}}if\
 not fs.exists(\"GuiH/apis/fonts.7sh\")then fs.makeDir(\"GuiH/apis/fonts.7sh\")end\
 for t,a in pairs(fs.list(\"GuiH/apis/fonts.7sh\"))do local\
@@ -788,7 +1218,221 @@ error(\"create_display needs an term object as its argument input to work!\",2)e
 return setmetatable({pos=vector.new(q,j),value=x or 0,symbol=T or\" \",bg=E or\
 colors.white,tg=A or colors.black,font=z or\"normal\",term=k},{__index=n})end\
 return{create_display=g}",
-[ "apis/pixelbox" ] = "local e=require(\"graphic_handle\")local t=require(\"util\")local\
+  [ "objects/text/graphic" ] = "return function(e)if e.text then e:update(e.text)e.text()end\
+end\
+",
+  [ "objects/button/graphic" ] = "local e=require(\"graphic_handle\").code return function(t)local\
+a=t.canvas.term_object local o,i=t.positioning.x,t.positioning.y if not\
+t.texture then\
+a.setBackgroundColor(t.background_color)a.setTextColor(t.text_color)for\
+n=i,t.positioning.height+i-1 do\
+a.setCursorPos(o,n)a.write(t.symbol:rep(t.positioning.width))end else\
+e.draw_box_tex(a,t.texture,o,i,t.positioning.width,t.positioning.height,t.background_color,t.text_color,nil,nil,t.canvas.texture_cache)end\
+if t.text then\
+t.text(a,t.positioning.x,t.positioning.y,t.positioning.width,t.positioning.height)end\
+end",
+  [ "animations/ease_in_quint" ] = "return function(e,t)return t^5\
+end\
+",
+  [ "objects/switch/logic" ] = "local e=require(\"util\")return function(t,a)if\
+e.is_within_field(a.x,a.y,t.positioning.x,t.positioning.y,t.positioning.width,t.positioning.height)then\
+t.value=not t.value t.on_change_state(t,a)end\
+end",
+  [ "animations/ease_in_out_back" ] = "return function(e,t)local a=1.70158;local o=a*1.525;return t<0.5\
+and((2*t)^2*((o+1)*2*t-o))/2 or((2*t-2)^2*((o+1)*(t*2-2)+o)+2)/2\
+end",
+  [ "objects/switch/graphic" ] = "local e=require(\"graphic_handle\").code return function(t)local\
+a=t.canvas.term_object local o,i=t.positioning.x,t.positioning.y if not\
+t.texture and not t.texture_on then a.setBackgroundColor(t.value and\
+t.background_color_on or t.background_color)a.setTextColor(t.value and\
+t.text_color_on or t.text_color)for n=i,t.positioning.height+i-1 do\
+a.setCursorPos(o,n)a.write(t.symbol:rep(t.positioning.width))end else\
+e.draw_box_tex(a,(t.value and t.texture_on or t.texture)or(t.texture or\
+t.texture_on),t.positioning.x,t.positioning.y,t.positioning.width,t.positioning.height,(t.value\
+and t.background_color_on or t.background_color)or colors.red,(t.value and\
+t.text_color_on or t.text_color)or\
+colors.black,nil,nil,t.canvas.texture_cache)end if t.text and((not t.value)or\
+not t.text_on)then\
+t.text(a,t.positioning.x,t.positioning.y,t.positioning.width,t.positioning.height)elseif\
+t.text_on and t.value then\
+t.text_on(a,t.positioning.x,t.positioning.y,t.positioning.width,t.positioning.height)end\
+end",
+  [ "objects/rectangle/logic" ] = "return\
+function()end\
+",
+  [ "objects/scrollbox/object" ] = "local e=require(\"util\")return function(t,a)a=a or{}if\
+type(a.visible)~=\"boolean\"then a.visible=true end if\
+type(a.reactive)~=\"boolean\"then a.reactive=true end if\
+type(a.blocking)~=\"boolean\"then a.blocking=false end if\
+type(a.always_update)~=\"boolean\"then a.always_update=true end local\
+o={name=a.name or e.uuid4(),positioning={x=a.x or 1,y=a.y or 1,width=a.width or\
+1,height=a.height or\
+1},visible=a.visible,reactive=a.reactive,react_to_events={[\"mouse_scroll\"]=true},order=a.order\
+or 1,logic_order=a.logic_order,graphic_order=a.graphic_order,value=a.value or\
+1,limit_min=a.limit_min or-math.huge,limit_max=a.limit_max or\
+math.huge,on_change_value=a.on_change_value or function()end,on_up=a.on_up or\
+function()end,on_down=a.on_down or\
+function()end,blocking=a.blocking,always_update=a.always_update}return o\
+end",
+  [ "objects/button/logic" ] = "local e=require(\"util\")return function(t,a)if\
+e.is_within_field(a.x,a.y,t.positioning.x,t.positioning.y,t.positioning.width,t.positioning.height)then\
+t.on_click(t,a)end\
+end",
+  [ "objects/inputbox/graphic" ] = "local e=require(\"graphic_handle\").code local function t(a)return\
+a:gsub(\"[%[%]%(%)%.%+%-%%%$%^%*%?]\",\"%%%1\")end return function(o)local\
+i=o.canvas.term_object local n,s=o.input,0 if#o.input>=o.positioning.width-1\
+then\
+n=o.input:sub(#o.input-o.positioning.width+1-o.shift,#o.input-o.shift)s=#o.input-#n\
+end local h=(o.positioning.x+o.cursor_pos)-s\
+i.setCursorPos(o.positioning.x,o.positioning.y)local r=n\
+n=n:gsub(\" \",o.space_symbol)..o.background_symbol:rep(o.positioning.width-#n+1)local\
+d if o.replace_char then\
+d=o.replace_char:rep(#r)..o.background_symbol:rep(o.positioning.width-#r+1)end\
+i.blit(d or\
+n,e.to_blit[o.text_color]:rep(#n),e.to_blit[o.background_color]:rep(#n))if\
+o.selected and(o.char_limit>o.cursor_pos)then\
+i.setCursorPos(math.max(h+o.shift,o.positioning.x),o.positioning.y)if\
+h+o.shift<o.positioning.x then o.shift=o.shift+1 end if\
+h+o.shift>o.positioning.x+o.positioning.width then o.shift=o.shift-1 end local\
+l if o.cursor_pos<o.positioning.width then\
+l=o.input:sub(o.cursor_pos+1,o.cursor_pos+1)o.cursor_x=o.cursor_pos+1 else\
+l=o.input:sub(o.cursor_pos+1,o.cursor_pos+1)i.setCursorPos(h+o.shift,o.positioning.y)end\
+o.cursor_x=h+o.shift i.blit((l)~=\"\"and(o.replace_char or l)or\"_\",l~=\"\"and\
+e.to_blit[o.background_color]or e.to_blit[o.text_color],l~=\"\"and\
+e.to_blit[o.text_color]or e.to_blit[o.background_color])else\
+i.setCursorPos(o.positioning.x+o.positioning.width,o.positioning.y)i.blit(\"\\127\",e.to_blit[o.text_color],e.to_blit[o.background_color])end\
+if o.autoc.str_diff then\
+i.setCursorPos(o.cursor_x+o.shift,o.positioning.y)local\
+u=o.autoc.sorted[o.autoc.selected]if u then local\
+c=o.input:match(\"%S+$\")or\"\"local m=u:gsub(\"^\"..c:gsub(\" $\",\"\"),\"\")if\
+o.cursor_pos>=#o.input then local m=m:gsub(\"%%(.)\",\"%1\")local\
+f=o.positioning.x+o.positioning.width+1 local w=o.cursor_x+o.shift+#m if w>f\
+and not o.autoc.ignore_width then local y=w-f m=m:sub(1,#m-y)end\
+i.blit(m,e.to_blit[o.autoc.fg]:rep(#m),e.to_blit[o.autoc.bg]:rep(#m))end end\
+end\
+end",
+  [ "apis/termtools" ] = "local function e(t,...)local a={...}local o={}for i,n in pairs(a[1])do\
+o[i]=function(...)local s=table.pack(t[i](...))for h,r in pairs(a)do\
+s=table.pack(r[i](...))end return table.unpack(s,1,s.n or 1)end end return o\
+end local function d(...)local l={...}local u={}for c,m in pairs(l[1])do\
+u[c]=function(...)local f={}for w,y in pairs(l)do f=table.pack(y[c](...))end\
+return table.unpack(f,1,f.n or 1)end end return u end\
+return{mirror=e,make_shared=d}",
+  [ "objects/scrollbox/logic" ] = "local e=require(\"util\")return function(t,a)if\
+e.is_within_field(a.x,a.y,t.positioning.x,t.positioning.y,t.positioning.width,t.positioning.height)then\
+if a.direction==-1 then t.value=t.value+1 if t.value>t.limit_max then\
+t.value=t.limit_max end t.on_change_value(t)t.on_up(t)elseif a.direction==1\
+then t.value=t.value-1 if t.value<t.limit_min then t.value=t.limit_min end\
+t.on_change_value(t)t.on_down(t)end end\
+end",
+  [ "objects/rectangle/object" ] = "local e=require(\"util\")local\
+t={[\"left-right\"]=true,[\"right-left\"]=true,[\"top-down\"]=true,[\"down-top\"]=true,}return\
+function(a,o)o=o or{}if type(o.visible)~=\"boolean\"then o.visible=true end if\
+type(o.symbols)~=\"table\"then o.symbols={}end if type(o.blocking)~=\"boolean\"then\
+o.blocking=true end if type(o.always_update)~=\"boolean\"then\
+o.always_update=false end local i={name=o.name or e.uuid4(),positioning={x=o.x\
+or 1,y=o.y or 1,width=o.width or 0,height=o.height or\
+0},visible=o.visible,color=o.color or\
+colors.white,filled=o.filled,symbols={[\"top_left\"]=o.symbols.top_left\
+or{sym=\" \",bg=o.color or\
+colors.white,fg=colors.black},[\"top_right\"]=o.symbols.top_right\
+or{sym=\" \",bg=o.color or\
+colors.white,fg=colors.black},[\"bottom_left\"]=o.symbols.bottom_left\
+or{sym=\" \",bg=o.color or\
+colors.white,fg=colors.black},[\"bottom_right\"]=o.symbols.bottom_right\
+or{sym=\" \",bg=o.color or\
+colors.white,fg=colors.black},[\"side_left\"]=o.symbols.side_left\
+or{sym=\" \",bg=o.color or\
+colors.white,fg=colors.black},[\"side_right\"]=o.symbols.side_right\
+or{sym=\" \",bg=o.color or\
+colors.white,fg=colors.black},[\"side_top\"]=o.symbols.side_top\
+or{sym=\" \",bg=o.color or\
+colors.white,fg=colors.black},[\"side_bottom\"]=o.symbols.side_bottom\
+or{sym=\" \",bg=o.color or\
+colors.white,fg=colors.black},[\"inside\"]=o.symbols.inside or{sym=\" \",bg=o.color\
+or colors.white,fg=colors.black}},order=o.order or 1,logic_order=o.logic_order\
+or-1,graphic_order=o.graphic_order,blocking=o.blocking,always_update=o.always_update}return\
+i\
+end",
+  [ "animations/ease_in_out_cubic" ] = "return function(e,t)return t<0.5 and 4*t^3 or 1-(-2*t+2)^3/2\
+end\
+",
+  [ "objects/scrollbox/graphic" ] = "return\
+function()end\
+",
+  [ "objects/button/object" ] = "local e=require(\"util\")return function(t,a)a=a or{}if\
+type(a.visible)~=\"boolean\"then a.visible=true end if\
+type(a.reactive)~=\"boolean\"then a.reactive=true end if\
+type(a.blocking)~=\"boolean\"then a.blocking=true end if\
+type(a.always_update)~=\"boolean\"then a.always_update=false end local\
+o={name=a.name or e.uuid4(),positioning={x=a.x or 1,y=a.y or 1,width=a.width or\
+0,height=a.height or 0},on_click=a.on_click or\
+function()end,background_color=a.background_color or\
+t.term_object.getBackgroundColor(),text_color=a.text_color or\
+t.term_object.getTextColor(),symbol=a.symbol\
+or\" \",texture=a.tex,text=a.text,visible=a.visible,reactive=a.reactive,react_to_events={mouse_click=true,monitor_touch=true,},order=a.order\
+or\
+1,logic_order=a.logic_order,graphic_order=a.graphic_order,tags={},btn=a.btn,value=(a.value~=nil)and\
+a.value or true,blocking=a.blocking,always_update=a.always_update}return o\
+end",
+  [ "animations/ease_out" ] = "return function(e,t)return\
+1-((1-t)^3)end\
+",
+  [ "objects/script/logic" ] = "return\
+function(e,t)e.code(e,t)end\
+",
+  [ "objects/script/graphic" ] = "return\
+function(e,t)e.graphic(e,t)end\
+",
+  [ "apis/text" ] = "local e=require(\"cc.expect\").expect local function\
+t(a,o,i)e(1,a,\"string\")e(2,o,\"number\")local n,s,h={},{},\"\"for r in\
+a:gmatch(\"[%w%p%a%d]+%s?\")do table.insert(n,r)end if o==0 then return\"\"end\
+while h<a and not(#n==0)do local d=\"\"while n~=0 do local l=n[1]if not l then\
+break end if#l>o then local u=l:match(\"% +$\")or\"\"if not((#l-#u)<=o)then local\
+c,m=l:sub(1,o),l:sub(o+1)if#(d..c)>o then n[1]=t(c..m,o,true)break end\
+d,n[1],l=d..c,m,m else l=l:sub(1,#l-(#l-o))end end if#(d..l)<=o then d=d..l\
+table.remove(n,1)else break end end table.insert(s,d)end return\
+table.concat(s,i and\"\"or\"\\n\")end local function\
+f(w,y)e(1,w,\"string\")e(2,y,\"number\")local p={}for v=1,#w,y do\
+p[#p+1]=w:sub(v,v+y-1)end return p end local function\
+b(g,k)e(1,g,\"string\")e(2,k,\"number\")local q=g:sub(1,k)if#q<k then\
+q=q..(\" \"):rep(k-#q)end return q end local function j(x)e(1,x,\"table\")return\
+table.concat(x,\"\\n\")end\
+return{wrap=t,cut_parts=f,ensure_size=b,newline=j}",
+  [ "objects/rectangle/graphic" ] = "local e=require(\"graphic_handle\").code return function(t)local\
+a=t.canvas.term_object local o,i=t.positioning.x,t.positioning.y local\
+n,s=t.positioning.width,t.positioning.height\
+a.setCursorPos(o,i)a.blit(t.symbols.top_left.sym..t.symbols.side_top.sym:rep(n-2)..t.symbols.top_right.sym,e.to_blit[t.symbols.top_left.fg]..e.to_blit[t.symbols.side_top.fg]:rep(n-2)..e.to_blit[t.symbols.top_right.fg],e.to_blit[t.symbols.top_left.bg]..e.to_blit[t.symbols.side_top.bg]:rep(n-2)..e.to_blit[t.symbols.top_right.bg])for\
+h=1,s-2 do\
+a.setCursorPos(o,i+h)a.blit(t.symbols.side_left.sym..t.symbols.inside.sym:rep(n-2)..t.symbols.side_right.sym,e.to_blit[t.symbols.side_left.fg]..e.to_blit[t.symbols.inside.fg]:rep(n-2)..e.to_blit[t.symbols.side_right.fg],e.to_blit[t.symbols.side_left.bg]..e.to_blit[t.symbols.inside.bg]:rep(n-2)..e.to_blit[t.symbols.side_right.bg])end\
+a.setCursorPos(o,i+s-1)a.blit(t.symbols.bottom_left.sym..t.symbols.side_bottom.sym:rep(n-2)..t.symbols.bottom_right.sym,e.to_blit[t.symbols.bottom_left.fg]..e.to_blit[t.symbols.side_bottom.fg]:rep(n-2)..e.to_blit[t.symbols.bottom_right.fg],e.to_blit[t.symbols.bottom_left.bg]..e.to_blit[t.symbols.side_bottom.bg]:rep(n-2)..e.to_blit[t.symbols.bottom_right.bg])end",
+  [ "objects/progressbar/object" ] = "local e=require(\"util\")local\
+t={[\"left-right\"]=true,[\"right-left\"]=true,[\"top-down\"]=true,[\"down-top\"]=true,}return\
+function(a,o)o=o or{}if type(o.visible)~=\"boolean\"then o.visible=true end if\
+type(o.drag_texture)~=\"boolean\"then o.drag_texture=false end if\
+type(o.blocking)~=\"boolean\"then o.blocking=false end if\
+type(o.always_update)~=\"boolean\"then o.always_update=false end local\
+i={name=o.name or e.uuid4(),positioning={x=o.x or 1,y=o.y or 1,width=o.width or\
+0,height=o.height or 0},visible=o.visible,fg=o.fg or colors.white,bg=o.bg or\
+colors.black,texture=o.tex,value=o.value or 0,direction=t[o.direction]and\
+o.direction or\"left-right\",order=o.order or\
+1,logic_order=o.logic_order,graphic_order=o.graphic_order,drag_texture=o.drag_texture,tex_offset_x=o.tex_offset_x\
+or 0,tex_offset_y=o.tex_offset_y or\
+0,blocking=o.blocking,always_update=o.always_update}return i\
+end",
+  [ "animations/flip" ] = "return function(e,t)return 1-t\
+end\
+",
+  [ "presets/rect/frame_thick" ] = "return\
+function(e,t)return{top_left={sym=\" \",bg=e,fg=t},top_right={sym=\" \",bg=e,fg=t},bottom_left={sym=\" \",bg=e,fg=t},bottom_right={sym=\" \",bg=e,fg=t},side_left={sym=\" \",bg=e,fg=t},side_right={sym=\" \",bg=e,fg=t},side_top={sym=\" \",bg=e,fg=t},side_bottom={sym=\" \",bg=e,fg=t},inside={sym=\" \",bg=t,fg=t},}end\
+",
+  [ "animations/ease_in_out_elastic" ] = "return function(e,t)local a=(2*math.pi)/4.5 return t==0 and 0 or(t==1 and 1\
+or(t<0.5 and-(2^(20*t-10)*math.sin((20*t-11.125)*a))/2\
+or(2^(-20*t+10)*math.sin((20*t-11.125)*a))/2+1))end",
+  [ "animations/ease_out_back" ] = "return function(e,t)local a=1.70158;local o=a+1 return 1+o*(t-1)^3+a*(t-1)^2\
+end\
+",
+  [ "apis/pixelbox" ] = "local e=require(\"graphic_handle\")local t=require(\"util\")local\
 a=require(\"cc.expect\").expect local o=require(\"core.algo\")local i={}local\
 n={}function i.INDEX_SYMBOL_CORDINATION(s,h,r,d)s[h+r*2-2]=d return s end\
 function n:within(l,u)return l>0 and u>0 and l<=self.width*2 and\
@@ -847,330 +1491,48 @@ Yt,Pt=Ct.getSize()Wt.term=setmetatable(Ct,{__tostring=function()return\"term_obj
 Wt.width=Yt Wt.height=Pt for Vt=1,Pt*3 do for Bt=1,Yt*2 do Wt.CANVAS[Vt][Bt]=Mt\
 end end return setmetatable(Wt,{__index=n})end return\
 i",
-[ "animations/ease_in_cubic" ] = "return function(e,t)return t^3\
-end\
-",
-[ "objects/text/logic" ] = "return\
-function()end\
-",
-[ "core/algo" ] = "local e=require(\"util\")_ENV=_ENV.ORIGINAL local function t(a,o,i,n,s)local\
-h,r=math.ceil(math.floor(a-0.5)/2),math.ceil(math.floor(o-0.5)/2)local d,l=0,r\
-local u=((r*r)-(h*h*r)+(0.25*h*h))local c=2*r^2*d local m=2*h^2*l local\
-f={}while c<m do\
-table.insert(f,{x=d+i,y=l+n})table.insert(f,{x=-d+i,y=l+n})table.insert(f,{x=d+i,y=-l+n})table.insert(f,{x=-d+i,y=-l+n})if\
-s then for l=-l+n+1,l+n-1 do\
-table.insert(f,{x=d+i,y=l})table.insert(f,{x=-d+i,y=l})end end if u<0 then\
-d=d+1 c=c+2*r^2 u=u+c+r^2 else d,l=d+1,l-1 c=c+2*r^2 m=m-2*h^2 u=u+c-m+r^2 end\
-end local w=(((r*r)*((d+0.5)*(d+0.5)))+((h*h)*((l-1)*(l-1)))-(h*h*r*r))while\
-l>=0 do\
-table.insert(f,{x=d+i,y=l+n})table.insert(f,{x=-d+i,y=l+n})table.insert(f,{x=d+i,y=-l+n})table.insert(f,{x=-d+i,y=-l+n})if\
-s then for l=-l+n,l+n do\
-table.insert(f,{x=d+i,y=l})table.insert(f,{x=-d+i,y=l})end end if w>0 then\
-l=l-1 m=m-2*h^2 w=w+h^2-m else l=l-1 d=d+1 m=m-2*h^2 c=c+2*r^2 w=w+c-m+h^2 end\
-end return f end local function y(p,v,b,g)local k=(g.x-v.x)/(g.y-v.y)local\
-q=(g.x-b.x)/(g.y-b.y)local j=math.ceil(v.y-0.5)local x=math.ceil(g.y-0.5)-1 for\
-z=j,x do local E=k*(z+0.5-v.y)+v.x local T=q*(z+0.5-b.y)+b.x local\
-A=math.ceil(E-0.5)local O=math.ceil(T-0.5)for I=A,O do\
-table.insert(p,{x=I,y=z})end end end local function N(S,H,R,D)local\
-L=(R.x-H.x)/(R.y-H.y)local U=(D.x-H.x)/(D.y-H.y)local C=math.ceil(H.y-0.5)local\
-M=math.ceil(D.y-0.5)-1 for F=C,M do local W=L*(F+0.5-H.y)+H.x local\
-Y=U*(F+0.5-H.y)+H.x local P=math.ceil(W-0.5)local V=math.ceil(Y-0.5)for B=P,V\
-do table.insert(S,{x=B,y=F})end end end local function G(K,Q,J)local X={}if\
-Q.y<K.y then K,Q=Q,K end if J.y<Q.y then Q,J=J,Q end if Q.y<K.y then K,Q=Q,K\
-end if K.y==Q.y then if Q.x<K.x then K,Q=Q,K end y(X,K,Q,J)elseif Q.y==J.y then\
-if J.x<Q.x then J,Q=Q,J end N(X,K,Q,J)else local Z=(Q.y-K.y)/(J.y-K.y)local\
-et={x=K.x+((J.x-K.x)*Z),y=K.y+((J.y-K.y)*Z),}if Q.x<et.x then\
-N(X,K,Q,et)y(X,Q,et,J)else N(X,K,et,Q)y(X,et,Q,J)end end return X end local\
-function tt(at,ot,it,nt)local st={}for at=at,at+it do for ot=ot,ot+nt do\
-table.insert(st,{x=at,y=ot})end end end local function ht(rt,dt,lt,ut)local\
-ct={}rt,dt,lt,ut=math.floor(rt),math.floor(dt),math.floor(lt),math.floor(ut)if\
-rt==lt and dt==ut then return{x=rt,y=dt}end local mt=math.min(rt,lt)local\
-ft,wt,yt if mt==rt then wt,ft,yt=dt,lt,ut else wt,ft,yt=ut,rt,dt end local\
-pt,vt=ft-mt,yt-wt if pt>math.abs(vt)then local bt=wt local gt=vt/pt for\
-kt=mt,ft do table.insert(ct,{x=kt,y=math.floor(bt+0.5)})bt=bt+gt end else local\
-qt,jt=mt,pt/vt if yt>=wt then for xt=wt,yt do\
-table.insert(ct,{x=math.floor(qt+0.5),y=xt})qt=qt+jt end else for zt=wt,yt,-1\
-do table.insert(ct,{x=math.floor(qt+0.5),y=zt})qt=qt-jt end end end return ct\
-end local function Et(Tt,At,Ot)local It={}local Nt=ht(Tt.x,Tt.y,At.x,At.y)local\
-St=ht(At.x,At.y,Ot.x,Ot.y)local Ht=ht(Ot.x,Ot.y,Tt.x,Tt.y)return\
-e.tables.merge(Nt,St,Ht)end\
-return{get_elipse_points=t,get_triangle_points=G,get_triangle_outline_points=Et,get_line_points=ht}",
-[ "objects/progressbar/object" ] = "local e=require(\"util\")local\
-t={[\"left-right\"]=true,[\"right-left\"]=true,[\"top-down\"]=true,[\"down-top\"]=true,}return\
-function(a,o)o=o or{}if type(o.visible)~=\"boolean\"then o.visible=true end if\
-type(o.drag_texture)~=\"boolean\"then o.drag_texture=false end if\
-type(o.blocking)~=\"boolean\"then o.blocking=false end if\
-type(o.always_update)~=\"boolean\"then o.always_update=false end local\
-i={name=o.name or e.uuid4(),positioning={x=o.x or 1,y=o.y or 1,width=o.width or\
-0,height=o.height or 0},visible=o.visible,fg=o.fg or colors.white,bg=o.bg or\
-colors.black,texture=o.tex,value=o.value or 0,direction=t[o.direction]and\
-o.direction or\"left-right\",order=o.order or\
-1,logic_order=o.logic_order,graphic_order=o.graphic_order,drag_texture=o.drag_texture,tex_offset_x=o.tex_offset_x\
-or 0,tex_offset_y=o.tex_offset_y or\
-0,blocking=o.blocking,always_update=o.always_update}return i\
-end",
-[ "objects/frame/graphic" ] = "return function(e)local t=e.last_known_position local a=e.positioning if\
-t.x~=a.x or t.y~=a.y or t.width~=a.width or t.height~=a.height then\
-e.window.reposition(a.x,a.y,a.width,a.height)e.last_known_position={x=a.x,y=a.y,width=a.width,height=a.height}end\
-e.on_graphic(e)end",
-[ "objects/button/logic" ] = "local e=require(\"util\")return function(t,a)if\
-e.is_within_field(a.x,a.y,t.positioning.x,t.positioning.y,t.positioning.width,t.positioning.height)then\
-t.on_click(t,a)end\
-end",
-[ "animations/ease_in_sine" ] = "return function(e,t)return\
+  [ "animations/ease_in_sine" ] = "return function(e,t)return\
 1-math.cos((t*math.pi)/2)end\
 ",
-[ "animations/ease_in_quint" ] = "return function(e,t)return t^5\
+  [ "animations/ease_in_back" ] = "return function(e,t)local a=1.70158;local o=a+1 return o*t^3-a*t^2\
 end\
 ",
-[ "apis/termtools" ] = "local function e(t,...)local a={...}local o={}for i,n in pairs(a[1])do\
-o[i]=function(...)local s=table.pack(t[i](...))for h,r in pairs(a)do\
-s=table.pack(r[i](...))end return table.unpack(s,1,s.n or 1)end end return o\
-end local function d(...)local l={...}local u={}for c,m in pairs(l[1])do\
-u[c]=function(...)local f={}for w,y in pairs(l)do f=table.pack(y[c](...))end\
-return table.unpack(f,1,f.n or 1)end end return u end\
-return{mirror=e,make_shared=d}",
-[ "core/blbfor" ] = "_ENV=_ENV.ORIGINAL local e=require(\"cc.expect\").expect local t=0x0A local\
-a=0x30 local o={INTERNAL={STRING={}}}local i={}local n={}function\
-o.INTERNAL.STRING.FORMAT_BLIT(s)return(\"%x\"):format(s)end function\
-o.INTERNAL.STRING.TO_BLIT(h,r)local d=(not\
-r)and(o.INTERNAL.STRING.FORMAT_BLIT(select(2,math.frexp(h))-1))or(select(2,math.frexp(h))-1)return\
-d end function o.INTERNAL.STRING.FROM_HEX(l)return tonumber(l,16)end function\
-o.INTERNAL.READ_BYTES_STREAM(u,c,m)local f={}u.seek(\"set\",c)for w=c,c+m-1 do\
-local y=u.read()table.insert(f,y)end return table.unpack(f)end function\
-o.INTERNAL.STRING_TO_BYTES(p)local v={}for b=1,#p do v[b]=p:byte(b)end return\
-table.unpack(v)end function o.INTERNAL.WRITE_BYTES_STREAM(g,k,...)local\
-q={...}for j=1,#q do g.seek(\"set\",k+j-1)g.write(q[j])end end function\
-o.INTERNAL.READ_STRING_UNTIL_SEP(x,z)local E=\"\"x.seek(\"set\",z)local\
-T=x.read()if not T then return false end while T~=t do\
-E=E..string.char(T)T=x.read()end return E end function\
-o.INTERNAL.READ_INT(A,O)local I=0 A.seek(\"set\",O)local N=A.read()while N~=t do\
-I=I*10+(N-a)N=A.read()end return I end function\
-o.INTERNAL.COLORS_TO_BYTE(S,H)local R=select(2,math.frexp(S))-1 local\
-D=select(2,math.frexp(H))-1 return R*16+D end function\
-o.INTERNAL.BYTE_TO_COLORS(L)return\
-bit32.rshift(bit32.band(0xF0,L),4),bit32.band(0x0F,L)end function\
-o.INTERNAL.WRITE_HEADER(U)U.stream.seek(\"set\",0)local\
-C=textutils.serialiseJSON(U.meta):gsub(\"\\n\",\"NEWLINE\")o.INTERNAL.WRITE_BYTES_STREAM(U.stream,0,o.INTERNAL.STRING_TO_BYTES((\"BLBFOR1\\n%d\\n%d\\n%d\\n%d\\n%s\\n\"):format(U.width,U.height,U.layers,os.epoch(\"utc\"),C)))end\
-function o.INTERNAL.ASSERT(M,F)if not M then error(F,3)else return M end end\
-function o.INTERNAL.createNDarray(W,Y)Y=Y or{}if W==0 then return Y end\
-setmetatable(Y,{__index=function(P,V)local\
-B=o.INTERNAL.createNDarray(W-1)P[V]=B return B end})return Y end function\
-o.INTERNAL.ENCODE(G)o.INTERNAL.WRITE_HEADER(G)for K,Q in ipairs(G.data)do for\
-J,X in ipairs(Q)do local Z={}for et,tt in ipairs(X)do\
-table.insert(Z,tt[1])table.insert(Z,o.INTERNAL.COLORS_TO_BYTE(2^tt[2],2^tt[3]))end\
-o.INTERNAL.WRITE_BYTES_STREAM(G.stream,G.stream.seek(\"cur\"),table.unpack(Z))end\
-end end function o.INTERNAL.DECODE(at)at.stream.seek(\"set\",0)local\
-ot=o.INTERNAL.READ_STRING_UNTIL_SEP(at.stream,0)local\
-it=o.INTERNAL.createNDarray(2)o.INTERNAL.ASSERT(ot==\"BLBFOR1\",\"Invalid header\",2)local\
-nt=o.INTERNAL.READ_INT(at.stream,at.stream.seek(\"cur\"))local\
-st=o.INTERNAL.READ_INT(at.stream,at.stream.seek(\"cur\"))local\
-ht=o.INTERNAL.READ_INT(at.stream,at.stream.seek(\"cur\"))local\
-rt=o.INTERNAL.READ_INT(at.stream,at.stream.seek(\"cur\"))local\
-dt=textutils.unserializeJSON(o.INTERNAL.READ_STRING_UNTIL_SEP(at.stream,at.stream.seek(\"cur\")))at.width=nt\
-at.height=st at.layers=ht at.meta=dt at.last_flushed=rt\
-at.data=o.INTERNAL.createNDarray(3,at.data)for lt=1,at.layers do for ut=1,st do\
-if not next(it[lt][ut])then it[lt][ut]={\"\",\"\",\"\"}end local ct={}for mt=1,nt do\
-local ft={}local\
-wt,yt=o.INTERNAL.READ_BYTES_STREAM(at.stream,at.stream.seek(\"cur\"),2)ft[1]=wt\
-ft[2],ft[3]=o.INTERNAL.BYTE_TO_COLORS(yt)ct[mt]=ft\
-it[lt][ut]={it[lt][ut][1]..string.char(ft[1]),it[lt][ut][2]..o.INTERNAL.STRING.FORMAT_BLIT(ft[2]),it[lt][ut][3]..o.INTERNAL.STRING.FORMAT_BLIT(ft[3])}end\
-at.data[lt][ut]=ct end end at.lines=it end function\
-i:set_pixel(pt,vt,bt,gt,kt,qt)o.INTERNAL.ASSERT(type(self)==\"table\",\"Please use \\\":\\\" when running this function\")o.INTERNAL.ASSERT(not\
-self.closed,\"Image handle closed\")e(1,pt,\"number\")e(2,vt,\"number\")e(3,bt,\"number\")e(4,gt,\"string\")e(5,kt,\"number\")e(6,qt,\"number\")o.INTERNAL.ASSERT(not(vt<1\
-or bt<1 or vt>self.width or\
-bt>self.height),\"pixel out of range\")self.data[pt][bt][vt]={gt:byte(),o.INTERNAL.STRING.TO_BLIT(kt,true),o.INTERNAL.STRING.TO_BLIT(qt,true)}end\
-function\
-n:get_pixel(jt,xt,zt,Et)o.INTERNAL.ASSERT(type(self)==\"table\",\"Please use \\\":\\\" when running this function\")e(1,jt,\"number\")e(2,xt,\"number\")e(3,zt,\"number\")e(4,Et,\"boolean\",\"nil\")o.INTERNAL.ASSERT(not(xt<1\
-or zt<1 or xt>self.width or zt>self.height),\"pixel out of range\")local\
-Tt=self.data[jt][zt][xt]local At={string.char(Tt[1]),2^Tt[2],2^Tt[3]}local\
-Ot={string.char(Tt[1]),o.INTERNAL.STRING.FORMAT_BLIT(Tt[2]),o.INTERNAL.STRING.FORMAT_BLIT(Tt[3])}return\
-table.unpack(Et and Ot or At)end function\
-n:get_line(It,Nt)o.INTERNAL.ASSERT(type(self)==\"table\",\"Please use \\\":\\\" when running this function\")e(1,It,\"number\")e(2,Nt,\"number\")o.INTERNAL.ASSERT(not(Nt<1\
-or Nt>self.height),\"line out of range\")return\
-self.lines[It][Nt][1],self.lines[It][Nt][2],self.lines[It][Nt][3]end function\
-i:set_line(St,Ht,Rt,Dt,Lt)o.INTERNAL.ASSERT(type(self)==\"table\",\"Please use \\\":\\\" when running this function\")o.INTERNAL.ASSERT(not\
-self.closed,\"Image handle closed\")e(1,St,\"number\")e(2,Ht,\"number\")e(3,Rt,\"string\")e(4,Dt,\"string\")e(5,Lt,\"string\")o.INTERNAL.ASSERT(#Dt==#Rt\
-and#Lt==#Rt,\"line length mismatch\")o.INTERNAL.ASSERT(#Rt<=self.width,\"line too long\")o.INTERNAL.ASSERT(Ht<=self.height\
-and Ht>0,\"line out of range\")for Ut=1,#Rt do\
-self:set_pixel(St,Ut,Ht,Rt:sub(Ut,Ut),2^o.INTERNAL.STRING.FROM_HEX(Dt:sub(Ut,Ut)),2^o.INTERNAL.STRING.FROM_HEX(Lt:sub(Ut,Ut)))end\
-end function\
-i:close()o.INTERNAL.ASSERT(type(self)==\"table\",\"Please use \\\":\\\" when running this function\")o.INTERNAL.ASSERT(not\
-self.closed,\"Image handle closed\")o.INTERNAL.ENCODE(self)self.stream.close()self.closed=true\
-end function\
-i:flush()o.INTERNAL.ASSERT(type(self)==\"table\",\"Please use \\\":\\\" when running this function\")o.INTERNAL.ASSERT(not\
-self.closed,\"Image handle closed\")o.INTERNAL.ENCODE(self)self.stream.flush()end\
-i.write_pixel=i.set_pixel i.write_line=i.set_line n.read_pixel=n.get_pixel\
-n.read_line=n.get_line function\
-o.open(Ct,Mt,Ft,Wt,Yt,Pt,Vt,Bt,Gt)e(1,Ct,\"string\")e(2,Mt,\"string\")local\
-Kt=Ct:match(\"%.%a+$\")o.INTERNAL.ASSERT(Kt==\".bbf\",\"file must be a .bbf file\")local\
-Qt={}if Mt:sub(1,1):lower()==\"w\"then\
-e(3,Ft,\"number\")e(4,Wt,\"number\")e(5,Yt,\"number\",\"nil\")e(6,Pt,\"string\",\"nil\")e(7,Vt,\"string\",\"nil\")e(8,Bt,\"string\",\"nil\")e(9,Gt,\"table\",\"nil\")Yt=Yt\
-or 1 local Jt=fs.open(Ct,\"wb\")if not Jt then error(\"Could not open file\",2)end\
-Qt.meta=Gt or{}Qt.width=Ft Qt.height=Wt Qt.layers=Yt\
-Qt.data=o.INTERNAL.createNDarray(3)Qt.stream=Jt for Xt=1,Yt do for Zt=1,Ft do\
-for ea=1,Wt do Qt.data[Xt][ea][Zt]={(Bt or\
-string.char(0)):byte(),o.INTERNAL.STRING.TO_BLIT(Pt or\
-colors.black,true),o.INTERNAL.STRING.TO_BLIT(Vt or colors.black,true)}end end\
-end return setmetatable(Qt,{__index=i})elseif Mt:sub(1,1):lower()==\"r\"then\
-local ta=fs.open(Ct,\"rb\")if not ta then error(\"Could not open file\",2)end local\
-aa=ta.seek(\"cur\")Qt.raw=ta.readAll()ta.seek(\"set\",aa)Qt.stream=ta\
-o.INTERNAL.DECODE(Qt)Qt.closed=true ta.close()return\
-setmetatable(Qt,{__index=n})else\
-stream.close()error(\"invalid mode. please use \\\"w\\\" or \\\"r\\\" (Write/Read)\",2)end\
-end return\
-o",
-[ "objects/rectangle/object" ] = "local e=require(\"util\")local\
+  [ "animations/ease_in" ] = "return function(e,t)return t*t*t\
+end\
+",
+  [ "objects/circle/graphic" ] = "local e=require(\"core.algo\")local t=require(\"graphic_handle\").code local\
+a=require(\"util\")return function(o)local i=o.canvas.term_object local n={}local\
+s={}local h=a.tables.createNDarray(2)if o.filled then local\
+r=e.get_elipse_points(o.positioning.radius,math.ceil(o.positioning.radius-o.positioning.radius/3)+0.5,o.positioning.x,o.positioning.y,true)for\
+d,l in ipairs(r)do if h[l.x][l.y]~=true then\
+n[l.y]=(n[l.y]or\"\")..\"*\"s[l.y]=math.min(s[l.y]or math.huge,l.x)h[l.x][l.y]=true\
+end end for u,c in pairs(n)do\
+i.setCursorPos(s[u],u)i.blit(c:gsub(\"%*\",o.symbol),c:gsub(\"%*\",t.to_blit[o.fg]),c:gsub(\"%*\",t.to_blit[o.bg]))end\
+else local\
+m=e.get_elipse_points(o.positioning.radius,math.ceil(o.positioning.radius-o.positioning.radius/3)+0.5,o.positioning.x,o.positioning.y)for\
+f,w in pairs(m)do\
+i.setCursorPos(w.x,w.y)i.blit(o.symbol,t.to_blit[o.fg],t.to_blit[o.bg])end end\
+end",
+  [ "animations/linear" ] = "return function(e,t)return t\
+end\
+",
+  [ "animations/ease_out_cubic" ] = "return function(e,t)return 1-(1-t)^3\
+end\
+",
+  [ "objects/circle/object" ] = "local e=require(\"util\")local\
 t={[\"left-right\"]=true,[\"right-left\"]=true,[\"top-down\"]=true,[\"down-top\"]=true,}return\
 function(a,o)o=o or{}if type(o.visible)~=\"boolean\"then o.visible=true end if\
-type(o.symbols)~=\"table\"then o.symbols={}end if type(o.blocking)~=\"boolean\"then\
-o.blocking=true end if type(o.always_update)~=\"boolean\"then\
-o.always_update=false end local i={name=o.name or e.uuid4(),positioning={x=o.x\
-or 1,y=o.y or 1,width=o.width or 0,height=o.height or\
-0},visible=o.visible,color=o.color or\
-colors.white,filled=o.filled,symbols={[\"top_left\"]=o.symbols.top_left\
-or{sym=\" \",bg=o.color or\
-colors.white,fg=colors.black},[\"top_right\"]=o.symbols.top_right\
-or{sym=\" \",bg=o.color or\
-colors.white,fg=colors.black},[\"bottom_left\"]=o.symbols.bottom_left\
-or{sym=\" \",bg=o.color or\
-colors.white,fg=colors.black},[\"bottom_right\"]=o.symbols.bottom_right\
-or{sym=\" \",bg=o.color or\
-colors.white,fg=colors.black},[\"side_left\"]=o.symbols.side_left\
-or{sym=\" \",bg=o.color or\
-colors.white,fg=colors.black},[\"side_right\"]=o.symbols.side_right\
-or{sym=\" \",bg=o.color or\
-colors.white,fg=colors.black},[\"side_top\"]=o.symbols.side_top\
-or{sym=\" \",bg=o.color or\
-colors.white,fg=colors.black},[\"side_bottom\"]=o.symbols.side_bottom\
-or{sym=\" \",bg=o.color or\
-colors.white,fg=colors.black},[\"inside\"]=o.symbols.inside or{sym=\" \",bg=o.color\
-or colors.white,fg=colors.black}},order=o.order or 1,logic_order=o.logic_order\
-or-1,graphic_order=o.graphic_order,blocking=o.blocking,always_update=o.always_update}return\
+type(a.symbols)~=\"table\"then o.symbols={}end if type(o.filled)~=\"boolean\"then\
+o.filled=true end if type(o.blocking)~=\"boolean\"then o.blocking=false end if\
+type(o.always_update)~=\"boolean\"then o.always_update=true end local\
+i={name=o.name or e.uuid4(),positioning={x=o.x or 1,y=o.y or 1,radius=o.radius\
+or 3},symbol=o.symbol or\" \",bg=o.background_color or\
+colors.white,fg=o.text_color or\
+colors.black,visible=o.visible,filled=o.filled,order=o.order or\
+1,logic_order=o.logic_order,graphic_order=o.graphic_order,blocking=o.blocking,always_update=o.always_update}return\
 i\
 end",
-[ "objects/frame/logic" ] = "local e=require(\"util\")return function(t,a)t.on_any(t,a)local\
-o,i=t.window.getPosition()local n=t.dragger.x+o local s=t.dragger.y+i if\
-a.name==\"mouse_click\"or a.name==\"monitor_touch\"then if\
-e.is_within_field(a.x,a.y,n-1,s-1,t.dragger.width,t.dragger.height)then\
-t.dragged=true t.last_click=a t.on_select(t,a)end elseif a.name==\"mouse_up\"then\
-t.dragged=false t.on_select(t,a)elseif a.name==\"mouse_drag\"and t.dragged and\
-t.dragable then local h,r=t.window.getPosition()local\
-d,l=a.x-t.last_click.x,a.y-t.last_click.y t.last_click=a local u,c=h+d,r+l if\
-not t.on_move(t,{x=u,y=c})then t.window.reposition(u,c)end local\
-m,f=t.window.getPosition()local\
-w,y=t.window.getSize()t.last_known_position={x=m,y=f,width=w,height=y}t.positioning={x=m,y=f,width=w,height=y}end\
-end",
-[ "objects/scrollbox/object" ] = "local e=require(\"util\")return function(t,a)a=a or{}if\
-type(a.visible)~=\"boolean\"then a.visible=true end if\
-type(a.reactive)~=\"boolean\"then a.reactive=true end if\
-type(a.blocking)~=\"boolean\"then a.blocking=false end if\
-type(a.always_update)~=\"boolean\"then a.always_update=true end local\
-o={name=a.name or e.uuid4(),positioning={x=a.x or 1,y=a.y or 1,width=a.width or\
-1,height=a.height or\
-1},visible=a.visible,reactive=a.reactive,react_to_events={[\"mouse_scroll\"]=true},order=a.order\
-or 1,logic_order=a.logic_order,graphic_order=a.graphic_order,value=a.value or\
-1,limit_min=a.limit_min or-math.huge,limit_max=a.limit_max or\
-math.huge,on_change_value=a.on_change_value or function()end,on_up=a.on_up or\
-function()end,on_down=a.on_down or\
-function()end,blocking=a.blocking,always_update=a.always_update}return o\
-end",
-[ "animations/ease_out" ] = "return function(e,t)return\
-1-((1-t)^3)end\
-",
-[ "objects/scrollbox/logic" ] = "local e=require(\"util\")return function(t,a)if\
-e.is_within_field(a.x,a.y,t.positioning.x,t.positioning.y,t.positioning.width,t.positioning.height)then\
-if a.direction==-1 then t.value=t.value+1 if t.value>t.limit_max then\
-t.value=t.limit_max end t.on_change_value(t)t.on_up(t)elseif a.direction==1\
-then t.value=t.value-1 if t.value<t.limit_min then t.value=t.limit_min end\
-t.on_change_value(t)t.on_down(t)end end\
-end",
-[ "objects/scrollbox/graphic" ] = "return\
-function()end\
-",
-[ "objects/button/object" ] = "local e=require(\"util\")return function(t,a)a=a or{}if\
-type(a.visible)~=\"boolean\"then a.visible=true end if\
-type(a.reactive)~=\"boolean\"then a.reactive=true end if\
-type(a.blocking)~=\"boolean\"then a.blocking=true end if\
-type(a.always_update)~=\"boolean\"then a.always_update=false end local\
-o={name=a.name or e.uuid4(),positioning={x=a.x or 1,y=a.y or 1,width=a.width or\
-0,height=a.height or 0},on_click=a.on_click or\
-function()end,background_color=a.background_color or\
-t.term_object.getBackgroundColor(),text_color=a.text_color or\
-t.term_object.getTextColor(),symbol=a.symbol\
-or\" \",texture=a.tex,text=a.text,visible=a.visible,reactive=a.reactive,react_to_events={mouse_click=true,monitor_touch=true,},order=a.order\
-or\
-1,logic_order=a.logic_order,graphic_order=a.graphic_order,tags={},btn=a.btn,value=(a.value~=nil)and\
-a.value or true,blocking=a.blocking,always_update=a.always_update}return o\
-end",
-[ "apis/text" ] = "local e=require(\"cc.expect\").expect local function\
-t(a,o,i)e(1,a,\"string\")e(2,o,\"number\")local n,s,h={},{},\"\"for r in\
-a:gmatch(\"[%w%p%a%d]+%s?\")do table.insert(n,r)end if o==0 then return\"\"end\
-while h<a and not(#n==0)do local d=\"\"while n~=0 do local l=n[1]if not l then\
-break end if#l>o then local u=l:match(\"% +$\")or\"\"if not((#l-#u)<=o)then local\
-c,m=l:sub(1,o),l:sub(o+1)if#(d..c)>o then n[1]=t(c..m,o,true)break end\
-d,n[1],l=d..c,m,m else l=l:sub(1,#l-(#l-o))end end if#(d..l)<=o then d=d..l\
-table.remove(n,1)else break end end table.insert(s,d)end return\
-table.concat(s,i and\"\"or\"\\n\")end local function\
-f(w,y)e(1,w,\"string\")e(2,y,\"number\")local p={}for v=1,#w,y do\
-p[#p+1]=w:sub(v,v+y-1)end return p end local function\
-b(g,k)e(1,g,\"string\")e(2,k,\"number\")local q=g:sub(1,k)if#q<k then\
-q=q..(\" \"):rep(k-#q)end return q end local function j(x)e(1,x,\"table\")return\
-table.concat(x,\"\\n\")end\
-return{wrap=t,cut_parts=f,ensure_size=b,newline=j}",
-[ "objects/frame/object" ] = "local e=require(\"util\")local t=require(\"core.gui_object\")return\
-function(a,o)o=o or{}if type(o.clear)~=\"boolean\"then o.clear=true end if\
-type(o.draggable)~=\"boolean\"then o.draggable=true end if\
-type(o.visible)~=\"boolean\"then o.visible=true end if\
-type(o.reactive)~=\"boolean\"then o.reactive=true end if\
-type(o.blocking)~=\"boolean\"then o.blocking=true end if\
-type(o.always_update)~=\"boolean\"then o.always_update=false end local\
-i={name=o.name or e.uuid4(),positioning={x=o.x or 1,y=o.y or 1,width=o.width or\
-0,height=o.height or\
-0},visible=o.visible,reactive=o.reactive,react_to_events={mouse_drag=true,mouse_click=true,mouse_up=true},dragged=false,dragger=o.dragger,last_click={x=1,y=1},last_known_position={x=o.x\
-or 1,y=o.y or 1,width=o.width or 0,height=o.height or 0},order=o.order or\
-1,logic_order=o.logic_order,graphic_order=o.graphic_order,btn=o.btn,dragable=o.draggable,on_move=o.on_move\
-or function()end,on_select=o.on_select or function()end,on_any=o.on_any or\
-function()end,on_graphic=o.on_graphic or\
-function()end,on_deselect=o.on_deselect or\
-function()end,blocking=o.blocking,always_update=o.always_update}local\
-n=window.create(a.term_object,i.positioning.x,i.positioning.y,i.positioning.width,i.positioning.height)if\
-not i.dragger then i.dragger={x=1,y=1,width=i.positioning.width,height=1}end\
-i.child=t(n,a.term_object,a.log)i.window=n i.child.inherit(a,i)return i\
-end",
-[ "objects/switch/graphic" ] = "local e=require(\"graphic_handle\").code return function(t)local\
-a=t.canvas.term_object local o,i=t.positioning.x,t.positioning.y if not\
-t.texture and not t.texture_on then a.setBackgroundColor(t.value and\
-t.background_color_on or t.background_color)a.setTextColor(t.value and\
-t.text_color_on or t.text_color)for n=i,t.positioning.height+i-1 do\
-a.setCursorPos(o,n)a.write(t.symbol:rep(t.positioning.width))end else\
-e.draw_box_tex(a,(t.value and t.texture_on or t.texture)or(t.texture or\
-t.texture_on),t.positioning.x,t.positioning.y,t.positioning.width,t.positioning.height,(t.value\
-and t.background_color_on or t.background_color)or colors.red,(t.value and\
-t.text_color_on or t.text_color)or\
-colors.black,nil,nil,t.canvas.texture_cache)end if t.text and((not t.value)or\
-not t.text_on)then\
-t.text(a,t.positioning.x,t.positioning.y,t.positioning.width,t.positioning.height)elseif\
-t.text_on and t.value then\
-t.text_on(a,t.positioning.x,t.positioning.y,t.positioning.width,t.positioning.height)end\
-end",
-[ "objects/rectangle/logic" ] = "return\
-function()end\
-",
-[ "objects/rectangle/graphic" ] = "local e=require(\"graphic_handle\").code return function(t)local\
-a=t.canvas.term_object local o,i=t.positioning.x,t.positioning.y local\
-n,s=t.positioning.width,t.positioning.height\
-a.setCursorPos(o,i)a.blit(t.symbols.top_left.sym..t.symbols.side_top.sym:rep(n-2)..t.symbols.top_right.sym,e.to_blit[t.symbols.top_left.fg]..e.to_blit[t.symbols.side_top.fg]:rep(n-2)..e.to_blit[t.symbols.top_right.fg],e.to_blit[t.symbols.top_left.bg]..e.to_blit[t.symbols.side_top.bg]:rep(n-2)..e.to_blit[t.symbols.top_right.bg])for\
-h=1,s-2 do\
-a.setCursorPos(o,i+h)a.blit(t.symbols.side_left.sym..t.symbols.inside.sym:rep(n-2)..t.symbols.side_right.sym,e.to_blit[t.symbols.side_left.fg]..e.to_blit[t.symbols.inside.fg]:rep(n-2)..e.to_blit[t.symbols.side_right.fg],e.to_blit[t.symbols.side_left.bg]..e.to_blit[t.symbols.inside.bg]:rep(n-2)..e.to_blit[t.symbols.side_right.bg])end\
-a.setCursorPos(o,i+s-1)a.blit(t.symbols.bottom_left.sym..t.symbols.side_bottom.sym:rep(n-2)..t.symbols.bottom_right.sym,e.to_blit[t.symbols.bottom_left.fg]..e.to_blit[t.symbols.side_bottom.fg]:rep(n-2)..e.to_blit[t.symbols.bottom_right.fg],e.to_blit[t.symbols.bottom_left.bg]..e.to_blit[t.symbols.side_bottom.bg]:rep(n-2)..e.to_blit[t.symbols.bottom_right.bg])end",
-[ "animations/ease_out_back" ] = "return function(e,t)local a=1.70158;local o=a+1 return 1+o*(t-1)^3+a*(t-1)^2\
-end\
-",
-[ "objects/progressbar/logic" ] = "return\
-function(e)end\
-",
-[ "core/logger" ] = "_ENV=_ENV.ORIGINAL local\
+  [ "core/logger" ] = "_ENV=_ENV.ORIGINAL local\
 e={{colors.red},{colors.yellow},{colors.white,colors.red},{colors.white,colors.lime},{colors.white,colors.lime},{colors.white},{colors.green},{colors.gray},}local\
 t={error=1,warn=2,fatal=3,success=4,message=6,update=7,info=8}local a=15 local\
 o={}for i,n in pairs(t)do o[n]=i end function t:dump()end local function\
@@ -1184,337 +1546,19 @@ local function v(b,g,k,q)g=g or\"-\"local\
 j=setmetatable({lastLog=\"\",nstr=1,maxln=1,history={},title=b,tsym=(#g<4)and g\
 or\"-\",auto_dump=k},{__index=t,__call=s})j.lastLog=nil return j end\
 return{create_log=v}",
-[ "objects/ellipse/logic" ] = "return\
-function()end\
-",
-[ "objects/switch/logic" ] = "local e=require(\"util\")return function(t,a)if\
-e.is_within_field(a.x,a.y,t.positioning.x,t.positioning.y,t.positioning.width,t.positioning.height)then\
-t.value=not t.value t.on_change_state(t,a)end\
+  [ "objects/ellipse/graphic" ] = "local e=require(\"core.algo\")local t=require(\"graphic_handle\").code local\
+a=require(\"util\")return function(o)local i=o.canvas.term_object local n={}local\
+s={}local h=a.tables.createNDarray(2)if o.filled then local\
+r=e.get_elipse_points(o.positioning.width,o.positioning.height,o.positioning.x,o.positioning.y,true)for\
+d,l in ipairs(r)do if h[l.x][l.y]~=true then\
+n[l.y]=(n[l.y]or\"\")..\"*\"s[l.y]=math.min(s[l.y]or math.huge,l.x)h[l.x][l.y]=true\
+end end for u,c in pairs(n)do\
+i.setCursorPos(s[u],u)i.blit(c:gsub(\"%*\",o.symbol),c:gsub(\"%*\",t.to_blit[o.fg]),c:gsub(\"%*\",t.to_blit[o.bg]))end\
+else local\
+m=e.get_elipse_points(o.positioning.width,o.positioning.height,o.positioning.x,o.positioning.y)for\
+f,w in pairs(m)do\
+i.setCursorPos(w.x,w.y)i.blit(o.symbol,t.to_blit[o.fg],t.to_blit[o.bg])end end\
 end",
-[ "core/luappm" ] = "_ENV=_ENV.ORIGINAL local function e(t,a,o)local i={}for n=a,o do\
-t.seek(\"set\",n)table.insert(i,t.read())end return\
-string.char(table.unpack(i))end local function s(h,r)local d=r local l={}for\
-u=1,3 do local c={}local m=\"\"while not(m==0x20 or m==0x0A)do\
-h.seek(\"set\",d)m=h.read()table.insert(c,m)d=d+1 end\
-table.insert(l,tonumber(string.char(table.unpack(c))))end return l,d end local\
-function f(w,y,p)local v=y local b={}local g=0 w.seek(\"set\",y)while w.read()do\
-g=g+1 end w.seek(\"set\",v)for k=1,math.floor(g/3)do local q=\"\"for k=1,3 do local\
-j=0 local x={}while q and j<3 do w.seek(\"set\",v)q=w.read()if q~=nil then\
-q=q/p[3]end table.insert(x,q)v=v+1 j=j+1 end if not next(x)then break end\
-table.insert(b,{r=x[1],g=x[2],b=x[3]})end end return b,g/3 end local function\
-z(E,T,A)local O={}for I,N in pairs(E)do local S=math.floor((I-1)%T+1)local\
-H=math.ceil(I/T)if not O[A and S or H]then O[A and S or H]={}end O[A and S or\
-H][A and H or S]=N end return O end local function R(D)local\
-L=fs.open(D,\"rb\")if not L then error(\"File: \"..(D or\"\")..\" doesnt exist\",3)end\
-if e(L,0,2)==\"P6\\x0A\"then local U=-math.huge while true do local C=L.read()if\
-string.char(C)==\"#\"then while true do local M=L.read()if M==0x0A then break end\
-U=L.seek(\"cur\")+1 end else local F,U=s(L,U)local W,Y=f(L,U,F)local\
-C=z(W,F[1],true)local\
-P=L.readAll()L.close()return{data=P,meta=F,pixels=C,pixel_count=Y,width=F[1],height=F[2],color_type=F[3],get_pixel=function(V,B)local\
-G=C[math.floor(V+0.5)]if G then return G[math.floor(B+0.5)]end\
-end,get_palette=function()local K={}local Q=0 local J={}local X={}for Z,et in\
-pairs(W)do local tt=colors.packRGB(et.r,et.g,et.b)if not K[tt]then Q=Q+1\
-K[tt]={c=tt,count=0}end K[tt].count=K[tt].count+1 end for at,ot in pairs(K)do\
-table.insert(J,ot)end table.sort(J,function(it,nt)return it.count>nt.count\
-end)for st,ht in ipairs(J)do local\
-rt,dt,lt=colors.unpackRGB(ht.c)table.insert(X,{r=rt,g=dt,b=lt,c=ht.count})end\
-return X,Q end}end end else\
-L.close()error(\"File is unsupported format: \"..e(L,0,1),2)end end return\
-R",
-[ "core/gui_object" ] = "local e=require(\"object_loader\")local t=require(\"graphic_handle\")local\
-a=require(\"core.update\")local o=require(\"util\")_ENV=_ENV.ORIGINAL local\
-function i(n,s,h,r,d)local l={}local u=\"term_object\"local c=s local function\
-m(f)r,d=0,0 pcall(function()local function w(y)local\
-p,v=y.getPosition()r=r+(p-1)d=d+(v-1)local\
-b,g=debug.getupvalue(y.reposition,5)if g.reposition and g~=term.current()then\
-c=g w(g)elseif g~=nil then c=g end end w(n)end)if f then f.event_offset_x=r\
-f.event_offset_y=d end end if not r or not d then m()end\
-pcall(function()u=peripheral.getType(c)end)for k,q in pairs(e.types)do\
-l[q]={}end local j,x=n.getSize()local\
-z={term_object=n,term=n,gui=l,update=a,visible=true,id=o.uuid4(),task_schedule={},update_delay=0.05,held_keys={},log=h,task_routine={},paused_task_routine={},w=j,h=x,width=j,height=x,event_listeners={},paused_listeners={},background=n.getBackgroundColor(),cls=false,key={},texture_cache={},debug=false,event_offset_x=r,event_offset_y=d,}z.inherit=function(E,T)z.api=E.api\
-z.preset=E.preset z.async=E.async z.schedule=E.schedule\
-z.add_listener=E.add_listener z.debug=E.debug z.parent=T end z.elements=z.gui\
-z.calibrate=function()m(z)end z.getSize=function()return z.w,z.h end\
-h(\"set up updater\",h.update)local function A(O,I,N,S,H,R,D,L,U,C,M)return\
-a(z,O,I,N,S,H,R,D,L,U,C,M)end local F local W=false\
-z.schedule=function(Y,P,V,B)local G=o.uuid4()if B or z.debug then\
-h(\"created new thread: \"..tostring(G),h.info)end local K={}local\
-Q={c=coroutine.create(function()local J,X=pcall(function()if P then\
-o.precise_sleep(P)end Y(z,z.term_object)end)if not J then if V==true then F=X\
-end K.err=X if B or z.debug then\
-h(\"error in thread: \"..tostring(G)..\"\\n\"..tostring(X),h.error)h:dump()end end\
-end),dbug=B}z.task_routine[G]=Q local function Z(...)local\
-et=z.task_routine[G]or z.paused_task_routine[G]if et then local\
-tt,F=coroutine.resume(et.c,...)if not tt then K.err=F if B or z.debug then\
-h(\"task \"..tostring(G)..\" error: \"..tostring(F),h.error)h:dump()end end return\
-true,tt,F else if B or z.debug then\
-h(\"task \"..tostring(G)..\" not found\",h.error)h:dump()end return false end end\
-return setmetatable(Q,{__index={kill=function()z.task_routine[G]=nil\
-z.paused_task_routine[G]=nil if B or z.debug then\
-h(\"killed task: \"..tostring(G),h.info)h:dump()end return true\
-end,alive=function()local at=z.task_routine[G]or z.paused_task_routine[G]if not\
-at then return false end return\
-coroutine.status(at.c)~=\"dead\"end,step=Z,update=Z,pause=function()local\
-ot=z.task_routine[G]or z.paused_task_routine[G]if ot then\
-z.paused_task_routine[G]=ot z.task_routine[G]=nil if B or z.debug then\
-h(\"paused task: \"..tostring(G),h.info)h:dump()end return true else if B or\
-z.debug then h(\"task \"..tostring(G)..\" not found\",h.error)h:dump()end return\
-false end end,resume=function()local it=z.paused_task_routine[G]or\
-z.task_routine[G]if it then z.task_routine[G]=it z.paused_task_routine[G]=nil\
-if B or z.debug then h(\"resumed task: \"..tostring(G),h.info)h:dump()end return\
-true else if B or z.debug then\
-h(\"task \"..tostring(G)..\" not found\",h.error)h:dump()end return false end\
-end,get_error=function()return K.err end,set_running=function(nt,B)local\
-st=z.task_routine[G]or z.paused_task_routine[G]local W=z.task_routine[G]~=nil\
-if st then if W and nt then return true end if not W and not nt then return\
-true end if W and not nt then z.paused_task_routine[G]=st z.task_routine[G]=nil\
-if B or z.debug then h(\"paused task: \"..tostring(G),h.info)h:dump()end return\
-true end if not W and nt then z.task_routine[G]=st z.paused_task_routine[G]=nil\
-if B or z.debug then h(\"resumed task: \"..tostring(G),h.info)h:dump()end return\
-true end end end},__tostring=function()return\"GuiH.SCHEDULED_THREAD.\"..G\
-end})end z.async=z.schedule z.add_listener=function(ht,rt,dt,lt)if not\
-_G.type(rt)==\"function\"then return end if not(_G.type(ht)==\"table\"or\
-_G.type(ht)==\"string\")then ht={}end local ut=dt or o.uuid4()local\
-ct={filter=ht,code=rt}z.event_listeners[ut]=ct if lt or z.debug then\
-h(\"created event listener: \"..ut,h.success)h:dump()end return\
-setmetatable(ct,{__index={kill=function()z.event_listeners[ut]=nil\
-z.paused_listeners[ut]=nil if lt or z.debug then\
-h(\"killed event listener: \"..ut,h.success)h:dump()end\
-end,pause=function()z.paused_listeners[ut]=ct z.event_listeners[ut]=nil if lt\
-or z.debug then h(\"paused event listener: \"..ut,h.success)h:dump()end\
-end,resume=function()local ct=z.paused_listeners[ut]or z.event_listeners[ut]if\
-ct then z.event_listeners[ut]=ct z.paused_listeners[ut]=nil if lt or z.debug\
-then h(\"resumed event listener: \"..ut,h.success)h:dump()end elseif lt or\
-z.debug then h(\"event listener not found: \"..ut,h.error)h:dump()end\
-end},__tostring=function()return\"GuiH.EVENT_LISTENER.\"..ut end})end\
-z.cause_exeption=function(mt)F=tostring(mt)end z.stop=function()W=false end\
-z.kill=z.stop z.error=z.cause_exeption z.clear=function(ft)if ft or z.debug\
-then h(\"clearing the gui..\",h.update)end local wt={}for yt,pt in\
-pairs(e.types)do wt[pt]={}end z.gui=wt z.elements=wt local\
-vt=e.main(z,wt,h)z.create=vt z.new=vt end z.isHeld=function(...)local\
-bt={...}local gt,kt=true,true for qt,jt in pairs(bt)do local\
-xt=z.held_keys[jt]or{}if xt[1]then gt=gt and true kt=kt and xt[2]else return\
-false,false,z.held_keys end end return gt,kt,z.held_keys end\
-z.key.held=z.isHeld\
-z.execute=setmetatable({},{__call=function(zt,Et,Tt,At,Ot)if W then\
-h(\"Coulnt execute. Gui is already running\",h.error)h:dump()return false end\
-F=nil W=true h(\"\")h(\"loading execute..\",h.update)local It=z.term_object local\
-Nt local St=It.getBackgroundColor()local Ht=coroutine.create(function()local\
-Rt,Dt=pcall(function()It.setVisible(true)A(0)It.redraw()while true do\
-It.setBackgroundColor(z.background or St)It.clear();(At or\
-function()end)(It)local Nt=a(z,nil,true,false,nil);(Tt or\
-function()end)(It,Nt);(Ot or function()end)(It)end end)if not Rt then F=Dt\
-h:dump()end end)h(\"created graphic routine 1\",h.update)local Lt=Et or\
-function()end local function Ut()local Ct,Mt=pcall(Lt,It)if not Ct then F=Mt\
-h:dump()end end h(\"created custom updater\",h.update)local\
-Ft=coroutine.create(function()while true do\
-It.setVisible(false)It.setBackgroundColor(z.background or\
-St)It.clear();z.update(0,true,nil,{type=\"mouse_click\",x=-math.huge,y=-math.huge,button=-math.huge});(Ot\
-or\
-function()end)(It)It.setVisible(true)It.setVisible(false)sleep(math.max(z.update_delay,0.05))end\
-end)h(\"created event listener handle\",h.update)local\
-Wt=coroutine.create(function()local Yt,Pt=pcall(function()while true do local\
-Vt=table.pack(os.pullEventRaw())for Bt,Gt in pairs(z.event_listeners)do local\
-Kt=Gt.filter if _G.type(Kt)==\"string\"then Kt={[Gt.filter]=true}end if\
-Kt[Vt[1]]or Kt==Vt[1]or(not next(Kt))then\
-Gt.code(table.unpack(Vt,_G.type(Gt.filter)~=\"table\"and 2 or 1,Vt.n))end end end\
-end)if not Yt then F=Pt h:dump()end\
-end)h(\"created graphic routine 2\",h.update)local\
-Qt=coroutine.create(function()while true do local Jt,Xt,Zt=os.pullEvent()if\
-Jt==\"key\"then z.held_keys[Xt]={true,Zt}end if Jt==\"key_up\"then\
-z.held_keys[Xt]=nil end end end)h(\"created key handler\")local\
-ea=coroutine.create(Ut)coroutine.resume(ea)coroutine.resume(Ht,\"mouse_click\",math.huge,-math.huge,-math.huge)coroutine.resume(Ht,\"mouse_click\",math.huge,-math.huge,-math.huge)coroutine.resume(Ht,\"mouse_click\",math.huge,-math.huge,-math.huge)coroutine.resume(Ft)h(\"\")h(\"Started execution..\",h.success)h(\"\")h:dump()while((coroutine.status(ea)~=\"dead\"or\
-not(_G.type(Et)==\"function\"))and coroutine.status(Ht)~=\"dead\"and F==nil)and W\
-do local Nt=table.pack(os.pullEventRaw())if o.events_with_cords[Nt[1]]then\
-Nt[3]=Nt[3]-(z.event_offset_x)Nt[4]=Nt[4]-(z.event_offset_y)end if\
-Nt[1]==\"terminate\"then F=\"Terminated\"break end if Nt[1]~=\"guih_data_event\"then\
-coroutine.resume(Wt,table.unpack(Nt,1,Nt.n))end\
-coroutine.resume(ea,table.unpack(Nt,1,Nt.n))if Nt[1]==\"key\"or\
-Nt[1]==\"key_up\"then coroutine.resume(Qt,table.unpack(Nt,1,Nt.n))end for ta,aa\
-in pairs(z.task_routine)do if coroutine.status(aa.c)~=\"dead\"then if\
-aa.filter==Nt[1]or aa.filter==nil then local\
-oa,ia=coroutine.resume(aa.c,table.unpack(Nt,1,Nt.n))if oa then aa.filter=ia end\
-end else z.task_routine[ta]=nil z.task_schedule[ta]=nil if aa.dbug then\
-h(\"Finished sheduled task: \"..tostring(ta),h.success)end end end\
-coroutine.resume(Ht,table.unpack(Nt,1,Nt.n))coroutine.resume(Ft,table.unpack(Nt,1,Nt.n))local\
-j,x=s.getSize()if j~=z.w or x~=z.h then if(Nt[1]==\"monitor_resize\"and\
-z.monitor==Nt[2])or z.monitor==\"term_object\"then\
-z.term_object.reposition(1,1,j,x)coroutine.resume(Ht,\"mouse_click\",math.huge,-math.huge,-math.huge)z.w,z.h=j,x\
-z.width,z.height=j,x end end end if F then z.last_err=F end\
-It.setVisible(true)if F then\
-h(\"a Fatal error occured: \"..F..\" \"..debug.traceback(),h.fatal)else\
-h(\"finished execution\",h.success)end h:dump()F=nil return z.last_err,true\
-end,__tostring=function()return\"GuiH.main_gui_executor\"end})z.run=z.execute if\
-u==\"monitor\"then\
-h(\"Display object: monitor\",h.info)z.monitor=peripheral.getName(c)else\
-h(\"Display object: term\",h.info)z.monitor=\"term_object\"end\
-z.load_texture=function(na)h(\"Loading nimg texture.. \",h.update)local\
-sa=t.load_texture(na)return sa end z.load_ppm_texture=function(ha,ra)local\
-da,la,ua=pcall(t.load_ppm_texture,z.term_object,ha,ra,h)if da then return la,ua\
-else h(\"Failed to load texture: \"..la,h.error)end end\
-z.load_cimg_texture=function(ca)h(\"Loading cimg texture.. \",h.update)local\
-ma=t.load_cimg_texture(ca)return ma end\
-z.load_blbfor_texture=function(fa)h(\"Loading blbfor texture.. \",h.update)local\
-wa,ya=t.load_blbfor_texture(fa)return wa,ya end\
-z.load_limg_texture=function(pa,va,ba)h(\"Loading limg texture.. \",h.update)local\
-ga,ka=t.load_limg_texture(pa,va,ba)return ga,ka end\
-z.load_limg_animation=function(qa,ja)h(\"Loading limg animation.. \",h.update)local\
-xa=t.load_limg_animation(qa,ja)return xa end\
-z.load_blbfor_animation=function(za)h(\"Loading blbfor animation.. \",h.update)local\
-Ea=t.load_blbfor_animation(za)return Ea end\
-z.set_event_offset=function(Ta,Aa)z.event_offset_x,z.event_offset_y=Ta or\
-z.event_offset_x,Aa or z.event_offset_y end\
-h(\"\")h(\"Starting creator..\",h.info)local Oa=e.main(z,z.gui,h)z.create=Oa\
-z.new=Oa h(\"\")z.update=A\
-h(\"loading text object...\",h.update)h(\"\")z.get_blit=function(Ia,Na,Sa)local Ha\
-pcall(function()Ha={z.term_object.getLine(Ia)}end)if not Ha then return false\
-end return Ha[1]:sub(Na,Sa),Ha[2]:sub(Na,Sa),Ha[3]:sub(Na,Sa)end\
-z.text=function(Ra)Ra=Ra or{}if _G.type(Ra.centered)~=\"boolean\"then\
-Ra.centered=false end local\
-Da=(_G.type(Ra.text)==\"string\")and(\"0\"):rep(#Ra.text)or(\"0\"):rep(13)local\
-La=(_G.type(Ra.text)==\"string\")and(\"f\"):rep(#Ra.text)or(\"f\"):rep(13)if\
-_G.type(Ra.blit)~=\"table\"then Ra.blit={Da,La}end Ra.blit[1]=(Ra.blit[1]or\
-Da):lower()Ra.blit[2]=(Ra.blit[2]or\
-La):lower()h(\"created new text object\",h.info)return setmetatable({text=Ra.text\
-or\"<TEXT OBJECT>\",centered=Ra.centered,x=Ra.x or 1,y=Ra.y or\
-1,offset_x=Ra.offset_x or 0,offset_y=Ra.offset_y or 0,blit=Ra.blit\
-or{Da,La},transparent=Ra.transparent,bg=Ra.bg,fg=Ra.fg,width=Ra.width,height=Ra.height},{__call=function(Ua,Ca,Ma,Fa,j,x)Ma,Fa=Ma\
-or Ua.x,Fa or Ua.y if Ua.width then j=Ua.width end if Ua.height then\
-x=Ua.height end local Wa=Ca or z.term_object local Ya if\
-_G.type(Ma)==\"number\"and _G.type(Fa)==\"number\"then Ya=1 end if\
-_G.type(Ma)~=\"number\"then Ma=1 end if _G.type(Fa)~=\"number\"then Fa=1 end local\
-Pa,Va=Ma,Fa local Ba={}for Ga in Ua.text:gmatch(\"[^\\n]+\")do\
-table.insert(Ba,Ga)end if Ua.centered then Va=Va-#Ba/2 else Va=Va-1 end for\
-Ka=1,#Ba do local Qa=Ba[Ka]Va=Va+1 if Ua.centered then local Ja=(x or\
-z.h)/2-0.5 local Xa=math.ceil(((j or\
-z.w)/2)-(#Qa/2)-0.5)Wa.setCursorPos(Xa+Ua.offset_x+Pa,Ja+Ua.offset_y+Va)Ma,Fa=Xa+Ua.offset_x+Pa,Ja+Ua.offset_y+Va\
-else Wa.setCursorPos((Ya or Ua.x)+Ua.offset_x+Pa-1,(Ya or\
-Ua.y)+Ua.offset_y+Va-1)Ma,Fa=(Ya or Ua.x)+Ua.offset_x+Pa-1,(Ya or\
-Ua.y)+Ua.offset_y+Va-1 end if Ua.transparent==true then local Za=-1 if Ma<1\
-then Za=math.abs(math.min(Ma+1,3)-2)Wa.setCursorPos(1,Fa)Ma=1\
-Qa=Qa:sub(Za+1)end local Da,La=table.unpack(Ua.blit)if Ua.bg then\
-La=t.code.to_blit[Ua.bg]:rep(#Qa)end if Ua.fg then\
-Da=t.code.to_blit[Ua.fg]:rep(#Qa)end local eo\
-pcall(function()_,_,eo=Wa.getLine(math.floor(Fa))end)if not eo then return end\
-local to=eo:sub(Ma,math.min(Ma+#Qa-1,z.w))local ao=#Qa-#to-1 if#Da~=#Qa then\
-Da=(\"0\"):rep(#Qa)end\
-pcall(Wa.blit,Qa,Da:sub(math.min(Ma,1)),to..La:sub(#La-ao,#La))else local\
-Da,La=table.unpack(Ua.blit)if Ua.bg then La=t.code.to_blit[Ua.bg]:rep(#Qa)end\
-if Ua.fg then Da=t.code.to_blit[Ua.fg]:rep(#Qa)end if#Da~=#Qa then\
-Da=(\"0\"):rep(#Qa)end if#La~=#Qa then La=(\"f\"):rep(#Qa)end\
-pcall(Wa.blit,Qa,Da,La)end end\
-end,__tostring=function()return\"GuiH.primitive.text\"end})end return z end\
-return\
-i",
-[ "animations/ease_out_cubic" ] = "return function(e,t)return 1-(1-t)^3\
-end\
-",
-[ "objects/button/graphic" ] = "local e=require(\"graphic_handle\").code return function(t)local\
-a=t.canvas.term_object local o,i=t.positioning.x,t.positioning.y if not\
-t.texture then\
-a.setBackgroundColor(t.background_color)a.setTextColor(t.text_color)for\
-n=i,t.positioning.height+i-1 do\
-a.setCursorPos(o,n)a.write(t.symbol:rep(t.positioning.width))end else\
-e.draw_box_tex(a,t.texture,o,i,t.positioning.width,t.positioning.height,t.background_color,t.text_color,nil,nil,t.canvas.texture_cache)end\
-if t.text then\
-t.text(a,t.positioning.x,t.positioning.y,t.positioning.width,t.positioning.height)end\
-end",
-[ "objects/group/graphic" ] = "return function(e)local t=e.last_known_position local a=e.positioning if\
-t.x~=a.x or t.y~=a.y or t.width~=a.width or t.height~=a.height then\
-e.window.reposition(a.x,a.y,a.width,a.height)e.last_known_position={x=a.x,y=a.y,width=a.width,height=a.height}end\
-e.window.redraw()end",
-[ "animations/ease_in_expo" ] = "return function(e,t)return t==0 and 0 or\
-2^(10*t-10)end\
-",
-[ "objects/switch/object" ] = "local e=require(\"util\")return function(t,a)a=a or{}if\
-type(a.visible)~=\"boolean\"then a.visible=true end if\
-type(a.reactive)~=\"boolean\"then a.reactive=true end if\
-type(a.blocking)~=\"boolean\"then a.blocking=true end if\
-type(a.always_update)~=\"boolean\"then a.always_update=false end local\
-o={name=a.name or e.uuid4(),positioning={x=a.x or 1,y=a.y or 1,width=a.width or\
-0,height=a.height or 0},on_change_state=a.on_change_state or\
-function()end,background_color=a.background_color or\
-t.term_object.getBackgroundColor(),background_color_on=a.background_color_on or\
-t.term_object.getBackgroundColor(),text_color=a.text_color or\
-t.term_object.getTextColor(),text_color_on=a.text_color_on or\
-t.term_object.getTextColor(),symbol=a.symbol\
-or\" \",texture=a.tex,texture_on=a.tex_on,text=a.text,text_on=a.text_on,visible=a.visible,reactive=a.reactive,react_to_events={mouse_click=true,monitor_touch=true},btn=a.btn,order=a.order\
-or\
-1,logic_order=a.logic_order,graphic_order=a.graphic_order,tags={},value=(a.value~=nil)and\
-a.value or false,blocking=a.blocking,always_update=a.always_update}return o\
-end",
-[ "animations/ease_in_elastic" ] = "return function(e,t)local a=(2*math.pi)/3;return t==0 and 0 or(t==1 and 1\
-or(-2^(10*t-10)*math.sin((t*10-10.75)*a)))end\
-",
-[ "animations/ease_in_out" ] = "return function(e,t)return\
-e(t^3,1-((1-t)^3),t)end\
-",
-[ "objects/group/logic" ] = "return\
-function(e,t)e.bef_draw(e,t)end\
-",
-[ "core/update" ] = "local e=require(\"util\")_ENV=_ENV.ORIGINAL local\
-t={[\"mouse_click\"]=true,[\"mouse_drag\"]=true,[\"monitor_touch\"]=true,[\"mouse_scroll\"]=true,[\"mouse_up\"]=true,[\"key\"]=true,[\"key_up\"]=true,[\"char\"]=true,[\"guih_data_event\"]=true,[\"paste\"]=true}local\
-a={[\"key\"]=true,[\"key_up\"]=true,[\"char\"]=true,[\"paste\"]=true}local\
-o={[1]=true,[2]=true}local\
-i={[\"mouse_click\"]=true,[\"mouse_drag\"]=true,[\"mouse_up\"]=true,[\"mouse_scroll\"]=true}return\
-function(n,s,h,r,d,l,u,c,m,f,w,y)if h==nil then h=true end local p=\"none\"local\
-v=d local b=d local g=n.gui local k,q,j,x local z,E={},{}local T=true if((s or\
-math.huge)>0)and not l then if not b or not r then while not t[p]do\
-p,k,q,j,x=os.pullEvent()end if p==\"monitor_touch\"then\
-v={name=p,monitor=k,x=q,y=j}end if p==\"mouse_click\"or p==\"mouse_up\"then\
-v={name=p,button=k,x=q,y=j}end if p==\"mouse_drag\"then\
-v={name=p,button=k,x=q,y=j}end if p==\"mouse_scroll\"then\
-v={name=p,direction=k,x=q,y=j}end if p==\"key\"then\
-v={name=p,key=k,held=q,x=math.huge,y=math.huge}end if p==\"key_up\"then\
-v={name=p,key=k,x=math.huge,y=math.huge}end if p==\"paste\"then\
-v={name=p,text=k,x=math.huge,y=math.huge}end if p==\"char\"then\
-v={name=p,character=k,x=math.huge,y=math.huge}end if p==\"guih_data_event\"then\
-v=k end if not v.monitor then v.monitor=\"term_object\"end if not(q~=n.id and\
-p~=\"guih_data_event\")then T=false end end local A={}local O={}local I=c or\
-e.tables.createNDarray(1)if T and((v.monitor==n.monitor)or a[v.name])and not u\
-then for N,S in pairs(g)do for H,R in pairs(S)do if R.react_to_events[v.name]or\
-not next(R.react_to_events)then if not A[R.logic_order or R.order]then\
-A[R.logic_order or R.order]={}end table.insert(A[R.logic_order or\
-R.order],function()if e.events_with_cords[v.name]and R.blocking then local\
-D=R.positioning if D and D.x and D.y then local L=D.width or 1 local U=D.height\
-or 1 local C=e.is_within_field(v.x,v.y,D.x,D.y,L,U)if C then if I[v.x][v.y]and\
-not R.always_update then return end if _G.type(R.on_focus)==\"function\"and\
-v.name~=\"mouse_drag\"then setfenv(R.on_focus,_ENV)(R)end for M=1,L*U do\
-I[(M-1)%L+D.x][math.ceil(M/L)+D.y-1]=true end end end end if R.reactive then\
-table.insert(w or O,function()if a[v.name]then if R.logic then\
-setfenv(R.logic,_ENV)(R,v,n)end else if((R.btn or o)[v.button])or\
-v.monitor==n.monitor then if R.logic then setfenv(R.logic,_ENV)(R,v,n)end end\
-end end)end end)end end end end for F,W in e.tables.iterate_order(A,true)do for\
-Y,P in pairs(W)do P()end end if not w then for V=#O,1,-1 do O[V]()end end end\
-local B,G=n.term_object.getCursorPos()if h and n.visible then for K,Q in\
-pairs(g)do for J,X in pairs(Q)do if not E[X.graphic_order or X.order]then\
-E[X.graphic_order or X.order]={}end table.insert(E[X.graphic_order or\
-X.order],function()if not(X.gui or X.child)then if X.visible and X.graphic then\
-setfenv(X.graphic,_ENV)(X,n)end else if X.visible and X.graphic then\
-setfenv(X.graphic,_ENV)(X,n);(X.gui or X.child).term_object.redraw()end end\
-end)end end end for Z,et in e.tables.iterate_order(E,y)do for tt,at in\
-pairs(et)do if y then table.insert(y,at)else at()end end end local ot={}for\
-it,nt in pairs(g)do for st,ht in pairs(nt)do if not ot[ht.graphic_order or\
-ht.order]then ot[ht.graphic_order or ht.order]={}end\
-table.insert(ot[ht.graphic_order or ht.order],function()if ht.gui or ht.child\
-then table.insert(z,ht)end end)end end for rt,dt in\
-e.tables.iterate_order(ot,true)do for lt,ut in pairs(dt)do ut()end end if not T\
-then return v,table.pack(p,k,q,j,x)end local ct=e.tables.createNDarray(1)local\
-mt,ft={},{}local wt={}for yt,pt in ipairs(z)do local\
-vt,bt=pt.window.getPosition()local gt,kt=pt.window.getSize()local b=b or d or v\
-if b then local\
-qt={x=(b.x-vt)+1,y=(b.y-bt)+1,name=b.name,monitor=b.monitor,button=b.button,direction=b.direction,held=b.held,key=b.key,character=b.character,text=b.text}if(pt.gui\
-or pt.child)and(pt.gui or pt.child).cls then(pt.gui or\
-pt.child).term_object.setBackgroundColor((pt.gui or\
-pt.child).background);(pt.gui or pt.child).term_object.clear();end if\
-e.is_within_field(b.x,b.y,vt,bt,vt+gt,bt+kt)then(pt.child or\
-pt.gui).update(math.huge,pt.visible,true,qt,not pt.reactive,not pt.visible,ct,m\
-or b.x,f or b.y,mt,ft)else qt.x=-math.huge qt.y=-math.huge;(pt.child or\
-pt.gui).update(math.huge,pt.visible,true,qt,not pt.reactive,not pt.visible,ct,m\
-or b.x,f or b.y,mt,mt)end if(pt.gui or pt.child)and(pt.gui or pt.child).cls\
-then(pt.gui or pt.child).term_object.redraw()end end end for jt=#mt,1,-1 do\
-mt[jt]()end for xt,zt in ipairs(ft)do zt()end return\
-v,table.pack(p,k,q,j,x)end",
 } local e local t local function a(o)local i=files[o]local n=load(i)return
 setfenv(n,t())end function e(s)if s=="cc.expect"then return
 require("cc.expect")end if s=="cc.pretty"then return require("cc.pretty")end
