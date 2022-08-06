@@ -30,7 +30,7 @@ function OBJECT:within(x,y)
         and y <= self.height*3
 end
 
-function PIXELBOX.RESTORE(BOX,color,existing)
+function PIXELBOX.RESTORE(BOX,color)
     BOX.CANVAS = api.createNDarray(1)
     BOX.UPDATES = api.createNDarray(1)
     BOX.CHARS = api.createNDarray(1)
@@ -75,27 +75,40 @@ function OBJECT:push_updates()
             end
         end
     end
+    local function add_prev(x,y)
+        local prev_data = self.CHARS[y][x]
+        self.lines[y] = {
+            self.lines[y][1]..prev_data.symbol,
+            self.lines[y][2]..prev_data.fg,
+            self.lines[y][3]..prev_data.background
+        }
+    end
+    local function generate_char(x,y)
+        local color_block = self.symbols[y][x]
+        local char,fg,bg = " ",colors.black,color_block[1]
+        if SYMBOL_COLORS[y][x] > 1 then
+            char,fg,bg = graphic.build_drawing_char(color_block)
+        end
+        self.CHARS[y][x] = {symbol=char, background=graphic.to_blit[bg], fg=graphic.to_blit[fg]}
+        self.lines[y] = {
+            self.lines[y][1]..char,
+            self.lines[y][2]..graphic.to_blit[fg],
+            self.lines[y][3]..graphic.to_blit[bg]
+        }
+    end
     for y=1,self.height do
         for x=1,self.width do
-            local color_block = self.symbols[y][x]
-            if self.UPDATES[y][x] then
-                local char,fg,bg = " ",colors.black,color_block[1]
-                if SYMBOL_COLORS[y][x] > 1 then
-                    char,fg,bg = graphic.build_drawing_char(color_block)
-                end
-                self.CHARS[y][x] = {symbol=char, background=graphic.to_blit[bg], fg=graphic.to_blit[fg]}
+            local terminal_data = self.terminal_map[y][x]
+            if self.UPDATES[y][x] and (terminal_data and terminal_data.clear) then
+                generate_char(x,y)
+            elseif terminal_data and not terminal_data.clear then
                 self.lines[y] = {
-                    self.lines[y][1]..char,
-                    self.lines[y][2]..graphic.to_blit[fg],
-                    self.lines[y][3]..graphic.to_blit[bg]
+                    self.lines[y][1]..terminal_data[1],
+                    self.lines[y][2]..graphic.to_blit[terminal_data[2]],
+                    self.lines[y][3]..graphic.to_blit[terminal_data[3]]
                 }
             else
-                local prev_data = self.CHARS[y][x]
-                self.lines[y] = {
-                    self.lines[y][1]..prev_data.symbol,
-                    self.lines[y][2]..prev_data.fg,
-                    self.lines[y][3]..prev_data.background
-                }
+                add_prev(x,y)
             end
         end
     end
@@ -261,6 +274,147 @@ function OBJECT:set_line(x1,y1,x2,y2,color,thiccness)
     end
 end
 
+function PIXELBOX.CREATE_TERM(pixelbox)
+    local object = {}
+    pixelbox.terminal_map = api.createNDarray(1)
+    local map = pixelbox.terminal_map
+    pixelbox.show_clears        = false
+
+    local current_fg        = pixelbox.term.getTextColor()
+    local current_bg        = pixelbox.term.getBackgroundColor()
+    local cursor_x,cursor_y = pixelbox.term.getCursorPos()
+
+    local function create_line(w,y,first)
+        local line = {}
+        for i=1,w do
+            if not first then
+                if not map[y][i].clear then
+                    pixelbox.UPDATES[y][i] = true
+                end
+            end
+            line[i] = {
+                " ",current_fg,current_bg,clear=not pixelbox.show_clears
+            }
+        end
+        return line
+    end
+
+    local function clear_object(object,first)
+        local w,h = pixelbox.term.getSize()
+        for y=1,h do
+            object[y] = create_line(w,y,first)
+        end
+    end
+
+    clear_object(map,true)
+
+    function object.blit(chars,fg,bg)
+        chars,fg,bg = chars:lower(),fg:lower(),bg:lower()
+        local len = #chars
+        if #bg == len and #fg == len then
+            for i=1,#chars do
+                local char  = chars:sub(i,i)
+                local fgbit = 2^tonumber(fg:sub(i,i),16)
+                local bgbit = 2^tonumber(bg:sub(i,i),16)
+                map[cursor_y][cursor_x+i-1] = {char,fgbit,bgbit,clear=false}
+            end
+        else
+            error("Arguments must be the same lenght",2)
+        end
+    end
+
+    function object.write(chars)
+        for i=1,#chars do
+            local char  = chars:sub(i,i)
+            map[cursor_y][cursor_x+i-1] = {char,current_fg,current_bg,clear=false}
+        end
+    end
+
+    function object.clear()
+        clear_object(map)
+    end
+
+    function object.getLine(y)
+        local char,bg,fg = "","",""
+        local w = pixelbox.term.getSize()
+        for x=1,w do
+            local point = map[y][x]
+            if not point.clear then
+                char = char .. point[1]
+                bg   = bg   .. point[2]
+                fg   = fg   .. point[3]
+            else
+                char = char .. " "
+                fg   = fg   .. graphic.to_blit[current_fg]
+                bg   = bg   .. graphic.to_blit[current_bg]
+            end
+        end
+        return char,bg,fg
+    end
+
+    function object.clearLine()
+        local w = pixelbox.term.getSize()
+        map[cursor_y] = create_line(w,cursor_y)
+    end
+
+    function object.scroll(y)
+        local w,h = pixelbox.term.getSize()
+        if y ~= 0 then
+            local temp = api.createNDarray(1)
+            clear_object(temp)
+            for cy=1,h do
+                if cy-y > h then break end
+                temp[cy-y] = map[cy]
+            end
+            pixelbox.terminal_map = temp
+            map = temp
+        end
+    end
+
+    function object.setBackgroundColor (bg)  current_bg = bg end
+    function object.setBackgroundColour(bg)  current_bg = bg end
+    function object.setTextColor (fg)        current_fg = fg end
+    function object.setTextColour(fg)        current_fg = fg end
+    function object.setCursorPos(x,y)        cursor_x,cursor_y = x,y end
+    function object.setCursorBlink(...)      pixelbox.term.setCursorBlink(...) end
+    function object.restoreCursor()          pixelbox.term.setCursorPos(cursor_x,cursor_y) end
+    function object.setPaletteColor (...)    pixelbox.term.setPaletteColor(...) end
+    function object.setPaletteColour(...)    pixelbox.term.setPaletteColor(...) end
+    function object.getBackgroundColor ()    return current_bg end
+    function object.getBackgroundColour()    return current_bg end
+    function object.getCursorBlink()         return pixelbox.term.getCursorBlink() end
+    function object.getCursorPos()           return cursor_x,cursor_y end
+    function object.getPaletteColor (...)    return pixelbox.term.getPaletteColor(...) end
+    function object.getPaletteColour(...)    return pixelbox.term.getPaletteColor(...) end
+    function object.getSize(...)             return pixelbox.term.getSize(...) end
+    function object.getTextColor()           return current_fg end
+    function object.getTextColour()          return current_fg end
+    function object.isColor()                return pixelbox.term.isColor() end
+    function object.isColour()               return pixelbox.term.isColor() end
+
+
+
+    object.drawPixels      = pixelbox.term.drawPixels
+    object.getFrozen       = pixelbox.term.getFrozen
+    object.getVisible      = pixelbox.term.getVisible
+    object.getGraphicsMode = pixelbox.term.getGraphicsMode
+    object.getPixel        = pixelbox.term.getPixel
+    object.getPixels       = pixelbox.term.getPixels
+    object.getPosition     = pixelbox.term.getPosition
+    object.isVisible       = pixelbox.term.isVisible
+    object.redraw          = pixelbox.term.redraw
+    object.reposition      = pixelbox.term.reposition
+    object.setFrozen       = pixelbox.term.setFrozen
+    object.setGraphicsMode = pixelbox.setGraphicsMode
+    object.setPixel        = pixelbox.term.setPixel
+    object.setVisible      = pixelbox.term.setVisible
+    object.showMouse       = pixelbox.term.showMouse
+
+    function object.clear_visibility(state) pixelbox.show_clears = state end
+
+    return object
+end
+
 function PIXELBOX.ASSERT(condition,message)
     if not condition then error(message,3) end
     return condition
@@ -274,9 +428,10 @@ function PIXELBOX.new(terminal,bg,existing)
     local BOX = {}
     local w,h = terminal.getSize()
     BOX.term = setmetatable(terminal,{__tostring=function() return "term_object" end})
-    BOX.width = w
+    BOX.width  = w
     BOX.height = h
     PIXELBOX.RESTORE(BOX,bg,existing)
+    BOX.emu    = PIXELBOX.CREATE_TERM(BOX)
     return setmetatable(BOX,{__index = OBJECT})
 end
 
