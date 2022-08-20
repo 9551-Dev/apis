@@ -581,7 +581,7 @@ function ALGO.get_line_points(startX, startY, endX, endY)
     local n = 1
     local points = {}
     startX,startY,endX,endY = FLOOR(startX),FLOOR(startY),FLOOR(endX),FLOOR(endY)
-    if startX == endX and startY == endY then return {x=startX,y=startY} end
+    if startX == endX and startY == endY then return {{x=startX,y=startY}} end
     local minX = MIN(startX, endX)
     local maxX, minY, maxY
     if minX == startX then minY,maxX,maxY = startY,endX,endY
@@ -591,22 +591,22 @@ function ALGO.get_line_points(startX, startY, endX, endY)
         local y = minY
         local dy = yDiff / xDiff
         for x = minX, maxX do
-            points[n] = {x=x,y=FLOOR(y + 0.5)}
             n = n + 1
+            points[n] = {x=x,y=FLOOR(y + 0.5)}
             y = y + dy
         end
     else
         local x,dx = minX,xDiff / yDiff
         if maxY >= minY then
             for y = minY, maxY do
-                points[n] = points,{x=FLOOR(x + 0.5),y=y}
                 n = n + 1
+                points[n] = {x=FLOOR(x + 0.5),y=y}
                 x = x + dx
             end
         else
             for y = minY, maxY, -1 do
-                points[n] = points,{x=FLOOR(x + 0.5),y=y}
                 n = n + 1
+                points[n] = {x=FLOOR(x + 0.5),y=y}
                 x = x - dx
             end
         end
@@ -646,9 +646,9 @@ function api.create_byte_array(count)
 end
 function api.merge_tables(...)
     local out = {}
-    local n = 0
+    local n = 1
     for k,v in pairs({...}) do
-        for _k,_v in pairs(v) do out[n] = v n=n+1 end
+        for _k,_v in pairs(v) do out[n] = _v n=n+1 end
     end
     return out
 end
