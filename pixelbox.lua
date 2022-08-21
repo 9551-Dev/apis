@@ -5,20 +5,20 @@
 ]]
 
 local EXPECT = require("cc.expect").expect
- 
+
 local PIXELBOX = {}
 local OBJECT = {}
 local api = {}
 local ALGO = {}
 local graphic = {}
- 
+
 local CEIL  = math.ceil
 local FLOOR = math.floor
 local SQRT  = math.sqrt
 local MIN   = math.min
 local ABS   = math.abs
 local t_insert, t_unpack, t_sort, s_char, pairs = table.insert, table.unpack, table.sort, string.char, pairs
- 
+
 local chars = "0123456789abcdef"
 graphic.to_blit = {}
 graphic.logify  = {}
@@ -26,20 +26,19 @@ for i = 0, 15 do
     graphic.to_blit[2^i] = chars:sub(i + 1, i + 1)
     graphic.logify [2^i] = i
 end
- 
- 
+
 function PIXELBOX.INDEX_SYMBOL_CORDINATION(tbl,x,y,val)
     tbl[x+y*2-2] = val
     return tbl
 end
- 
+
 function OBJECT:within(x,y)
     return x > 0
         and y > 0
         and x <= self.width*2
         and y <= self.height*3
 end
- 
+
 function PIXELBOX.RESTORE(BOX,color)
     BOX.CANVAS = api.createNDarray(1)
     BOX.UPDATES = api.createNDarray(1)
@@ -58,7 +57,7 @@ function PIXELBOX.RESTORE(BOX,color)
     end
     getmetatable(BOX.CANVAS).__tostring = function() return "PixelBOX_SCREEN_BUFFER" end
 end
- 
+
 function OBJECT:push_updates()
     PIXELBOX.ASSERT(type(self)=="table","Please use \":\" when running this function")
     self.symbols = api.createNDarray(2)
@@ -134,7 +133,7 @@ function OBJECT:push_updates()
     end
     self.UPDATES = api.createNDarray(1)
 end
- 
+
 function OBJECT:get_pixel(x,y)
     PIXELBOX.ASSERT(type(self)=="table","Please use \":\" when running this function")
     EXPECT(1,x,"number")
@@ -142,13 +141,13 @@ function OBJECT:get_pixel(x,y)
     assert(self.CANVAS[y] and self.CANVAS[y][x],"Out of range")
     return self.CANVAS[y][x]
 end
- 
+
 function OBJECT:clear(color)
     PIXELBOX.ASSERT(type(self)=="table","Please use \":\" when running this function")
     EXPECT(1,color,"number")
     PIXELBOX.RESTORE(self,color)
 end
- 
+
 function OBJECT:draw()
     PIXELBOX.ASSERT(type(self)=="table","Please use \":\" when running this function")
     if not self.lines then error("You must push_updates in order to draw",2) end
@@ -159,7 +158,7 @@ function OBJECT:draw()
         )
     end
 end
- 
+
 function OBJECT:set_pixel(x,y,color,thiccness,base)
     if not base then
         PIXELBOX.ASSERT(type(self)=="table","Please use \":\" when running this function")
@@ -182,7 +181,7 @@ function OBJECT:set_pixel(x,y,color,thiccness,base)
         self.CANVAS[y][x] = color
     end
 end
- 
+
 function OBJECT:set_pixel_raw(x,y,color)
     local RELATIVE_X = CEIL(x/2)
     local RELATIVE_Y = CEIL(y/3)
@@ -191,7 +190,7 @@ function OBJECT:set_pixel_raw(x,y,color)
     end
     self.CANVAS[y][x] = color
 end
- 
+
 function OBJECT:set_box(sx,sy,ex,ey,color,check)
     if not check then
         PIXELBOX.ASSERT(type(self)=="table","Please use \":\" when running this function")
@@ -212,7 +211,7 @@ function OBJECT:set_box(sx,sy,ex,ey,color,check)
         end
     end
 end
- 
+
 function OBJECT:set_ellipse(x,y,rx,ry,color,filled,thiccness,check)
     if not check then
         PIXELBOX.ASSERT(type(self)=="table","Please use \":\" when running this function")
@@ -237,7 +236,7 @@ function OBJECT:set_ellipse(x,y,rx,ry,color,filled,thiccness,check)
         end
     end
 end
- 
+
 function OBJECT:set_circle(x,y,radius,color,filled,thiccness)
     PIXELBOX.ASSERT(type(self)=="table","Please use \":\" when running this function")
     EXPECT(1,x,"number")
@@ -247,7 +246,7 @@ function OBJECT:set_circle(x,y,radius,color,filled,thiccness)
     EXPECT(5,filled,"boolean","nil")
     self:set_ellipse(x,y,radius,radius,color,filled,thiccness,true)
 end
- 
+
 function OBJECT:set_triangle(x1,y1,x2,y2,x3,y3,color,filled,thiccness)
     PIXELBOX.ASSERT(type(self)=="table","Please use \":\" when running this function")
     EXPECT(1,x1,"number")
@@ -282,7 +281,7 @@ function OBJECT:set_triangle(x1,y1,x2,y2,x3,y3,color,filled,thiccness)
         end
     end
 end
- 
+
 function OBJECT:set_line(x1,y1,x2,y2,color,thiccness)
     PIXELBOX.ASSERT(type(self)=="table","Please use \":\" when running this function")
     EXPECT(1,x1,"number")
@@ -303,17 +302,17 @@ function OBJECT:set_line(x1,y1,x2,y2,color,thiccness)
         end
     end
 end
- 
+
 function PIXELBOX.CREATE_TERM(pixelbox)
     local object = {}
     pixelbox.terminal_map = api.createNDarray(1)
     local map = pixelbox.terminal_map
     pixelbox.show_clears        = false
- 
+
     local current_fg        = pixelbox.term.getTextColor()
     local current_bg        = pixelbox.term.getBackgroundColor()
     local cursor_x,cursor_y = pixelbox.term.getCursorPos()
- 
+
     local function create_line(w,y,first)
         local line = {}
         for i=1,w do
@@ -328,16 +327,16 @@ function PIXELBOX.CREATE_TERM(pixelbox)
         end
         return line
     end
- 
+
     local function clear_object(object,first)
         local w,h = pixelbox.term.getSize()
         for y=1,h do
             object[y] = create_line(w,y,first)
         end
     end
- 
+
     clear_object(map,true)
- 
+
     function object.blit(chars,fg,bg)
         chars,fg,bg = chars:lower(),fg:lower(),bg:lower()
         local len = #chars
@@ -352,18 +351,18 @@ function PIXELBOX.CREATE_TERM(pixelbox)
             error("Arguments must be the same lenght",2)
         end
     end
- 
+
     function object.write(chars)
         for i=1,#chars do
             local char  = chars:sub(i,i)
             map[cursor_y][cursor_x+i-1] = {char,current_fg,current_bg,clear=false}
         end
     end
- 
+
     function object.clear()
         clear_object(map)
     end
- 
+
     function object.getLine(y)
         local char,bg,fg = "","",""
         local w = pixelbox.term.getSize()
@@ -381,12 +380,12 @@ function PIXELBOX.CREATE_TERM(pixelbox)
         end
         return char,bg,fg
     end
- 
+
     function object.clearLine()
         local w = pixelbox.term.getSize()
         map[cursor_y] = create_line(w,cursor_y)
     end
- 
+
     function object.scroll(y)
         local w,h = pixelbox.term.getSize()
         if y ~= 0 then
@@ -400,7 +399,7 @@ function PIXELBOX.CREATE_TERM(pixelbox)
             map = temp
         end
     end
- 
+
     function object.setBackgroundColor (bg)  current_bg = bg end
     function object.setBackgroundColour(bg)  current_bg = bg end
     function object.setTextColor (fg)        current_fg = fg end
@@ -421,7 +420,7 @@ function PIXELBOX.CREATE_TERM(pixelbox)
     function object.getTextColour()          return current_fg end
     function object.isColor()                return pixelbox.term.isColor() end
     function object.isColour()               return pixelbox.term.isColor() end
- 
+
     object.drawPixels      = pixelbox.term.drawPixels
     object.getVisible      = pixelbox.term.getVisible
     object.getPixel        = pixelbox.term.getPixel
@@ -432,21 +431,20 @@ function PIXELBOX.CREATE_TERM(pixelbox)
     object.reposition      = pixelbox.term.reposition
     object.setVisible      = pixelbox.term.setVisible
     object.showMouse       = pixelbox.term.showMouse
- 
+
     function object.clear_visibility(state) pixelbox.show_clears = state end
- 
+
     return object
 end
- 
+
 function PIXELBOX.ASSERT(condition,message)
     if not condition then error(message,3) end
     return condition
 end
- 
-function PIXELBOX.new(terminal,bg,existing)
+
+function PIXELBOX.new(terminal,bg)
     EXPECT(1,terminal,"table")
     EXPECT(2,bg,"number","nil")
-    EXPECT(3,existing,"table","nil")
     local bg = bg or terminal.getBackgroundColor() or colors.black
     local BOX = {}
     local w,h = terminal.getSize()
@@ -454,11 +452,11 @@ function PIXELBOX.new(terminal,bg,existing)
     setmetatable(BOX,{__index = OBJECT})
     BOX.width  = w
     BOX.height = h
-    PIXELBOX.RESTORE(BOX,bg,existing)
+    PIXELBOX.RESTORE(BOX,bg)
     BOX.emu    = PIXELBOX.CREATE_TERM(BOX)
     return BOX
 end
- 
+
 function ALGO.get_elipse_points(radius_x,radius_y,xc,yc,filled)
     local rx,ry = CEIL(FLOOR(radius_x-0.5)/2),CEIL(FLOOR(radius_y-0.5)/2)
     local x,y=0,ry
@@ -514,7 +512,7 @@ function ALGO.get_elipse_points(radius_x,radius_y,xc,yc,filled)
     end
     return points
 end
- 
+
 local function drawFlatTopTriangle(points,vec1,vec2,vec3)
     local n = #points
     local m1 = (vec3.x - vec1.x) / (vec3.y - vec1.y)
@@ -532,7 +530,7 @@ local function drawFlatTopTriangle(points,vec1,vec2,vec3)
         end
     end
 end
- 
+
 local function drawFlatBottomTriangle(points,vec1,vec2,vec3)
     local n = #points
     local m1 = (vec2.x - vec1.x) / (vec2.y - vec1.y)
@@ -686,7 +684,7 @@ function api.update(box)
     box:push_updates()
     box:draw()
 end
- 
+
 local BUILDS = {}
 local count_sort = function(a,b) return a.count > b.count end
 function graphic.build_drawing_char(arr)
@@ -728,5 +726,5 @@ function graphic.build_drawing_char(arr)
     end
     return t_unpack(BUILDS[build_id])
 end
- 
+
 return PIXELBOX
