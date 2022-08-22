@@ -67,9 +67,9 @@ function OBJECT:push_updates()
     local SYMBOL_LUT =    api.createNDarray(2)
     getmetatable(self.symbols).__tostring=function() return "PixelBOX.SYMBOL_BUFFER" end
     setmetatable(self.lines,{__tostring=function() return "PixelBOX.LINE_BUFFER" end})
-    for y=1,#self.CANVAS do
+    for y=1,self.height*3 do
         local x_list = self.CANVAS[y]
-        for x=1,#x_list do
+        for x=1,self.width*2 do
             local block_color = x_list[x]
             local RELATIVE_X = CEIL(x/2)
             local RELATIVE_Y = CEIL(y/3)
