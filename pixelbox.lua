@@ -63,70 +63,58 @@ function OBJECT:push_updates()
     self.symbols = api.createNDarray(2)
     self.lines = api.create_blit_array(self.height)
     self.pixels = api.createNDarray(1)
-    local SYMBOL_COLORS = api.createNDarray(1)
-    local SYMBOL_LUT =    api.createNDarray(2)
     getmetatable(self.symbols).__tostring=function() return "PixelBOX.SYMBOL_BUFFER" end
     setmetatable(self.lines,{__tostring=function() return "PixelBOX.LINE_BUFFER" end})
-    for y=1,self.height*3 do
-        local x_list = self.CANVAS[y]
-        for x=1,self.width*2 do
-            local block_color = x_list[x]
-            local RELATIVE_X = CEIL(x/2)
-            local RELATIVE_Y = CEIL(y/3)
-            if self.UPDATES[RELATIVE_Y][RELATIVE_X] then
-                local SYMBOL_POS_X = (x-1)%2+1
-                local SYMBOL_POS_Y = (y-1)%3+1
-                if not SYMBOL_LUT[RELATIVE_Y][RELATIVE_X][block_color] then
-                    if not SYMBOL_COLORS[RELATIVE_Y][RELATIVE_X] then SYMBOL_COLORS[RELATIVE_Y][RELATIVE_X] = 0 end
-                    SYMBOL_COLORS[RELATIVE_Y][RELATIVE_X] = SYMBOL_COLORS[RELATIVE_Y][RELATIVE_X] + 1
-                    SYMBOL_LUT[RELATIVE_Y][RELATIVE_X][block_color] = true
+    for y=1,self.height*3,3 do
+        local layer_1 = self.CANVAS[y]
+        local layer_2 = self.CANVAS[y+1]
+        local layer_3 = self.CANVAS[y+2]
+        for x=1,self.width*2,2 do
+            local block_color = {
+                layer_1[x],layer_1[x+1],
+                layer_2[x],layer_2[x+1],
+                layer_3[x],layer_3[x+1]
+            }
+            local B1 = layer_1[x]
+            local SCREEN_X = CEIL(x/2)
+            local SCREEN_Y = CEIL(y/3)
+            local LINES_Y = self.lines[SCREEN_Y]
+            local terminal_data = self.terminal_map[SCREEN_Y][SCREEN_X]
+            if (self.UPDATES[SCREEN_Y][SCREEN_X] or not self.prev_data) and (terminal_data and terminal_data.clear) then
+                local char,fg,bg = " ",colors.black,B1
+                if not (block_color[2] == B1
+                    and block_color[3] == B1
+                    and block_color[4] == B1
+                    and block_color[5] == B1
+                    and block_color[6] == B1) then
+                    char,fg,bg = graphic.build_drawing_char(block_color)
+                    self.CHARS[y][x] = {symbol=char, background=graphic.to_blit[bg], fg=graphic.to_blit[fg]}
                 end
-                self.symbols[RELATIVE_Y][RELATIVE_X] = PIXELBOX.INDEX_SYMBOL_CORDINATION(
-                    self.symbols[RELATIVE_Y][RELATIVE_X],
-                    SYMBOL_POS_X,SYMBOL_POS_Y,
-                    block_color
-                )
-                self.pixels[y][x] = block_color
-            end
-        end
-        os.queueEvent("yield")
-        os.pullEvent("yield")
-    end
-    local function add_prev(x,y)
-        local prev_data = self.CHARS[y][x]
-        self.lines[y] = {
-            self.lines[y][1]..prev_data.symbol,
-            self.lines[y][2]..prev_data.fg,
-            self.lines[y][3]..prev_data.background
-        }
-    end
-    local function generate_char(x,y)
-        local color_block = self.symbols[y][x]
-        local char,fg,bg = " ",colors.black,color_block[1]
-        if SYMBOL_COLORS[y][x] > 1 then
-            char,fg,bg = graphic.build_drawing_char(color_block)
-        end
-        self.CHARS[y][x] = {symbol=char, background=graphic.to_blit[bg], fg=graphic.to_blit[fg]}
-        self.lines[y] = {
-            self.lines[y][1]..char,
-            self.lines[y][2]..graphic.to_blit[fg],
-            self.lines[y][3]..graphic.to_blit[bg]
-        }
-    end
-    for y=1,self.height do
-        for x=1,self.width do
-            local terminal_data = self.terminal_map[y][x]
-            if self.UPDATES[y][x] and (terminal_data and terminal_data.clear) then
-                generate_char(x,y)
+                self.lines[SCREEN_Y] = {
+                    LINES_Y[1]..char,
+                    LINES_Y[2]..graphic.to_blit[fg],
+                    LINES_Y[3]..graphic.to_blit[bg]
+                }
             elseif terminal_data and not terminal_data.clear then
-                self.lines[y] = {
-                    self.lines[y][1]..terminal_data[1],
-                    self.lines[y][2]..graphic.to_blit[terminal_data[2]],
-                    self.lines[y][3]..graphic.to_blit[terminal_data[3]]
+                self.lines[SCREEN_Y] = {
+                    LINES_Y[1]..terminal_data[1],
+                    LINES_Y[2]..graphic.to_blit[terminal_data[2]],
+                    LINES_Y[3]..graphic.to_blit[terminal_data[3]]
                 }
             else
-                add_prev(x,y)
+                local prev_data = self.CHARS[y][x]
+                self.lines[SCREEN_Y] = {
+                    LINES_Y[1]..prev_data.symbol,
+                    LINES_Y[2]..prev_data.fg,
+                    LINES_Y[3]..prev_data.background
+                }
             end
+            self.pixels[y][x]     = block_color[1]
+            self.pixels[y][x+1]   = block_color[2]
+            self.pixels[y+1][x]   = block_color[3]
+            self.pixels[y+1][x+1] = block_color[4]
+            self.pixels[y+2][x]   = block_color[5]
+            self.pixels[y+2][x+1] = block_color[5]
         end
         os.queueEvent("yield")
         os.pullEvent("yield")
@@ -353,7 +341,7 @@ function PIXELBOX.CREATE_TERM(pixelbox)
     end
 
     function object.write(chars)
-        for i=1,#chars do
+        for i=1,#tostring(chars) do
             local char  = chars:sub(i,i)
             map[cursor_y][cursor_x+i-1] = {char,current_fg,current_bg,clear=false}
         end
