@@ -17,7 +17,25 @@ local FLOOR = math.floor
 local SQRT  = math.sqrt
 local MIN   = math.min
 local ABS   = math.abs
-local t_insert, t_unpack, t_sort, s_char, pairs = table.insert, table.unpack, table.sort, string.char, pairs
+local t_sort = table.sort
+local distances = {
+    {5,256,16,8,64,32},
+    {4,16,16384,256,128},
+    [4]    ={4,64,1024,256,128},
+    [8]    ={4,512,2048,256,1},
+    [16]   ={4,2,16384,256,1},
+    [32]   ={4,8192,4096,256,1},
+    [64]   ={4,4,1024,256,1},
+    [128]  ={6,32768,256,1024,2048,4096,16384},
+    [256]  ={6,1,128,2,512,4,8192},
+    [512]  ={4,8,2048,256,128},
+    [1024] ={4,4,64,128,32768},
+    [2048] ={4,512,8,128,32768},
+    [4096] ={4,8192,32,128,32768},
+    [8192] ={3,32,4096,256128},
+    [16384]={4,2,16,128,32768},
+    [32768]={5,128,1024,2048,4096,16384}
+}
 
 local chars = "0123456789abcdef"
 graphic.to_blit = {}
@@ -47,8 +65,6 @@ function PIXELBOX.RESTORE(BOX,color)
         for x=1,BOX.width*2 do
             BOX.CANVAS[y][x] = color
         end
-        os.queueEvent("yield")
-        os.pullEvent("yield")
     end
     for y=1,BOX.height do
         for x=1,BOX.width do
@@ -116,9 +132,10 @@ function OBJECT:push_updates()
             self.pixels[y+2][x]   = block_color[5]
             self.pixels[y+2][x+1] = block_color[5]
         end
-        os.queueEvent("yield")
-        os.pullEvent("yield")
     end
+    local t = {}
+    os.queueEvent(tostring(t))
+    os.pullEvent(tostring(t))
     self.UPDATES = api.createNDarray(1)
 end
 
@@ -674,45 +691,77 @@ function api.update(box)
 end
 
 local BUILDS = {}
-local count_sort = function(a,b) return a.count > b.count end
+local n = 2^15
+local function sort(a,b) return a[2] > b[2] end
 function graphic.build_drawing_char(arr)
-    local cols,fin,char,visited = {},{},{},{}
-    local entries = 0
-    local build_id = ""
-    for k = 1, 6 do
-        build_id = build_id .. ("%x"):format(graphic.logify[arr[k]])
-        if cols[arr[k]] == nil then
-            entries = entries + 1
-            cols[arr[k]] = {count=1,c=arr[k]}
-        else cols[arr[k]] = {count=cols[arr[k]].count+1,c=cols[arr[k]].c}
+    local c_types = {}
+    local sortable = {}
+    local ind = 0
+    local id = 0
+    for i=1,6 do
+        local c = arr[i]
+        id = id + c+n
+        if not c_types[c] then
+            ind = ind + 1
+            c_types[c] = {0,ind}
         end
+        local t = c_types[c]
+
+        t[1] = t[1] + 1
+        sortable[t[2]] = {c,t[1]}
     end
-    if not BUILDS[build_id] then
-        for k,v in pairs(cols) do
-            if not visited[v.c] then
-                visited[v.c] = true
-                if entries == 1 then t_insert(fin,v) end
-                t_insert(fin,v)
+    if not BUILDS[id] then
+        local n = #sortable
+        while n > 2 do
+            t_sort(sortable,sort)
+            local bit6 = distances[sortable[n][1]]
+            local index,run = 1,false
+            for i=2,bit6[1] do
+                if run then break end
+                local tab = bit6[i]
+                for j=1,n-1 do
+                    if sortable[j][1] == tab then
+                        index = j
+                        run = true
+                        break
+                    end
+                end
             end
-        end
-        t_sort(fin, count_sort)
-        local swap = true
-        for k=1,6 do
-            if arr[k] == fin[1].c then char[k] = 1
-            elseif arr[k] == fin[2].c then char[k] = 0
-            else
-                swap = not swap
-                char[k] = swap and 1 or 0
+            local from,to = sortable[n][1],sortable[index][1]
+            for i=1,6 do
+                if arr[i] == from then
+                    arr[i] = to
+                    local sindex = sortable[index]
+                    sindex[2] = sindex[2] + 1
+                end
             end
+
+            sortable[n] = nil
+            n = n - 1
         end
-        if char[6] == 1 then for i = 1, 5 do char[i] = 1-char[i] end end
+
         local n = 128
-        for i = 0, 4 do n = n + char[i+1]*2^i end
-        if char[6] == 1 then BUILDS[build_id] = {s_char(n), fin[2].c, fin[1].c}
-        else BUILDS[build_id] = {s_char(n), fin[1].c, fin[2].c}
+        for i = 1, #arr - 1 do
+            if arr[i] ~= arr[6] then n = n + 2^(i-1) end
+        end
+
+        if sortable[1][1] == arr[6] then
+            BUILDS[id] = {
+                string.char(n),
+                sortable[2][1],
+                arr[6]
+            }
+        else
+            BUILDS[id] = {
+                string.char(n),
+                sortable[1][1],
+                arr[6]
+            }
         end
     end
-    return t_unpack(BUILDS[build_id])
+
+    local b = BUILDS[id]
+    return b[1],b[2],b[3]
 end
 
 return PIXELBOX
