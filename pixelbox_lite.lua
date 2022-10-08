@@ -2,6 +2,8 @@
     * api for easy interaction with drawing characters
 
     * single file implementation of GuiH pixelbox api
+
+    * this version is very fast and ment for implementing into other apis
 ]]
 
 local PIXELBOX = {}
@@ -50,25 +52,30 @@ local function createNDarray(n, tbl)
 end
 
 function PIXELBOX.RESTORE(BOX,color)
-    BOX.CANVAS = createNDarray(1)
-    BOX.UPDATES = createNDarray(1)
-    BOX.CHARS = createNDarray(1)
+    local bc = {}
+    local chars = {}
+
     for y=1,BOX.height*3 do
         for x=1,BOX.width*2 do
-            BOX.CANVAS[y][x] = color
+            if not bc[y] then bc[y] = {} end
+            bc[y][x] = color
         end
     end
     for y=1,BOX.height do
         for x=1,BOX.width do
-            BOX.CHARS[y][x] = {symbol=" ",background=graphic.to_blit[color],fg="f"}
+            if not chars[y] then chars[y] = {} end
+            chars[y][x] = {symbol=" ",background=graphic.to_blit[color],fg="f"}
         end
     end
+
+    BOX.CANVAS = bc
+    BOX.CHARS = chars
+    BOX.UPDATES = {}
 end
 
 function OBJECT:push_updates()
-    self.symbols = createNDarray(2)
+    self.symbols = {}
     local newlines = {}
-    local out = {}
     for i=1,self.height do
         newlines[i] = {"","",""}
     end
@@ -88,6 +95,7 @@ function OBJECT:push_updates()
             local SCREEN_X = CEIL(x/2)
             local SCREEN_Y = CEIL(y/3)
             local LINES_Y = self.lines[SCREEN_Y]
+            local C = self.CHARS
             local b2,b3,b4,b5,b6 = block_color[2],block_color[3],block_color[4],block_color[5],block_color[6]
             if self.UPDATES[SCREEN_Y][SCREEN_X] or not self.prev_data then
                 local char,fg,bg = " ",colors.black,B1
@@ -97,7 +105,8 @@ function OBJECT:push_updates()
                     and b5 == B1
                     and b6 == B1) then
                     char,fg,bg = graphic.build_drawing_char(block_color)
-                    self.CHARS[y][x] = {symbol=char, background=graphic.to_blit[bg], fg=graphic.to_blit[fg]}
+                    if not C[y] then C[y] = {} end
+                    C[y][x] = {symbol=char, background=graphic.to_blit[bg], fg=graphic.to_blit[fg]}
                 end
                 self.lines[SCREEN_Y] = {
                     LINES_Y[1]..char,
@@ -142,7 +151,10 @@ end
 function OBJECT:set_pixel(x,y,color)
     local spx = self.pixels
     if not spx or spx[y][x] ~= color then
-        self.UPDATES[CEIL(y/3)][CEIL(x/2)] = true
+        local y = CEIL(y/3)
+        local u = self.UPDATES
+        if not u[y] then u[y] = {} end
+        u[y][CEIL(x/2)] = true
     end
     self.CANVAS[y][x] = color
 end
