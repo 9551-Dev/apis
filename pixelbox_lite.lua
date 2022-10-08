@@ -97,6 +97,7 @@ function OBJECT:push_updates()
             local LINES_Y = self.lines[SCREEN_Y]
             local C = self.CHARS
             local b2,b3,b4,b5,b6 = block_color[2],block_color[3],block_color[4],block_color[5],block_color[6]
+            if not self.UPDATES[SCREEN_Y] then self.UPDATES[SCREEN_Y] = {} end
             if self.UPDATES[SCREEN_Y][SCREEN_X] or not self.prev_data then
                 local char,fg,bg = " ",colors.black,B1
                 if not (b2 == B1
@@ -172,16 +173,13 @@ function PIXELBOX.new(terminal,bg)
 end
 
 local BUILDS = {}
-local n = 2^15
 local function sort(a,b) return a[2] > b[2] end
 function graphic.build_drawing_char(arr)
     local c_types = {}
     local sortable = {}
     local ind = 0
-    local id = 0
     for i=1,6 do
         local c = arr[i]
-        id = id + c+n
         if not c_types[c] then
             ind = ind + 1
             c_types[c] = {0,ind}
@@ -191,58 +189,45 @@ function graphic.build_drawing_char(arr)
         t[1] = t[1] + 1
         sortable[t[2]] = {c,t[1]}
     end
-    if not BUILDS[id] then
-        local n = #sortable
-        while n > 2 do
-            t_sort(sortable,sort)
-            local bit6 = distances[sortable[n][1]]
-            local index,run = 1,false
-            for i=2,bit6[1] do
-                if run then break end
-                local tab = bit6[i]
-                for j=1,n-1 do
-                    if sortable[j][1] == tab then
-                        index = j
-                        run = true
-                        break
-                    end
+    local n = #sortable
+    while n > 2 do
+        t_sort(sortable,sort)
+        local bit6 = distances[sortable[n][1]]
+        local index,run = 1,false
+        for i=2,bit6[1] do
+            if run then break end
+            local tab = bit6[i]
+            for j=1,n-1 do
+                if sortable[j][1] == tab then
+                    index = j
+                    run = true
+                    break
                 end
             end
-            local from,to = sortable[n][1],sortable[index][1]
-            for i=1,6 do
-                if arr[i] == from then
-                    arr[i] = to
-                    local sindex = sortable[index]
-                    sindex[2] = sindex[2] + 1
-                end
+        end
+        local from,to = sortable[n][1],sortable[index][1]
+        for i=1,6 do
+            if arr[i] == from then
+                arr[i] = to
+                local sindex = sortable[index]
+                sindex[2] = sindex[2] + 1
             end
-
-            sortable[n] = nil
-            n = n - 1
         end
 
-        local n = 128
-        for i = 1, #arr - 1 do
-            if arr[i] ~= arr[6] then n = n + 2^(i-1) end
-        end
-
-        if sortable[1][1] == arr[6] then
-            BUILDS[id] = {
-                s_char(n),
-                sortable[2][1],
-                arr[6]
-            }
-        else
-            BUILDS[id] = {
-                s_char(n),
-                sortable[1][1],
-                arr[6]
-            }
-        end
+        sortable[n] = nil
+        n = n - 1
     end
 
-    local b = BUILDS[id]
-    return b[1],b[2],b[3]
+    local n = 128
+    for i = 1, #arr - 1 do
+        if arr[i] ~= arr[6] then n = n + 2^(i-1) end
+    end
+
+    if sortable[1][1] == arr[6] then
+        return s_char(n),sortable[2][1],arr[6]
+    else
+        return s_char(n),sortable[1][1],arr[6]
+    end
 end
 
 return PIXELBOX
