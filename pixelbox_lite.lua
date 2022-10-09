@@ -8,11 +8,9 @@
 
 local PIXELBOX = {}
 local OBJECT = {}
-local graphic = {}
 
-local CEIL  = math.ceil
-local t_sort = table.sort
-local s_char = string.char
+local CEIL,t_sort,s_char  = math.ceil,table.sort,string.char
+local function sort(a,b) return a[2] > b[2] end
 
 local distances = {
     {5,256,16,8,64,32},
@@ -33,12 +31,9 @@ local distances = {
     [32768]={5,128,1024,2048,4096,16384}
 }
 
-local chars = "0123456789abcdef"
-graphic.to_blit = {}
-graphic.logify  = {}
+local to_blit = {}
 for i = 0, 15 do
-    graphic.to_blit[2^i] = chars:sub(i + 1, i + 1)
-    graphic.logify [2^i] = i
+    to_blit[2^i] = ("%x"):format(i)
 end
 
 local function createNDarray(n, tbl)
@@ -65,73 +60,7 @@ function PIXELBOX.RESTORE(BOX,color)
     BOX.CANVAS = bc
 end
 
-local tb = graphic.to_blit
-function OBJECT:push_updates()
-    local lines = {}
-    self.lines = lines
-    local w_double = self.width*2
-    local canv = self.CANVAS
-    for y=1,self.height*3,3 do
-        local layer_1 = canv[y]
-        local layer_2 = canv[y+1]
-        local layer_3 = canv[y+2]
-        local SCREEN_Y = CEIL(y/3)
-        local LINES_Y = {"","",""}
-        lines[SCREEN_Y] = LINES_Y
-        for x=1,w_double,2 do
-            local xp1 = x+1
-            local block_color = {
-                layer_1[x],layer_1[xp1],
-                layer_2[x],layer_2[xp1],
-                layer_3[x],layer_3[xp1]
-            }
-            local B1 = layer_1[x]
-            local char,fg,bg = " ",1,B1
-            if not (block_color[2] == B1
-                and block_color[3] == B1
-                and block_color[4] == B1
-                and block_color[5] == B1
-                and block_color[6] == B1) then
-                char,fg,bg = graphic.build_drawing_char(block_color)
-            end
-            LINES_Y[1] = LINES_Y[1] .. char
-            LINES_Y[2] = LINES_Y[2] .. tb[fg]
-            LINES_Y[3] = LINES_Y[3] .. tb[bg]
-        end
-    end
-end
-
-function OBJECT:clear(color)
-    PIXELBOX.RESTORE(self,color)
-end
-
-function OBJECT:draw()
-    for y,line in ipairs(self.lines) do
-        self.term.setCursorPos(1,y)
-        self.term.blit(
-            table.unpack(line)
-        )
-    end
-end
-
-function OBJECT:set_pixel(x,y,color)
-    self.CANVAS[y][x] = color
-end
-
-function PIXELBOX.new(terminal,bg)
-    local bg = bg or terminal.getBackgroundColor() or colors.black
-    local BOX = {}
-    local w,h = terminal.getSize()
-    BOX.term = terminal
-    setmetatable(BOX,{__index = OBJECT})
-    BOX.width  = w
-    BOX.height = h
-    PIXELBOX.RESTORE(BOX,bg)
-    return BOX
-end
-
-local function sort(a,b) return a[2] > b[2] end
-function graphic.build_drawing_char(arr)
+local function build_drawing_char(arr)
     local c_types = {}
     local sortable = {}
     local ind = 0
@@ -188,6 +117,70 @@ function graphic.build_drawing_char(arr)
     else
         return s_char(n),sortable[1][1],arr[6]
     end
+end
+
+function OBJECT:push_updates()
+    local lines = {}
+    self.lines = lines
+    local w_double = self.width*2
+    local canv = self.CANVAS
+    for y=1,self.height*3,3 do
+        local layer_1 = canv[y]
+        local layer_2 = canv[y+1]
+        local layer_3 = canv[y+2]
+        local SCREEN_Y = CEIL(y/3)
+        local LINES_Y = {"","",""}
+        lines[SCREEN_Y] = LINES_Y
+        for x=1,w_double,2 do
+            local xp1 = x+1
+            local block_color = {
+                layer_1[x],layer_1[xp1],
+                layer_2[x],layer_2[xp1],
+                layer_3[x],layer_3[xp1]
+            }
+            local B1 = layer_1[x]
+            local char,fg,bg = " ",1,B1
+            if not (block_color[2] == B1
+                and block_color[3] == B1
+                and block_color[4] == B1
+                and block_color[5] == B1
+                and block_color[6] == B1) then
+                char,fg,bg = build_drawing_char(block_color)
+            end
+            LINES_Y[1] = LINES_Y[1] .. char
+            LINES_Y[2] = LINES_Y[2] .. to_blit[fg]
+            LINES_Y[3] = LINES_Y[3] .. to_blit[bg]
+        end
+    end
+end
+
+function OBJECT:clear(color)
+    PIXELBOX.RESTORE(self,color)
+end
+
+function OBJECT:draw()
+    for y,line in ipairs(self.lines) do
+        self.term.setCursorPos(1,y)
+        self.term.blit(
+            table.unpack(line)
+        )
+    end
+end
+
+function OBJECT:set_pixel(x,y,color)
+    self.CANVAS[y][x] = color
+end
+
+function PIXELBOX.new(terminal,bg)
+    local bg = bg or terminal.getBackgroundColor() or colors.black
+    local BOX = {}
+    local w,h = terminal.getSize()
+    BOX.term = terminal
+    setmetatable(BOX,{__index = OBJECT})
+    BOX.width  = w
+    BOX.height = h
+    PIXELBOX.RESTORE(BOX,bg)
+    return BOX
 end
 
 return PIXELBOX
