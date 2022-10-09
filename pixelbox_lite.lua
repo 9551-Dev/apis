@@ -13,6 +13,7 @@ local graphic = {}
 local CEIL  = math.ceil
 local t_sort = table.sort
 local s_char = string.char
+
 local distances = {
     {5,256,16,8,64,32},
     {4,16,16384,256,128},
@@ -64,10 +65,11 @@ function PIXELBOX.RESTORE(BOX,color)
     BOX.CANVAS = bc
 end
 
-local blck = colors.black
 local tb = graphic.to_blit
 function OBJECT:push_updates()
-    self.lines = {}
+    local lines = {}
+    self.lines = lines
+    local w_double = self.width*2
     local canv = self.CANVAS
     for y=1,self.height*3,3 do
         local layer_1 = canv[y]
@@ -75,8 +77,8 @@ function OBJECT:push_updates()
         local layer_3 = canv[y+2]
         local SCREEN_Y = CEIL(y/3)
         local LINES_Y = {"","",""}
-        self.lines[SCREEN_Y] = LINES_Y
-        for x=1,self.width*2,2 do
+        lines[SCREEN_Y] = LINES_Y
+        for x=1,w_double,2 do
             local xp1 = x+1
             local block_color = {
                 layer_1[x],layer_1[xp1],
@@ -84,7 +86,7 @@ function OBJECT:push_updates()
                 layer_3[x],layer_3[xp1]
             }
             local B1 = layer_1[x]
-            local char,fg,bg = " ",blck,B1
+            local char,fg,bg = " ",1,B1
             if not (block_color[2] == B1
                 and block_color[3] == B1
                 and block_color[4] == B1
@@ -139,21 +141,23 @@ function graphic.build_drawing_char(arr)
             ind = ind + 1
             c_types[c] = {0,ind}
         end
-        
-        local t = c_types[c]
 
-        t[1] = t[1] + 1
-        sortable[t[2]] = {c,t[1]}
+        local t = c_types[c]
+        local t1 = t[1] + 1
+
+        t[1] = t1
+        sortable[t[2]] = {c,t1}
     end
     local n = #sortable
     while n > 2 do
         t_sort(sortable,sort)
         local bit6 = distances[sortable[n][1]]
         local index,run = 1,false
+        local nm1 = n - 1
         for i=2,bit6[1] do
             if run then break end
             local tab = bit6[i]
-            for j=1,n-1 do
+            for j=1,nm1 do
                 if sortable[j][1] == tab then
                     index = j
                     run = true
@@ -175,7 +179,7 @@ function graphic.build_drawing_char(arr)
     end
 
     local n = 128
-    for i = 1, #arr - 1 do
+    for i = 1, 5 do
         if arr[i] ~= arr[6] then n = n + 2^(i-1) end
     end
 
