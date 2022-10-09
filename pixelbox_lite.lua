@@ -73,6 +73,7 @@ function PIXELBOX.RESTORE(BOX,color)
     BOX.UPDATES = {}
 end
 
+local blck = colors.black
 function OBJECT:push_updates()
     self.symbols = {}
     local newlines = {}
@@ -82,9 +83,10 @@ function OBJECT:push_updates()
     self.lines = newlines
     self.pixels = createNDarray(1)
     for y=1,self.height*3,3 do
-        local layer_1 = self.CANVAS[y]
-        local layer_2 = self.CANVAS[y+1]
-        local layer_3 = self.CANVAS[y+2]
+        local canv = self.CANVAS
+        local layer_1 = canv[y]
+        local layer_2 = canv[y+1]
+        local layer_3 = canv[y+2]
         for x=1,self.width*2,2 do
             local block_color = {
                 layer_1[x],layer_1[x+1],
@@ -99,7 +101,7 @@ function OBJECT:push_updates()
             local b2,b3,b4,b5,b6 = block_color[2],block_color[3],block_color[4],block_color[5],block_color[6]
             if not self.UPDATES[SCREEN_Y] then self.UPDATES[SCREEN_Y] = {} end
             if self.UPDATES[SCREEN_Y][SCREEN_X] or not self.prev_data then
-                local char,fg,bg = " ",colors.black,B1
+                local char,fg,bg = " ",blck,B1
                 if not (b2 == B1
                     and b3 == B1
                     and b4 == B1
@@ -172,7 +174,6 @@ function PIXELBOX.new(terminal,bg)
     return BOX
 end
 
-local BUILDS = {}
 local function sort(a,b) return a[2] > b[2] end
 function graphic.build_drawing_char(arr)
     local c_types = {}
