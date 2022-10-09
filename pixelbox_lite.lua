@@ -53,7 +53,6 @@ end
 
 function PIXELBOX.RESTORE(BOX,color)
     local bc = {}
-    local chars = {}
 
     for y=1,BOX.height*3 do
         for x=1,BOX.width*2 do
@@ -61,81 +60,43 @@ function PIXELBOX.RESTORE(BOX,color)
             bc[y][x] = color
         end
     end
-    for y=1,BOX.height do
-        for x=1,BOX.width do
-            if not chars[y] then chars[y] = {} end
-            chars[y][x] = {symbol=" ",background=graphic.to_blit[color],fg="f"}
-        end
-    end
 
     BOX.CANVAS = bc
-    BOX.CHARS = chars
-    BOX.UPDATES = {}
 end
 
 local blck = colors.black
+local tb = graphic.to_blit
 function OBJECT:push_updates()
-    self.symbols = {}
-    local newlines = {}
-    for i=1,self.height do
-        newlines[i] = {"","",""}
-    end
-    self.lines = newlines
-    self.pixels = createNDarray(1)
+    self.lines = {}
+    local canv = self.CANVAS
     for y=1,self.height*3,3 do
-        local canv = self.CANVAS
         local layer_1 = canv[y]
         local layer_2 = canv[y+1]
         local layer_3 = canv[y+2]
+        local SCREEN_Y = CEIL(y/3)
+        local LINES_Y = {"","",""}
+        self.lines[SCREEN_Y] = LINES_Y
         for x=1,self.width*2,2 do
+            local xp1 = x+1
             local block_color = {
-                layer_1[x],layer_1[x+1],
-                layer_2[x],layer_2[x+1],
-                layer_3[x],layer_3[x+1]
+                layer_1[x],layer_1[xp1],
+                layer_2[x],layer_2[xp1],
+                layer_3[x],layer_3[xp1]
             }
             local B1 = layer_1[x]
-            local SCREEN_X = CEIL(x/2)
-            local SCREEN_Y = CEIL(y/3)
-            local LINES_Y = self.lines[SCREEN_Y]
-            local C = self.CHARS
-            local b2,b3,b4,b5,b6 = block_color[2],block_color[3],block_color[4],block_color[5],block_color[6]
-            if not self.UPDATES[SCREEN_Y] then self.UPDATES[SCREEN_Y] = {} end
-            if self.UPDATES[SCREEN_Y][SCREEN_X] or not self.prev_data then
-                local char,fg,bg = " ",blck,B1
-                if not (b2 == B1
-                    and b3 == B1
-                    and b4 == B1
-                    and b5 == B1
-                    and b6 == B1) then
-                    char,fg,bg = graphic.build_drawing_char(block_color)
-                    if not C[y] then C[y] = {} end
-                    C[y][x] = {symbol=char, background=graphic.to_blit[bg], fg=graphic.to_blit[fg]}
-                end
-                self.lines[SCREEN_Y] = {
-                    LINES_Y[1]..char,
-                    LINES_Y[2]..graphic.to_blit[fg],
-                    LINES_Y[3]..graphic.to_blit[bg]
-                }
-            else
-                local prev_data = self.CHARS[y][x]
-                self.lines[SCREEN_Y] = {
-                    LINES_Y[1]..prev_data.symbol,
-                    LINES_Y[2]..prev_data.fg,
-                    LINES_Y[3]..prev_data.background
-                }
+            local char,fg,bg = " ",blck,B1
+            if not (block_color[2] == B1
+                and block_color[3] == B1
+                and block_color[4] == B1
+                and block_color[5] == B1
+                and block_color[6] == B1) then
+                char,fg,bg = graphic.build_drawing_char(block_color)
             end
-            self.pixels[y][x]     = block_color[1]
-            self.pixels[y][x+1]   = b2
-            self.pixels[y+1][x]   = b3
-            self.pixels[y+1][x+1] = b4
-            self.pixels[y+2][x]   = b5
-            self.pixels[y+2][x+1] = b6
+            LINES_Y[1] = LINES_Y[1] .. char
+            LINES_Y[2] = LINES_Y[2] .. tb[fg]
+            LINES_Y[3] = LINES_Y[3] .. tb[bg]
         end
     end
-    local t = {}
-    os.queueEvent(tostring(t))
-    os.pullEvent(tostring(t))
-    self.UPDATES = createNDarray(1)
 end
 
 function OBJECT:clear(color)
@@ -152,13 +113,6 @@ function OBJECT:draw()
 end
 
 function OBJECT:set_pixel(x,y,color)
-    local spx = self.pixels
-    if not spx or spx[y][x] ~= color then
-        local y = CEIL(y/3)
-        local u = self.UPDATES
-        if not u[y] then u[y] = {} end
-        u[y][CEIL(x/2)] = true
-    end
     self.CANVAS[y][x] = color
 end
 
@@ -185,6 +139,7 @@ function graphic.build_drawing_char(arr)
             ind = ind + 1
             c_types[c] = {0,ind}
         end
+        
         local t = c_types[c]
 
         t[1] = t[1] + 1
