@@ -9,7 +9,7 @@
 local PIXELBOX = {}
 local OBJECT = {}
 
-local CEIL,t_sort,s_char  = math.ceil,table.sort,string.char
+local CEIL,t_sort,t_cat,s_char  = math.ceil,table.sort,table.concat,string.char
 local function sort(a,b) return a[2] > b[2] end
 
 local distances = {
@@ -60,7 +60,8 @@ function PIXELBOX.RESTORE(BOX,color)
     BOX.CANVAS = bc
 end
 
-local function build_drawing_char(arr)
+local function build_drawing_char(a,b,c,d,e,f)
+    local arr = {a,b,c,d,e,f}
     local c_types = {}
     local sortable = {}
     local ind = 0
@@ -108,9 +109,13 @@ local function build_drawing_char(arr)
     end
 
     local n = 128
-    for i = 1, 5 do
-        if arr[i] ~= arr[6] then n = n + 2^(i-1) end
-    end
+    local a6 = arr[6]
+
+    if arr[1] ~= a6 then n = n + 1 end
+    if arr[2] ~= a6 then n = n + 2 end
+    if arr[3] ~= a6 then n = n + 4 end
+    if arr[4] ~= a6 then n = n + 8 end
+    if arr[5] ~= a6 then n = n + 16 end
 
     if sortable[1][1] == arr[6] then
         return s_char(n),sortable[2][1],arr[6]
@@ -119,53 +124,54 @@ local function build_drawing_char(arr)
     end
 end
 
-function OBJECT:push_updates()
-    local lines = {}
-    self.lines = lines
+function OBJECT:render()
+    local t = self.term
+    local blit_line,set_cursor = t.blit,t.setCursorPos
+
     local w_double = self.width*2
     local canv = self.CANVAS
+
+    local sy = 0
     for y=1,self.height*3,3 do
+        sy = sy + 1
         local layer_1 = canv[y]
         local layer_2 = canv[y+1]
         local layer_3 = canv[y+2]
-        local SCREEN_Y = CEIL(y/3)
-        local LINES_Y = {"","",""}
-        lines[SCREEN_Y] = LINES_Y
+        local char_line,fg_line,bg_line = {},{},{}
+        local n = 0
         for x=1,w_double,2 do
             local xp1 = x+1
-            local block_color = {
+            local b11,b21,b12,b22,b13,b23 =
                 layer_1[x],layer_1[xp1],
                 layer_2[x],layer_2[xp1],
                 layer_3[x],layer_3[xp1]
-            }
-            local B1 = layer_1[x]
-            local char,fg,bg = " ",1,B1
-            if not (block_color[2] == B1
-                and block_color[3] == B1
-                and block_color[4] == B1
-                and block_color[5] == B1
-                and block_color[6] == B1) then
-                char,fg,bg = build_drawing_char(block_color)
+
+            local char,fg,bg = " ",1,b11
+            if not (b21 == b11
+                and b12 == b11
+                and b22 == b11
+                and b13 == b11
+                and b23 == b11) then
+                char,fg,bg = build_drawing_char(b11,b21,b12,b22,b13,b23)
             end
-            LINES_Y[1] = LINES_Y[1] .. char
-            LINES_Y[2] = LINES_Y[2] .. to_blit[fg]
-            LINES_Y[3] = LINES_Y[3] .. to_blit[bg]
+            n = n + 1
+            char_line[n] = char
+            fg_line  [n] = to_blit[fg]
+            bg_line  [n] = to_blit[bg]
         end
+
+        set_cursor(1,sy)
+        blit_line(
+            t_cat(char_line,""),
+            t_cat(fg_line,""),
+            t_cat(bg_line,"")
+        )
     end
 end
 
 function OBJECT:clear(color)
     PIXELBOX.RESTORE(self,color)
-end
-
-function OBJECT:draw()
-    for y,line in ipairs(self.lines) do
-        self.term.setCursorPos(1,y)
-        self.term.blit(
-            table.unpack(line)
-        )
-    end
-end
+end 
 
 function OBJECT:set_pixel(x,y,color)
     self.CANVAS[y][x] = color
