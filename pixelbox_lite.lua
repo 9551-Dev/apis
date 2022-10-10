@@ -9,7 +9,7 @@
 local PIXELBOX = {}
 local OBJECT = {}
 
-local CEIL,t_sort,t_cat,s_char  = math.ceil,table.sort,table.concat,string.char
+local t_sort,t_cat,s_char  = table.sort,table.concat,string.char
 local function sort(a,b) return a[2] > b[2] end
 
 local distances = {
@@ -36,16 +36,6 @@ for i = 0, 15 do
     to_blit[2^i] = ("%x"):format(i)
 end
 
-local function createNDarray(n, tbl)
-    tbl = tbl or {}
-    if n == 0 then return tbl end
-    setmetatable(tbl, {__index = function(t, k)
-        local new = createNDarray(n - 1)
-        t[k] = new
-        return new
-    end})
-    return tbl
-end
 
 function PIXELBOX.RESTORE(BOX,color)
     local bc = {}
