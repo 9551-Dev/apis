@@ -4,6 +4,9 @@
     * single file implementation of GuiH pixelbox api
 
     * this version is very fast and ment for implementing into other apis
+
+    * OUTDATED VERSION, this only exists for the sake of not breaking stuff
+      GO GET LATEST AT https://github.com/9551-Dev/pixelbox_lite
 ]]
 
 local PIXELBOX = {}
